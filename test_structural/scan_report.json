@@ -1,0 +1,53 @@
+{
+  "gaps": [],
+  "metadata": {
+    "deterministic_hash": "placeholder-hash",
+    "run_timestamp": "2025-12-23T00:00:00Z",
+    "scanner_version": "1.1.0"
+  },
+  "repository": {
+    "name": "Repo-Scanner",
+    "path": "/home/dee/workspace/AI/Repo-Scanner"
+  },
+  "run_id": "placeholder-run-id",
+  "structure": {
+    "build_systems": [],
+    "configuration": [
+      ".gitignore"
+    ],
+    "documentation": [
+      "README",
+      "docs/ directory",
+      "Markdown files"
+    ],
+    "file_counts": {
+      "code": 50,
+      "config": 9,
+      "docs": 17,
+      "test": 23,
+      "total": 139
+    },
+    "frameworks": [
+      "Python (pyproject.toml)"
+    ],
+    "languages": {
+      "JSON": 5,
+      "Markdown": 15,
+      "Python": 30,
+      "Shell": 1,
+      "Text": 7,
+      "Unknown": 79,
+      "YAML": 2
+    },
+    "test_frameworks": [
+      "pytest"
+    ]
+  },
+  "summary": {
+    "files_scanned": 139,
+    "gaps_count": 0,
+    "overall_score": 0.0,
+    "tests_discovered": 23
+  },
+  "tasks": {}
+}

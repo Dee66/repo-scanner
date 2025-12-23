@@ -1,0 +1,16 @@
+{
+  "name": "lightweight-classification-1766508075",
+  "version": "1.0.0",
+  "model_type": "classification",
+  "framework": "lightweight_transformers",
+  "parameters": {
+    "model_type": "lightweight_fine_tuned",
+    "base_model": "distilgpt2",
+    "task": "classification",
+    "training_samples": 52,
+    "fine_tuned_at": "2025-12-23T16:41:15Z"
+  },
+  "hash": "lightweight-lightweight-classification-1766508075-1.0.0",
+  "created_at": "2025-12-23T16:41:15Z",
+  "description": "Lightweight fine-tuned model for classification"
+}

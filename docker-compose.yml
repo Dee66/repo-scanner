@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  repo-scanner:
+    build:
+      context: .
+      target: production
+    container_name: repo-scanner
+    volumes:
+      # Mount host repository for scanning
+      - ${REPO_PATH:-./}:/scan-target:ro
+      # Mount output directory
+      - ${OUTPUT_DIR:-./reports}:/app/output
+      # Optional: Mount model cache for AI features
+      - ${MODEL_CACHE:-./models}:/app/models
+    environment:
+      - PYTHONPATH=/app
+      - REPO_SCANNER_LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - REPO_SCANNER_MAX_WORKERS=${MAX_WORKERS:-4}
+    command: ["python", "-m", "src.cli", "/scan-target", "--output-dir", "/app/output"]
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+
+  # Optional: API server for web interface
+  api-server:
+    build:
+      context: .
+      target: production
+    container_name: repo-scanner-api
+    ports:
+      - "${API_PORT:-8080}:8080"
+    environment:
+      - PYTHONPATH=/app
+      - REPO_SCANNER_API_HOST=0.0.0.0
+      - REPO_SCANNER_API_PORT=8080
+    command: ["python", "-m", "src.api_server"]
+    restart: unless-stopped
+    depends_on:
+      - repo-scanner
+    profiles:
+      - api
+
+  # Optional: Background worker for batch processing
+  worker:
+    build:
+      context: .
+      target: production
+    container_name: repo-scanner-worker
+    volumes:
+      - ${WORK_QUEUE:-./queue}:/app/queue
+      - ${OUTPUT_DIR:-./reports}:/app/output
+    environment:
+      - PYTHONPATH=/app
+      - REPO_SCANNER_WORKER_MODE=true
+    command: ["python", "-m", "src.worker"]
+    restart: unless-stopped
+    profiles:
+      - worker</content>
+<parameter name="filePath">/home/dee/workspace/AI/Repo-Scanner/docker-compose.yml

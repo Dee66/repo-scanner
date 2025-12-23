@@ -251,3 +251,96 @@ Unknown > incorrect
 Deterministic > fast
 
 Useful > verbose
+
+---
+
+OUTPUT CONTRACT — v2 (AUTHORITATIVE)
+
+This section defines the dual report system introduced in v2, supporting both comprehensive analysis and concise verdict reports.
+
+## Report Types
+
+### 1. COMPREHENSIVE ANALYSIS REPORT
+**Purpose**: Provide complete technical assessment with full evidence chain for detailed review and audit.
+
+**Format**: Markdown document with all required sections from v1 PRIMARY_REPORT schema.
+
+**Constraints**:
+- Evidence-dense but not verbose
+- All claims anchored to verifiable evidence
+- Includes complete risk synthesis and decision artifacts
+- No length limit (severity drives length)
+
+**Required Sections** (same as v1 PRIMARY_REPORT):
+- executive_summary
+- system_characterization  
+- evidence_highlights
+- misleading_signals
+- safe_to_change_surface
+- risk_synthesis
+- decision_artifacts
+- authority_ceiling_evaluation
+- what_not_to_fix
+- refusal_or_first_action
+- confidence_and_limits
+- validity_and_expiry
+
+### 2. EXECUTIVE VERDICT REPORT
+**Purpose**: Provide concise, decision-focused assessment answering: "Can a competent engineer safely act on this repository right now, and if so, how?"
+
+**Format**: Markdown document with structured verdict sections.
+
+**Constraints**:
+- Max 300 words total
+- Evidence-based with explicit references
+- Degrades to INSUFFICIENT_EVIDENCE if confidence < 0.5
+- No speculation or generic statements
+
+**Required Sections**:
+- Executive Verdict (verdict + confidence + assessment)
+- Scope of Assessment (repository + risk level + confidence)
+- Blocking Risks (if verdict = FAIL, list critical issues)
+- Safe Action Summary (permitted actions based on verdict)
+- Unsafe Action Summary (prohibited actions and conditions)
+
+**Verdict Values**: PASS | FAIL | INSUFFICIENT_EVIDENCE
+
+### 3. MACHINE-READABLE OUTPUT
+**Purpose**: Structured data for automated processing and integration.
+
+**Format**: Canonical JSON with embedded governance hash.
+
+**Constraints**:
+- Deterministic sorting
+- All timestamps in ISO format
+- Confidence scores as floats 0.0-1.0
+- Evidence references as structured objects
+
+## CLI Interface (v2)
+
+New `--report-type` argument controls output generation:
+
+- `comprehensive`: Generate comprehensive report + machine output
+- `verdict`: Generate executive verdict + machine output  
+- `both`: Generate comprehensive report + executive verdict + machine output
+
+## Evidence Standards (v2)
+
+**Enhanced Rigor**:
+- All claims must reference specific evidence sources
+- Confidence scores must reflect actual assessment coverage
+- Unknown states preferred over incorrect assumptions
+- Evidence format: [EVIDENCE:source.field] or [EVIDENCE:stage_name]
+
+**Degradation Rules**:
+- Confidence < 0.5 → INSUFFICIENT_EVIDENCE
+- Missing evidence → qualification or omission
+- Contradictory evidence → explicit uncertainty statement
+
+## Migration from v1
+
+v2 maintains backward compatibility while adding dual report capability:
+- Existing `--format` argument still supported for basic output control
+- `--report-type` takes precedence when both specified
+- All v1 schemas remain valid
+- Executive verdict now computed from analysis data instead of placeholder

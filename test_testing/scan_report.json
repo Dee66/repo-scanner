@@ -1,0 +1,824 @@
+{
+  "gaps": [],
+  "metadata": {
+    "deterministic_hash": "placeholder-hash",
+    "run_timestamp": "2025-12-23T00:00:00Z",
+    "scanner_version": "1.1.0"
+  },
+  "repository": {
+    "name": "Repo-Scanner",
+    "path": "/home/dee/workspace/AI/Repo-Scanner"
+  },
+  "run_id": "placeholder-run-id",
+  "semantic": {
+    "code_quality_signals": [],
+    "dependencies": {},
+    "exports": {},
+    "imports": {},
+    "python_analysis": {
+      "classes": [
+        {
+          "file": "src/adapters/java_adapter.py",
+          "line": 4,
+          "name": "JavaAdapter"
+        },
+        {
+          "file": "src/adapters/python_adapter.py",
+          "line": 4,
+          "name": "PythonAdapter"
+        },
+        {
+          "file": "src/adapters/rust_adapter.py",
+          "line": 4,
+          "name": "RustAdapter"
+        },
+        {
+          "file": "src/api_server.py",
+          "line": 7,
+          "name": "ScannerAPIHandler"
+        }
+      ],
+      "complexity_signals": [],
+      "exports": [],
+      "functions": [
+        {
+          "file": "src/api_server.py",
+          "is_method": false,
+          "line": 48,
+          "name": "main"
+        },
+        {
+          "file": "src/cli.py",
+          "is_method": false,
+          "line": 12,
+          "name": "main"
+        },
+        {
+          "file": "src/core/constraints/operating.py",
+          "is_method": false,
+          "line": 40,
+          "name": "validate_execution_constraints"
+        },
+        {
+          "file": "src/core/constraints/operating.py",
+          "is_method": false,
+          "line": 44,
+          "name": "enforce_determinism_guarantees"
+        },
+        {
+          "file": "src/core/constraints/operating.py",
+          "is_method": false,
+          "line": 48,
+          "name": "handle_unexpected_conditions"
+        },
+        {
+          "file": "src/core/pipeline/analysis.py",
+          "is_method": false,
+          "line": 32,
+          "name": "execute_pipeline"
+        },
+        {
+          "file": "src/core/pipeline/analysis.py",
+          "is_method": false,
+          "line": 57,
+          "name": "validate_parallelism_guarantees"
+        },
+        {
+          "file": "src/core/pipeline/repository_discovery.py",
+          "is_method": false,
+          "line": 7,
+          "name": "discover_repository_root"
+        },
+        {
+          "file": "src/core/pipeline/repository_discovery.py",
+          "is_method": false,
+          "line": 37,
+          "name": "get_canonical_file_list"
+        },
+        {
+          "file": "src/core/pipeline/static_semantic_analysis.py",
+          "is_method": false,
+          "line": 9,
+          "name": "analyze_semantic_structure"
+        },
+        {
+          "file": "src/core/pipeline/static_semantic_analysis.py",
+          "is_method": false,
+          "line": 27,
+          "name": "analyze_python_files"
+        },
+        {
+          "file": "src/core/pipeline/static_semantic_analysis.py",
+          "is_method": false,
+          "line": 38,
+          "name": "analyze_python_codebase"
+        },
+        {
+          "file": "src/core/pipeline/static_semantic_analysis.py",
+          "is_method": false,
+          "line": 76,
+          "name": "analyze_python_file"
+        },
+        {
+          "file": "src/core/pipeline/structural_modeling.py",
+          "is_method": false,
+          "line": 8,
+          "name": "analyze_repository_structure"
+        },
+        {
+          "file": "src/core/pipeline/structural_modeling.py",
+          "is_method": false,
+          "line": 22,
+          "name": "detect_languages"
+        },
+        {
+          "file": "src/core/pipeline/structural_modeling.py",
+          "is_method": false,
+          "line": 54,
+          "name": "detect_frameworks"
+        },
+        {
+          "file": "src/core/pipeline/structural_modeling.py",
+          "is_method": false,
+          "line": 83,
+          "name": "detect_build_systems"
+        },
+        {
+          "file": "src/core/pipeline/structural_modeling.py",
+          "is_method": false,
+          "line": 99,
+          "name": "detect_test_frameworks"
+        },
+        {
+          "file": "src/core/pipeline/structural_modeling.py",
+          "is_method": false,
+          "line": 122,
+          "name": "detect_documentation"
+        },
+        {
+          "file": "src/core/pipeline/structural_modeling.py",
+          "is_method": false,
+          "line": 136,
+          "name": "detect_configuration"
+        },
+        {
+          "file": "src/core/pipeline/structural_modeling.py",
+          "is_method": false,
+          "line": 148,
+          "name": "get_file_counts"
+        },
+        {
+          "file": "src/core/pipeline/test_signal_analysis.py",
+          "is_method": false,
+          "line": 8,
+          "name": "analyze_test_signals"
+        },
+        {
+          "file": "src/core/pipeline/test_signal_analysis.py",
+          "is_method": false,
+          "line": 22,
+          "name": "identify_test_files"
+        },
+        {
+          "file": "src/core/pipeline/test_signal_analysis.py",
+          "is_method": false,
+          "line": 48,
+          "name": "is_test_file"
+        },
+        {
+          "file": "src/core/pipeline/test_signal_analysis.py",
+          "is_method": false,
+          "line": 72,
+          "name": "detect_test_frameworks_detailed"
+        },
+        {
+          "file": "src/core/pipeline/test_signal_analysis.py",
+          "is_method": false,
+          "line": 125,
+          "name": "assess_test_coverage"
+        },
+        {
+          "file": "src/core/pipeline/test_signal_analysis.py",
+          "is_method": false,
+          "line": 164,
+          "name": "evaluate_test_quality"
+        },
+        {
+          "file": "src/core/pipeline/test_signal_analysis.py",
+          "is_method": false,
+          "line": 205,
+          "name": "calculate_testing_maturity"
+        },
+        {
+          "file": "src/core/pipeline/test_signal_analysis.py",
+          "is_method": false,
+          "line": 241,
+          "name": "identify_test_gaps"
+        },
+        {
+          "file": "src/core/principles/behavioral.py",
+          "is_method": false,
+          "line": 11,
+          "name": "check_never_guess_intent"
+        },
+        {
+          "file": "src/core/principles/behavioral.py",
+          "is_method": false,
+          "line": 16,
+          "name": "check_never_optimize_for_output_volume"
+        },
+        {
+          "file": "src/core/principles/behavioral.py",
+          "is_method": false,
+          "line": 20,
+          "name": "check_never_mask_unknowns"
+        },
+        {
+          "file": "src/core/principles/behavioral.py",
+          "is_method": false,
+          "line": 24,
+          "name": "check_never_force_action"
+        },
+        {
+          "file": "src/core/principles/behavioral.py",
+          "is_method": false,
+          "line": 28,
+          "name": "check_never_require_manual_intervention"
+        },
+        {
+          "file": "src/core/principles/trust.py",
+          "is_method": false,
+          "line": 10,
+          "name": "enforce_determinism"
+        },
+        {
+          "file": "src/core/principles/trust.py",
+          "is_method": false,
+          "line": 14,
+          "name": "enforce_reproducibility"
+        },
+        {
+          "file": "src/core/principles/trust.py",
+          "is_method": false,
+          "line": 18,
+          "name": "apply_conservative_bias"
+        },
+        {
+          "file": "src/core/principles/trust.py",
+          "is_method": false,
+          "line": 22,
+          "name": "enforce_authority_limits"
+        },
+        {
+          "file": "src/core/quality/assurance.py",
+          "is_method": false,
+          "line": 30,
+          "name": "enforce_quality_bar"
+        },
+        {
+          "file": "src/core/quality/assurance.py",
+          "is_method": false,
+          "line": 34,
+          "name": "check_success_criteria"
+        },
+        {
+          "file": "src/core/quality/output_contract.py",
+          "is_method": false,
+          "line": 31,
+          "name": "generate_primary_report"
+        },
+        {
+          "file": "src/core/quality/output_contract.py",
+          "is_method": false,
+          "line": 129,
+          "name": "generate_machine_output"
+        },
+        {
+          "file": "src/core/risk/confidence_model.py",
+          "is_method": false,
+          "line": 15,
+          "name": "evaluate_confidence"
+        },
+        {
+          "file": "src/core/risk/confidence_model.py",
+          "is_method": false,
+          "line": 20,
+          "name": "justify_confidence"
+        },
+        {
+          "file": "src/core/risk/decision_artifacts.py",
+          "is_method": false,
+          "line": 14,
+          "name": "generate_decision_artifacts"
+        },
+        {
+          "file": "src/core/risk/synthesis.py",
+          "is_method": false,
+          "line": 18,
+          "name": "synthesize_risks_and_gaps"
+        },
+        {
+          "file": "src/core/safety/authority_ceiling.py",
+          "is_method": false,
+          "line": 22,
+          "name": "evaluate_authority_ceiling"
+        },
+        {
+          "file": "src/core/safety/authority_ceiling.py",
+          "is_method": false,
+          "line": 27,
+          "name": "emit_refusal_artifact"
+        },
+        {
+          "file": "src/core/safety/intent_classification.py",
+          "is_method": false,
+          "line": 22,
+          "name": "classify_intent_posture"
+        },
+        {
+          "file": "src/core/safety/refusal_artifact.py",
+          "is_method": false,
+          "line": 19,
+          "name": "create_refusal_artifact"
+        },
+        {
+          "file": "src/core/safety/safe_change_surface.py",
+          "is_method": false,
+          "line": 22,
+          "name": "model_safe_change_surface"
+        },
+        {
+          "file": "tests/fixtures/minimal_repo/sample.py",
+          "is_method": false,
+          "line": 4,
+          "name": "hello"
+        },
+        {
+          "file": "tests/test_determinism.py",
+          "is_method": false,
+          "line": 12,
+          "name": "create_test_repo"
+        },
+        {
+          "file": "tests/test_determinism.py",
+          "is_method": false,
+          "line": 34,
+          "name": "get_file_hash"
+        },
+        {
+          "file": "tests/test_determinism.py",
+          "is_method": false,
+          "line": 40,
+          "name": "get_dir_hash"
+        },
+        {
+          "file": "tests/test_determinism.py",
+          "is_method": false,
+          "line": 52,
+          "name": "run_scanner_deterministic"
+        },
+        {
+          "file": "tests/test_determinism.py",
+          "is_method": false,
+          "line": 66,
+          "name": "test_determinism_multiple_runs"
+        },
+        {
+          "file": "tests/test_determinism.py",
+          "is_method": false,
+          "line": 85,
+          "name": "test_determinism_different_output_dirs"
+        },
+        {
+          "file": "tests/test_determinism.py",
+          "is_method": false,
+          "line": 102,
+          "name": "test_determinism_repository_content"
+        },
+        {
+          "file": "tests/test_determinism.py",
+          "is_method": false,
+          "line": 126,
+          "name": "test_determinism_json_canonical_sorting"
+        },
+        {
+          "file": "tests/test_determinism.py",
+          "is_method": false,
+          "line": 149,
+          "name": "test_determinism_no_timestamps"
+        },
+        {
+          "file": "tests/test_determinism.py",
+          "is_method": false,
+          "line": 174,
+          "name": "test_determinism_file_ordering"
+        },
+        {
+          "file": "tests/test_output_contract.py",
+          "is_method": false,
+          "line": 8,
+          "name": "test_generate_primary_report_basic"
+        },
+        {
+          "file": "tests/test_output_contract.py",
+          "is_method": false,
+          "line": 40,
+          "name": "test_generate_primary_report_fallback"
+        },
+        {
+          "file": "tests/test_output_contract.py",
+          "is_method": false,
+          "line": 51,
+          "name": "test_generate_machine_output_basic"
+        },
+        {
+          "file": "tests/test_output_contract.py",
+          "is_method": false,
+          "line": 84,
+          "name": "test_generate_machine_output_fallback"
+        },
+        {
+          "file": "tests/test_output_contract.py",
+          "is_method": false,
+          "line": 96,
+          "name": "test_machine_output_json_serializable"
+        },
+        {
+          "file": "tests/test_output_contract.py",
+          "is_method": false,
+          "line": 112,
+          "name": "test_machine_output_schema_compliance"
+        },
+        {
+          "file": "tests/test_pipeline.py",
+          "is_method": false,
+          "line": 9,
+          "name": "test_execute_pipeline_basic"
+        },
+        {
+          "file": "tests/test_pipeline.py",
+          "is_method": false,
+          "line": 30,
+          "name": "test_execute_pipeline_git_repo"
+        },
+        {
+          "file": "tests/test_pipeline.py",
+          "is_method": false,
+          "line": 56,
+          "name": "test_execute_pipeline_empty_repo"
+        },
+        {
+          "file": "tests/test_pipeline.py",
+          "is_method": false,
+          "line": 68,
+          "name": "test_execute_pipeline_nested_structure"
+        },
+        {
+          "file": "tests/test_pipeline.py",
+          "is_method": false,
+          "line": 90,
+          "name": "test_execute_pipeline_file_sorting"
+        },
+        {
+          "file": "tests/test_pipeline.py",
+          "is_method": false,
+          "line": 106,
+          "name": "test_execute_pipeline_subdirectory_start"
+        },
+        {
+          "file": "tests/test_repository_discovery.py",
+          "is_method": false,
+          "line": 12,
+          "name": "test_discover_repository_root_git"
+        },
+        {
+          "file": "tests/test_repository_discovery.py",
+          "is_method": false,
+          "line": 37,
+          "name": "test_discover_repository_root_non_git"
+        },
+        {
+          "file": "tests/test_repository_discovery.py",
+          "is_method": false,
+          "line": 49,
+          "name": "test_get_canonical_file_list"
+        },
+        {
+          "file": "tests/test_repository_discovery.py",
+          "is_method": false,
+          "line": 71,
+          "name": "test_get_canonical_file_list_empty"
+        },
+        {
+          "file": "tests/test_repository_discovery.py",
+          "is_method": false,
+          "line": 80,
+          "name": "test_get_canonical_file_list_nested"
+        },
+        {
+          "file": "tests/test_repository_discovery.py",
+          "is_method": false,
+          "line": 98,
+          "name": "test_discover_repository_root_invalid_path"
+        },
+        {
+          "file": "tests/test_repository_discovery.py",
+          "is_method": false,
+          "line": 104,
+          "name": "test_get_canonical_file_list_invalid_path"
+        },
+        {
+          "file": "tests/test_scanner_cli.py",
+          "is_method": false,
+          "line": 15,
+          "name": "test_repo"
+        },
+        {
+          "file": "tests/test_scanner_cli.py",
+          "is_method": false,
+          "line": 34,
+          "name": "output_dir"
+        },
+        {
+          "file": "tests/test_scanner_cli.py",
+          "is_method": false,
+          "line": 41,
+          "name": "run_scanner"
+        },
+        {
+          "file": "tests/test_scanner_cli.py",
+          "is_method": false,
+          "line": 51,
+          "name": "test_cli_valid_repository"
+        },
+        {
+          "file": "tests/test_scanner_cli.py",
+          "is_method": false,
+          "line": 63,
+          "name": "test_cli_invalid_repository"
+        },
+        {
+          "file": "tests/test_scanner_cli.py",
+          "is_method": false,
+          "line": 72,
+          "name": "test_cli_file_as_repo"
+        },
+        {
+          "file": "tests/test_scanner_cli.py",
+          "is_method": false,
+          "line": 87,
+          "name": "test_cli_markdown_only"
+        },
+        {
+          "file": "tests/test_scanner_cli.py",
+          "is_method": false,
+          "line": 96,
+          "name": "test_cli_json_only"
+        },
+        {
+          "file": "tests/test_scanner_cli.py",
+          "is_method": false,
+          "line": 105,
+          "name": "test_output_markdown_structure"
+        },
+        {
+          "file": "tests/test_scanner_cli.py",
+          "is_method": false,
+          "line": 128,
+          "name": "test_output_json_schema"
+        },
+        {
+          "file": "tests/test_scanner_cli.py",
+          "is_method": false,
+          "line": 158,
+          "name": "test_determinism"
+        },
+        {
+          "file": "tests/test_scanner_cli.py",
+          "is_method": false,
+          "line": 184,
+          "name": "test_repository_discovery_git_repo"
+        },
+        {
+          "file": "tests/test_scanner_cli.py",
+          "is_method": false,
+          "line": 203,
+          "name": "test_repository_discovery_non_git"
+        },
+        {
+          "file": "tests/test_scanner_cli.py",
+          "is_method": false,
+          "line": 221,
+          "name": "test_scanner_cli_invocation"
+        }
+      ],
+      "imports": [
+        "src.core.quality.output_contract.generate_machine_output",
+        "src.core.pipeline.structural_modeling.analyze_repository_structure",
+        "typing.Set",
+        "shutil",
+        "src.core.pipeline.static_semantic_analysis.analyze_semantic_structure",
+        "src.core.pipeline.test_signal_analysis.analyze_test_signals",
+        "sys",
+        "hashlib",
+        "src.core.pipeline.repository_discovery.discover_repository_root",
+        "src.core.pipeline.repository_discovery.get_canonical_file_list",
+        "src.core.quality.output_contract.generate_primary_report",
+        "http.server.BaseHTTPRequestHandler",
+        "typing.List",
+        "os",
+        "subprocess",
+        "json",
+        "pathlib.Path",
+        "src.core.pipeline.analysis.execute_pipeline",
+        "http.server.HTTPServer",
+        "argparse",
+        "typing.Dict",
+        "tempfile",
+        "ast",
+        "pytest"
+      ],
+      "modules": [
+        "src/adapters/java_adapter.py",
+        "src/adapters/python_adapter.py",
+        "src/adapters/rust_adapter.py",
+        "src/api_server.py",
+        "src/cli.py",
+        "src/core/constraints/operating.py",
+        "src/core/pipeline/analysis.py",
+        "src/core/pipeline/repository_discovery.py",
+        "src/core/pipeline/static_semantic_analysis.py",
+        "src/core/pipeline/structural_modeling.py",
+        "src/core/pipeline/test_signal_analysis.py",
+        "src/core/principles/behavioral.py",
+        "src/core/principles/epistemic.py",
+        "src/core/principles/trust.py",
+        "src/core/quality/assurance.py",
+        "src/core/quality/output_contract.py",
+        "src/core/risk/confidence_model.py",
+        "src/core/risk/decision_artifacts.py",
+        "src/core/risk/synthesis.py",
+        "src/core/safety/authority_ceiling.py",
+        "src/core/safety/intent_classification.py",
+        "src/core/safety/refusal_artifact.py",
+        "src/core/safety/safe_change_surface.py",
+        "src/core/system_config.py",
+        "src/core/system_identity.py",
+        "src/core/system_purpose.py",
+        "tests/fixtures/minimal_repo/sample.py",
+        "tests/test_determinism.py",
+        "tests/test_output_contract.py",
+        "tests/test_pipeline.py",
+        "tests/test_repository_discovery.py",
+        "tests/test_scanner_cli.py"
+      ],
+      "test_coverage_signals": [],
+      "total_classes": 4,
+      "total_functions": 95,
+      "total_modules": 32
+    }
+  },
+  "structure": {
+    "build_systems": [],
+    "configuration": [
+      ".gitignore"
+    ],
+    "documentation": [
+      "README",
+      "docs/ directory",
+      "Markdown files"
+    ],
+    "file_counts": {
+      "code": 56,
+      "config": 11,
+      "docs": 19,
+      "test": 29,
+      "total": 147
+    },
+    "frameworks": [
+      "Python (pyproject.toml)"
+    ],
+    "languages": {
+      "JSON": 7,
+      "Markdown": 17,
+      "Python": 32,
+      "Shell": 1,
+      "Text": 7,
+      "Unknown": 81,
+      "YAML": 2
+    },
+    "test_frameworks": [
+      "pytest"
+    ]
+  },
+  "summary": {
+    "files_scanned": 147,
+    "gaps_count": 0,
+    "overall_score": 0.0,
+    "tests_discovered": 29
+  },
+  "tasks": {},
+  "test_signals": {
+    "test_coverage_signals": {
+      "coverage_tools": [],
+      "has_coverage_tools": false,
+      "test_file_percentage": 34.11764705882353,
+      "test_to_code_ratio": 0.5178571428571429,
+      "untested_modules": [
+        "src/adapters/java_adapter.py",
+        "src/adapters/python_adapter.py",
+        "src/adapters/rust_adapter.py",
+        "src/api_server.py",
+        "src/cli.py",
+        "src/core/constraints/operating.py",
+        "src/core/pipeline/analysis.py",
+        "src/core/pipeline/static_semantic_analysis.py",
+        "src/core/pipeline/structural_modeling.py",
+        "src/core/pipeline/test_signal_analysis.py",
+        "src/core/principles/behavioral.py",
+        "src/core/principles/epistemic.py",
+        "src/core/principles/trust.py",
+        "src/core/quality/assurance.py",
+        "src/core/risk/confidence_model.py",
+        "src/core/risk/decision_artifacts.py",
+        "src/core/risk/synthesis.py",
+        "src/core/safety/authority_ceiling.py",
+        "src/core/safety/intent_classification.py",
+        "src/core/safety/refusal_artifact.py",
+        "src/core/safety/safe_change_surface.py",
+        "src/core/system_config.py",
+        "src/core/system_identity.py",
+        "src/core/system_purpose.py",
+        "tests/fixtures/minimal_repo/sample.py",
+        "tests/test_determinism.py",
+        "tests/test_output_contract.py",
+        "tests/test_pipeline.py",
+        "tests/test_repository_discovery.py",
+        "tests/test_scanner_cli.py"
+      ]
+    },
+    "test_files": {
+      "e2e_tests": [],
+      "integration_tests": [],
+      "other_tests": [
+        "final_test/scan_report.json",
+        "final_test/scan_report.md",
+        "pytest.ini",
+        "tests/fixtures/minimal_repo/README.md",
+        "tests/fixtures/minimal_repo/sample.py"
+      ],
+      "total_test_files": 22,
+      "unit_tests": [
+        ".pytest_cache/CACHEDIR.TAG",
+        ".pytest_cache/README.md",
+        ".pytest_cache/v/cache/lastfailed",
+        ".pytest_cache/v/cache/nodeids",
+        "docs/TEST_PLAN.md",
+        "src/core/pipeline/test_signal_analysis.py",
+        "test_output/scan_report.json",
+        "test_output/scan_report.md",
+        "test_semantic/scan_report.json",
+        "test_semantic/scan_report.md",
+        "test_structural/scan_report.json",
+        "test_structural/scan_report.md",
+        "tests/test_determinism.py",
+        "tests/test_output_contract.py",
+        "tests/test_pipeline.py",
+        "tests/test_repository_discovery.py",
+        "tests/test_scanner_cli.py"
+      ]
+    },
+    "test_frameworks": [
+      {
+        "confidence": "high",
+        "framework": "pytest",
+        "language": "Python"
+      },
+      {
+        "confidence": "high",
+        "framework": "pytest",
+        "language": "Configuration"
+      }
+    ],
+    "test_gaps": [
+      {
+        "description": "No dedicated test directory found",
+        "gap_type": "missing_test_directory",
+        "severity": "medium"
+      },
+      {
+        "description": "30 modules appear untested",
+        "gap_type": "untested_modules",
+        "severity": "high"
+      }
+    ],
+    "test_quality_signals": [
+      {
+        "count": 47,
+        "quality": "positive",
+        "signal": "test_functions_found"
+      }
+    ],
+    "testing_maturity_score": 0.6
+  }
+}

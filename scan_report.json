@@ -1,0 +1,2512 @@
+{
+  "authority_ceiling_evaluation": {
+    "authority_confidence": {
+      "authority_confidence_level": "medium",
+      "authority_confidence_score": 0.7257396449704143,
+      "confidence_factors": {
+        "base_analysis_confidence": 0.8257396449704143,
+        "constraint_application": false,
+        "constraint_count": 0
+      },
+      "description": "Moderate confidence with some subjectivity"
+    },
+    "authority_constraints": {
+      "constraint_count": 2,
+      "constraints": [
+        {
+          "authority_minimum": "technical_lead",
+          "constraint_type": "risk_based",
+          "description": "Medium risk requires technical leadership",
+          "rationale": "Medium risk needs oversight from experienced technical personnel",
+          "severity": "medium"
+        },
+        {
+          "authority_minimum": "technical_lead",
+          "constraint_type": "governance_based",
+          "description": "Moderate governance requires oversight",
+          "rationale": "Governance gaps need experienced oversight",
+          "severity": "medium"
+        }
+      ],
+      "highest_severity": "medium"
+    },
+    "authority_rationale": {
+      "authority_rationale": [
+        "Standard authority level (technical lead) maintained - no elevation required",
+        "Decision scope limited to feature changes allowed with oversight required"
+      ],
+      "key_factors": [],
+      "rationale_summary": "Standard authority level (technical lead) maintained - no elevation required Decision scope limited to feature changes allowed with oversight required"
+    },
+    "evaluation_timestamp": "2025-12-23T00:00:00Z",
+    "evaluation_version": "1.0.0",
+    "final_authority_ceiling": {
+      "applied_constraints": [],
+      "authority_level": 4,
+      "constraint_count": 0,
+      "decision_scope": "feature_changes_allowed",
+      "maximum_authority": "technical_lead",
+      "oversight_required": true
+    },
+    "organizational_factors": {
+      "factor_count": 2,
+      "highest_impact": "medium",
+      "organizational_factors": [
+        {
+          "authority_implication": "technical_lead",
+          "description": "Medium codebase requires technical leadership",
+          "factor_type": "scale",
+          "impact": "medium",
+          "rationale": "Medium codebases need experienced technical guidance"
+        },
+        {
+          "authority_implication": "technical_lead",
+          "description": "Low testing indicates team maturity concerns",
+          "factor_type": "team_maturity",
+          "impact": "medium",
+          "rationale": "Teams with low testing maturity need experienced oversight"
+        }
+      ]
+    }
+  },
+  "decision_artifacts": {
+    "action_plan": {
+      "action_count": 6,
+      "immediate_actions": [
+        {
+          "category": "security",
+          "description": "Address critical security vulnerabilities immediately",
+          "estimated_effort": "medium",
+          "rationale": "Security risk level: high - immediate action required"
+        },
+        {
+          "category": "governance",
+          "description": "Establish governance framework",
+          "estimated_effort": "high",
+          "rationale": "High governance risk indicates missing critical processes"
+        }
+      ],
+      "long_term_actions": [
+        {
+          "category": "safe_improvement",
+          "description": "Add or modify test files",
+          "estimated_effort": "low",
+          "rationale": "Safe change that can improve repository health"
+        },
+        {
+          "category": "safe_improvement",
+          "description": "Update documentation",
+          "estimated_effort": "low",
+          "rationale": "Safe change that can improve repository health"
+        }
+      ],
+      "prohibited_actions": [
+        "Address misleading signals before making changes"
+      ],
+      "short_term_actions": [
+        {
+          "category": "compliance",
+          "description": "Address high-severity compliance issues",
+          "estimated_effort": "low",
+          "rationale": "High compliance risk indicates significant standards violations"
+        },
+        {
+          "category": "code_quality",
+          "description": "Address high code duplication",
+          "estimated_effort": "medium",
+          "rationale": "High duplication risk indicates significant maintainability issues"
+        }
+      ]
+    },
+    "authority_ceiling": {
+      "decision_scope": "feature_changes_allowed",
+      "maximum_authority": "technical_lead",
+      "oversight_required": true,
+      "rationale": "Medium risk requires technical lead approval"
+    },
+    "confidence_assessment": {
+      "confidence_factors": {
+        "analysis_consistency": 0.6272189349112427,
+        "data_completeness": 1.0,
+        "risk_assessment_confidence": 0.85
+      },
+      "confidence_level": "high",
+      "confidence_score": 0.8257396449704143,
+      "description": "Strong confidence in analysis results"
+    },
+    "decision_framework": {
+      "approval_gates": [
+        "code_review",
+        "testing_review"
+      ],
+      "authority_required": "technical_lead",
+      "decision_type": "balanced",
+      "rationale": "Medium risk requires standard oversight and review processes",
+      "timeframe": "standard_review_period"
+    },
+    "decision_timestamp": "2025-12-23T00:00:00Z",
+    "decision_version": "1.0.0",
+    "next_steps": [
+      {
+        "owner": "assigned_developer",
+        "priority": "immediate",
+        "rationale": "Critical issues require immediate attention",
+        "step": "Address 2 critical issue(s)",
+        "timeframe": "within_1_week"
+      },
+      {
+        "owner": "technical_lead",
+        "priority": "short_term",
+        "rationale": "High-priority items need planning and scheduling",
+        "step": "Plan 2 high-priority improvement(s)",
+        "timeframe": "within_2_weeks"
+      },
+      {
+        "owner": "analysis_owner",
+        "priority": "immediate",
+        "rationale": "Team needs to be aware of analysis results",
+        "step": "Document findings and share with team",
+        "timeframe": "within_48_hours"
+      }
+    ]
+  },
+  "determinism_verification": {
+    "canonical_data_summary": {
+      "data_components": 11,
+      "has_all_required_components": true,
+      "hash_input_size": 63202,
+      "total_files": 193
+    },
+    "consistency_check": {
+      "consistency_issues": [
+        {
+          "description": "Structure file counts total (376) doesn't match overall count (193)",
+          "issue": "structure_file_count_mismatch",
+          "severity": "medium"
+        },
+        {
+          "description": "Risk synthesis has 13 components, expected 7",
+          "issue": "risk_component_count_mismatch",
+          "severity": "low"
+        }
+      ],
+      "consistency_score": 0.75,
+      "issues_found": 2,
+      "overall_consistency": "medium"
+    },
+    "determinism_hash": "a959b0504858d35978d328bfb95a5ef51c86e315702fbc51071621885e12e1da",
+    "determinism_report": {
+      "analysis_hash": "a959b0504858d35978d328bfb95a5ef51c86e315702fbc51071621885e12e1da",
+      "confidence_level": "medium",
+      "consistency_score": 0.75,
+      "description": "Analysis pipeline produces mostly deterministic results with minor inconsistencies",
+      "determinism_status": "acceptable",
+      "hash_algorithm": "SHA-256",
+      "issues_found": 2,
+      "verification_method": "canonical_data_hashing"
+    },
+    "verification_timestamp": "2025-12-23T00:00:00Z",
+    "verification_version": "1.0.0"
+  },
+  "gaps": [],
+  "governance": {
+    "ci_cd_governance": {
+      "automation_scripts": [
+        ".sh"
+      ],
+      "build_automation": [],
+      "ci_config_files": [],
+      "ci_platforms": [],
+      "has_ci_cd": false
+    },
+    "code_quality_governance": {
+      "code_quality_config_files": [
+        "pyproject.toml"
+      ],
+      "formatters": [],
+      "linters": [],
+      "pre_commit_hooks": false,
+      "static_analyzers": [
+        "safety"
+      ]
+    },
+    "compliance_artifacts": [
+      {
+        "artifact": "CLA",
+        "compliance_area": "contribution",
+        "found": true,
+        "type": "contributor_license"
+      }
+    ],
+    "dependency_governance": {
+      "dependency_files": [
+        {
+          "file": "pyproject.toml",
+          "language": "Python"
+        }
+      ],
+      "dependency_scanning": false,
+      "has_dependency_management": true,
+      "has_lock_files": false,
+      "lock_files": []
+    },
+    "documentation_governance": {
+      "api_docs": true,
+      "changelog": false,
+      "code_of_conduct": false,
+      "contributing_guide": false,
+      "documentation_tools": [],
+      "license_file": false,
+      "readme_files": [
+        ".pytest_cache/README.md",
+        "README.md",
+        "enhanced_scanner/README.md",
+        "tests/fixtures/minimal_repo/README.md"
+      ]
+    },
+    "governance_gaps": [
+      {
+        "description": "No CI/CD pipeline detected",
+        "gap_type": "missing_ci_cd",
+        "recommendation": "Implement automated testing and deployment pipelines",
+        "severity": "high"
+      },
+      {
+        "description": "Limited security governance detected",
+        "gap_type": "missing_security_practices",
+        "recommendation": "Add security scanning, dependency updates, and security policy",
+        "severity": "high"
+      },
+      {
+        "description": "Missing documentation: LICENSE",
+        "gap_type": "incomplete_documentation",
+        "recommendation": "Add comprehensive documentation and legal files",
+        "severity": "medium"
+      }
+    ],
+    "governance_maturity_score": 0.53125,
+    "security_governance": {
+      "has_security_md": false,
+      "secret_scanning": false,
+      "security_policies": [],
+      "security_scanners": [
+        "safety"
+      ],
+      "vulnerability_management": []
+    }
+  },
+  "intent_posture": {
+    "code_patterns": {
+      "architecture_patterns": [],
+      "quality_patterns": [
+        "uses_typing",
+        "uses_dataclasses"
+      ],
+      "security_patterns": [
+        "uses_hashlib"
+      ]
+    },
+    "development_stage": {
+      "development_stage": "development",
+      "stage_confidence": 1.0,
+      "stage_description": "Active development with basic functionality",
+      "stage_indicators": {
+        "concept": 1,
+        "development": 2,
+        "production": 1,
+        "stabilization": 1,
+        "testing": 0
+      }
+    },
+    "intent_confidence": 0.80390625,
+    "maturity_classification": {
+      "description": "Alpha-quality, functional but incomplete",
+      "maturity_factors": {
+        "code_structure": 0.7,
+        "documentation_completeness": 0.3,
+        "governance_maturity": 0.53125,
+        "maturity_recommendations": [],
+        "testing_maturity": 0.5
+      },
+      "maturity_level": "alpha",
+      "maturity_score": 0.5093749999999999
+    },
+    "primary_intent": {
+      "confidence_score": 1.0,
+      "intent_signals": {
+        "application": 0,
+        "educational": 0,
+        "framework": 1,
+        "infrastructure": 1,
+        "library": 3,
+        "research": 0,
+        "tool": 3
+      },
+      "primary_intent": "library",
+      "secondary_intents": [
+        [
+          "tool",
+          3
+        ],
+        [
+          "framework",
+          1
+        ]
+      ]
+    },
+    "risk_posture": {
+      "overall_risk_level": "medium",
+      "risk_factors": {
+        "maintenance_risks": 2,
+        "operational_risks": 2,
+        "quality_risks": 2,
+        "security_risks": 3
+      },
+      "risk_mitigation_suggestions": [
+        "Add code quality tools (linters, formatters)",
+        "Add comprehensive documentation",
+        "Add monitoring and logging",
+        "Add security policy and disclosure guidelines",
+        "Establish contribution guidelines",
+        "Implement CI/CD pipelines",
+        "Implement automated security scanning",
+        "Implement code review processes",
+        "Implement proper error handling",
+        "Increase test coverage to at least 70%",
+        "Set up automated testing and deployment",
+        "Use dependency scanning tools"
+      ],
+      "risk_score": 9
+    },
+    "security_posture": {
+      "overall_posture": "weak",
+      "risk_level": "high",
+      "security_controls": [
+        "safety",
+        "safety"
+      ],
+      "security_practices_score": 0.3,
+      "security_recommendations": [],
+      "vulnerability_indicators": []
+    }
+  },
+  "metadata": {
+    "deterministic_hash": "placeholder-hash",
+    "run_timestamp": "2025-12-23T00:00:00Z",
+    "scanner_version": "1.1.0"
+  },
+  "misleading_signals": {
+    "misleading_signals": {
+      "code_quality_inconsistencies": [],
+      "documentation_discrepancies": [
+        {
+          "description": "Multiple README files may indicate confusion or duplication",
+          "evidence": "Found 4 README files: ['.pytest_cache/README.md', 'README.md', 'enhanced_scanner/README.md', 'tests/fixtures/minimal_repo/README.md']",
+          "severity": "low",
+          "type": "multiple_readmes"
+        }
+      ],
+      "governance_conflicts": [],
+      "intent_mismatches": [],
+      "maintenance_indicators": [
+        {
+          "description": "No CI/CD pipeline detected, may indicate poor maintenance",
+          "evidence": "CI/CD governance: absent",
+          "severity": "low",
+          "type": "missing_ci_cd"
+        }
+      ],
+      "security_deceptions": [
+        {
+          "description": "Security practices score is very low",
+          "evidence": "Security score: 0.3/10",
+          "severity": "high",
+          "type": "low_security_score"
+        }
+      ]
+    },
+    "overall_misleading_risk": "medium",
+    "requires_caution": true,
+    "total_misleading_signals": 3
+  },
+  "repository": {
+    "name": "Repo-Scanner",
+    "path": "/home/dee/workspace/AI/Repo-Scanner"
+  },
+  "risk_synthesis": {
+    "component_risks": {
+      "api_risk": {
+        "description": "Low API risk (0 points)",
+        "risk_factors": [],
+        "risk_level": "low",
+        "risk_score": 0
+      },
+      "change_risk": {
+        "description": "Change risk: low (0 points)",
+        "risk_factors": [],
+        "risk_level": "low",
+        "risk_score": 0
+      },
+      "compliance_risk": {
+        "description": "Compliance risk: high (107 points)",
+        "risk_factors": [
+          "moderate_compliance_issues",
+          "critical_compliance_violations",
+          "high_severity_compliance_violations"
+        ],
+        "risk_level": "high",
+        "risk_score": 10
+      },
+      "comprehension_risk": {
+        "description": "Comprehension risk: low (0 points)",
+        "risk_factors": [],
+        "risk_level": "low",
+        "risk_score": 0
+      },
+      "dependency_risk": {
+        "description": "Low dependency risk (0 points)",
+        "risk_factors": [],
+        "risk_level": "low",
+        "risk_score": 0
+      },
+      "duplication_risk": {
+        "description": "High duplication risk (6 points)",
+        "risk_factors": [
+          "high_duplication",
+          "moderate_duplicate_ratio"
+        ],
+        "risk_level": "high",
+        "risk_score": 6
+      },
+      "governance_risk": {
+        "description": "Governance risk: high (4 points)",
+        "risk_factors": [
+          "low_governance_maturity",
+          "missing_security_scanning"
+        ],
+        "risk_level": "high",
+        "risk_score": 4
+      },
+      "intent_risk": {
+        "description": "Intent risk: medium (3 points)",
+        "risk_factors": [
+          "low_security_posture"
+        ],
+        "risk_level": "medium",
+        "risk_score": 3
+      },
+      "misleading_risk": {
+        "description": "Misleading risk: medium (2 points)",
+        "risk_factors": [
+          "medium_misleading_signals"
+        ],
+        "risk_level": "medium",
+        "risk_score": 2
+      },
+      "security_risk": {
+        "description": "Security risk: high (6.9 points)",
+        "risk_factors": [
+          "high_security_vulnerabilities"
+        ],
+        "risk_level": "high",
+        "risk_score": 6.8500000000000005
+      },
+      "semantic_risk": {
+        "description": "Semantic risk: low (0 points)",
+        "risk_factors": [],
+        "risk_level": "low",
+        "risk_score": 0
+      },
+      "structural_risk": {
+        "description": "Structural risk: low (2 points)",
+        "risk_factors": [
+          "missing_build_system"
+        ],
+        "risk_level": "low",
+        "risk_score": 2
+      },
+      "testing_risk": {
+        "description": "Testing risk: medium (2 points)",
+        "risk_factors": [
+          "low_test_maturity"
+        ],
+        "risk_level": "medium",
+        "risk_score": 2
+      }
+    },
+    "critical_issues": [],
+    "overall_risk_assessment": {
+      "average_risk_score": 1.9523809523809523,
+      "description": "Medium risk - some concerns requiring attention",
+      "overall_risk_level": "medium",
+      "risk_components_count": 13
+    },
+    "recommendations": [
+      {
+        "action": "Address critical security vulnerabilities immediately",
+        "category": "security",
+        "priority": "critical",
+        "rationale": "Security risk level: high - immediate action required"
+      },
+      {
+        "action": "Establish governance framework",
+        "category": "governance",
+        "priority": "critical",
+        "rationale": "High governance risk indicates missing critical processes"
+      },
+      {
+        "action": "Address high-severity compliance issues",
+        "category": "compliance",
+        "priority": "high",
+        "rationale": "High compliance risk indicates significant standards violations"
+      },
+      {
+        "action": "Address high code duplication",
+        "category": "code_quality",
+        "priority": "high",
+        "rationale": "High duplication risk indicates significant maintainability issues"
+      }
+    ],
+    "risk_confidence": 0.85
+  },
+  "run_id": "placeholder-run-id",
+  "safe_change_surface": {
+    "change_confidence": 0.8,
+    "overall_change_safety": {
+      "average_score": 2.6,
+      "description": "Changes require caution and testing",
+      "overall_safety_level": "medium",
+      "safety_factors_count": 5
+    },
+    "safe_changes": [
+      "Add or modify test files",
+      "Update documentation"
+    ],
+    "safety_factors": {
+      "complexity_safety": {
+        "complex_functions_count": 0,
+        "complexity_ratio": 0.0,
+        "description": "Low complexity codebase is generally safe to modify",
+        "safety_level": "high",
+        "simple_functions_count": 0
+      },
+      "critical_path_safety": {
+        "critical_files": [
+          ".gitignore",
+          "ci/verify_determinism.yml",
+          "src/core/ai/registry/models/lightweight-classification-1766516788-1.0.0/special_tokens_map.json",
+          "src/core/ai/registry/models/lightweight-summarization-1766516780-1.0.0/special_tokens_map.json",
+          "src/core/pipeline/code_comprehension/__init__.py",
+          "src/core/pipeline/decision_artifact_generation.py",
+          "src/core/pipeline/security_analysis/__init__.py",
+          "src/core/principles/behavioral.py",
+          "src/core/principles/epistemic.py",
+          "src/core/principles/trust.py"
+        ],
+        "critical_files_count": 11,
+        "critical_ratio": 0.05699481865284974,
+        "description": "Few critical files, most changes are safe",
+        "safety_level": "high"
+      },
+      "dependency_safety": {
+        "description": "No dependency lock files increase change risk",
+        "external_dependencies": 0,
+        "has_lock_files": false,
+        "has_vulnerable_deps": false,
+        "internal_dependencies": 0,
+        "safety_level": "low"
+      },
+      "documentation_safety": {
+        "description": "No documentation makes changes very risky",
+        "doc_coverage_ratio": 0.23958333333333334,
+        "doc_files_count": 23,
+        "has_api_docs": false,
+        "has_readme": false,
+        "safety_level": "very_low"
+      },
+      "test_coverage_safety": {
+        "description": "Limited test coverage increases change risk",
+        "safety_level": "low",
+        "test_gaps_count": 2,
+        "testing_maturity": 0.5
+      }
+    },
+    "unsafe_changes": [
+      "Address misleading signals before making changes"
+    ]
+  },
+  "semantic": {
+    "code_quality_signals": [],
+    "dependencies": {},
+    "exports": {},
+    "imports": {},
+    "java_analysis": {
+      "annotations": [],
+      "classes": [
+        {
+          "file": "TestService.java",
+          "line": 0,
+          "name": "TestService"
+        }
+      ],
+      "complexity_signals": [],
+      "enums": [],
+      "imports": [
+        "java.util.ArrayList",
+        "java.util.List"
+      ],
+      "interfaces": [],
+      "methods": [],
+      "modules": [
+        "TestService.java"
+      ],
+      "packages": [
+        "com.example"
+      ],
+      "test_coverage_signals": [],
+      "total_classes": 1,
+      "total_enums": 0,
+      "total_interfaces": 0,
+      "total_methods": 0,
+      "total_modules": 1
+    },
+    "javascript_analysis": {
+      "classes": [],
+      "complexity_signals": [],
+      "exports": [
+        "default"
+      ],
+      "functions": [
+        {
+          "file": "test_component.js",
+          "line": 0,
+          "name": "App"
+        },
+        {
+          "file": "test_component.js",
+          "line": 0,
+          "name": "App"
+        }
+      ],
+      "imports": [
+        "react"
+      ],
+      "modules": [
+        "test_component.js"
+      ],
+      "react_components": [
+        "App"
+      ],
+      "test_coverage_signals": [],
+      "total_classes": 0,
+      "total_functions": 2,
+      "total_modules": 1,
+      "total_react_components": 1
+    },
+    "python_analysis": {
+      "classes": [
+        {
+          "file": "src/core/ai/inference_pipeline.py",
+          "line": 43,
+          "name": "AIModelRegistry"
+        },
+        {
+          "file": "src/core/pipeline/api_analysis.py",
+          "line": 21,
+          "name": "APIAnalyzer"
+        },
+        {
+          "file": "src/core/exceptions.py",
+          "line": 20,
+          "name": "AnalysisError"
+        },
+        {
+          "file": "src/core/ai/inference_pipeline.py",
+          "line": 111,
+          "name": "BaseAIModel"
+        },
+        {
+          "file": "src/core/ai/training/bootstrap_trainer.py",
+          "line": 24,
+          "name": "BootstrapTrainer"
+        },
+        {
+          "file": "src/core/pipeline/code_comprehension/__init__.py",
+          "line": 39,
+          "name": "CodeComprehensionAnalyzer"
+        },
+        {
+          "file": "src/core/ai/training/model_trainer.py",
+          "line": 52,
+          "name": "CodeDataset"
+        },
+        {
+          "file": "src/core/pipeline/code_duplication_analysis.py",
+          "line": 19,
+          "name": "CodeDuplicationAnalyzer"
+        },
+        {
+          "file": "src/core/ai/training/data_pipeline.py",
+          "line": 22,
+          "name": "CodeSample"
+        },
+        {
+          "file": "src/core/pipeline/code_comprehension/__init__.py",
+          "line": 20,
+          "name": "CodeUnderstanding"
+        },
+        {
+          "file": "src/core/pipeline/compliance_analysis.py",
+          "line": 34,
+          "name": "ComplianceAnalyzer"
+        },
+        {
+          "file": "src/core/pipeline/compliance_analysis.py",
+          "line": 16,
+          "name": "ComplianceRule"
+        },
+        {
+          "file": "src/core/pipeline/code_comprehension/__init__.py",
+          "line": 31,
+          "name": "ComprehensionResult"
+        },
+        {
+          "file": "src/core/exceptions.py",
+          "line": 35,
+          "name": "ConfigurationError"
+        },
+        {
+          "file": "src/core/ai/training/lightweight_trainer.py",
+          "line": 27,
+          "name": "Dataset"
+        },
+        {
+          "file": "src/core/pipeline/dependency_analysis.py",
+          "line": 20,
+          "name": "DependencyAnalyzer"
+        },
+        {
+          "file": "enhanced_scanner/baseline_assessment.py",
+          "line": 17,
+          "name": "EffectivenessAssessor"
+        },
+        {
+          "file": "src/core/exceptions.py",
+          "line": 40,
+          "name": "FileAccessError"
+        },
+        {
+          "file": "src/core/pipeline/analysis.py",
+          "line": 29,
+          "name": "FileCache"
+        },
+        {
+          "file": "src/core/exceptions.py",
+          "line": 49,
+          "name": "GitError"
+        },
+        {
+          "file": "src/core/ai/inference_pipeline.py",
+          "line": 147,
+          "name": "InferencePipeline"
+        },
+        {
+          "file": "src/core/ai/inference_pipeline.py",
+          "line": 33,
+          "name": "InferenceResult"
+        },
+        {
+          "file": "src/adapters/java_adapter.py",
+          "line": 4,
+          "name": "JavaAdapter"
+        },
+        {
+          "file": "src/core/ai/training/lightweight_trainer.py",
+          "line": 32,
+          "name": "LightweightCodeDataset"
+        },
+        {
+          "file": "src/core/ai/training/lightweight_trainer.py",
+          "line": 123,
+          "name": "LightweightTrainer"
+        },
+        {
+          "file": "src/core/ai/models/llama_cpp_model.py",
+          "line": 23,
+          "name": "LlamaCppModel"
+        },
+        {
+          "file": "src/core/ai/inference_pipeline.py",
+          "line": 21,
+          "name": "ModelMetadata"
+        },
+        {
+          "file": "src/core/ai/training/model_trainer.py",
+          "line": 155,
+          "name": "ModelTrainer"
+        },
+        {
+          "file": "src/core/exceptions.py",
+          "line": 25,
+          "name": "OutputGenerationError"
+        },
+        {
+          "file": "src/core/ai/training/lightweight_trainer.py",
+          "line": 219,
+          "name": "PatternBasedModel"
+        },
+        {
+          "file": "src/adapters/python_adapter.py",
+          "line": 4,
+          "name": "PythonAdapter"
+        },
+        {
+          "file": "src/core/exceptions.py",
+          "line": 15,
+          "name": "RepositoryDiscoveryError"
+        },
+        {
+          "file": "src/adapters/rust_adapter.py",
+          "line": 4,
+          "name": "RustAdapter"
+        },
+        {
+          "file": "src/api_server.py",
+          "line": 7,
+          "name": "ScannerAPIHandler"
+        },
+        {
+          "file": "src/core/exceptions.py",
+          "line": 6,
+          "name": "ScannerError"
+        },
+        {
+          "file": "src/core/pipeline/security_analysis/__init__.py",
+          "line": 21,
+          "name": "SecurityAnalyzer"
+        },
+        {
+          "file": "src/core/pipeline/security_analysis/__init__.py",
+          "line": 10,
+          "name": "SecurityFinding"
+        },
+        {
+          "file": "src/core/ai/training/model_trainer.py",
+          "line": 36,
+          "name": "TrainingConfig"
+        },
+        {
+          "file": "src/core/ai/training/data_pipeline.py",
+          "line": 44,
+          "name": "TrainingDataPipeline"
+        },
+        {
+          "file": "src/core/ai/training/data_pipeline.py",
+          "line": 35,
+          "name": "TrainingDataset"
+        },
+        {
+          "file": "src/core/ai/models/transformers_model.py",
+          "line": 25,
+          "name": "TransformersModel"
+        },
+        {
+          "file": "src/core/exceptions.py",
+          "line": 30,
+          "name": "ValidationError"
+        }
+      ],
+      "complexity_signals": [],
+      "exports": [],
+      "functions": [
+        {
+          "file": "src/core/pipeline/safe_change_surface_modeling.py",
+          "is_method": false,
+          "line": 83,
+          "name": "_analyze_complexity_safety"
+        },
+        {
+          "file": "src/core/pipeline/safe_change_surface_modeling.py",
+          "is_method": false,
+          "line": 162,
+          "name": "_analyze_critical_path_safety"
+        },
+        {
+          "file": "src/core/pipeline/safe_change_surface_modeling.py",
+          "is_method": false,
+          "line": 123,
+          "name": "_analyze_dependency_safety"
+        },
+        {
+          "file": "src/core/pipeline/safe_change_surface_modeling.py",
+          "is_method": false,
+          "line": 205,
+          "name": "_analyze_documentation_safety"
+        },
+        {
+          "file": "src/core/pipeline/safe_change_surface_modeling.py",
+          "is_method": false,
+          "line": 57,
+          "name": "_analyze_test_coverage_safety"
+        },
+        {
+          "file": "src/core/pipeline/decision_artifact_generation.py",
+          "is_method": false,
+          "line": 297,
+          "name": "_assess_analysis_consistency"
+        },
+        {
+          "file": "src/core/pipeline/authority_ceiling_evaluation.py",
+          "is_method": false,
+          "line": 300,
+          "name": "_assess_authority_confidence"
+        },
+        {
+          "file": "src/core/pipeline/decision_artifact_generation.py",
+          "is_method": false,
+          "line": 288,
+          "name": "_assess_data_completeness"
+        },
+        {
+          "file": "src/core/pipeline/authority_ceiling_evaluation.py",
+          "is_method": false,
+          "line": 135,
+          "name": "_assess_organizational_factors"
+        },
+        {
+          "file": "src/core/pipeline/risk_synthesis.py",
+          "is_method": false,
+          "line": 956,
+          "name": "_calculate_api_risk"
+        },
+        {
+          "file": "src/core/pipeline/safe_change_surface_modeling.py",
+          "is_method": false,
+          "line": 336,
+          "name": "_calculate_change_confidence"
+        },
+        {
+          "file": "src/core/pipeline/risk_synthesis.py",
+          "is_method": false,
+          "line": 441,
+          "name": "_calculate_change_risk"
+        },
+        {
+          "file": "src/core/pipeline/risk_synthesis.py",
+          "is_method": false,
+          "line": 734,
+          "name": "_calculate_compliance_risk"
+        },
+        {
+          "file": "src/core/pipeline/risk_synthesis.py",
+          "is_method": false,
+          "line": 233,
+          "name": "_calculate_comprehension_risk"
+        },
+        {
+          "file": "src/core/pipeline/risk_synthesis.py",
+          "is_method": false,
+          "line": 800,
+          "name": "_calculate_dependency_risk"
+        },
+        {
+          "file": "src/core/pipeline/determinism_verification.py",
+          "is_method": false,
+          "line": 115,
+          "name": "_calculate_deterministic_hash"
+        },
+        {
+          "file": "src/core/pipeline/risk_synthesis.py",
+          "is_method": false,
+          "line": 877,
+          "name": "_calculate_duplication_risk"
+        },
+        {
+          "file": "src/core/pipeline/risk_synthesis.py",
+          "is_method": false,
+          "line": 332,
+          "name": "_calculate_governance_risk"
+        },
+        {
+          "file": "src/core/pipeline/risk_synthesis.py",
+          "is_method": false,
+          "line": 372,
+          "name": "_calculate_intent_risk"
+        },
+        {
+          "file": "src/core/pipeline/risk_synthesis.py",
+          "is_method": false,
+          "line": 406,
+          "name": "_calculate_misleading_risk"
+        },
+        {
+          "file": "src/core/pipeline/safe_change_surface_modeling.py",
+          "is_method": false,
+          "line": 244,
+          "name": "_calculate_overall_safety"
+        },
+        {
+          "file": "src/core/pipeline/risk_synthesis.py",
+          "is_method": false,
+          "line": 1042,
+          "name": "_calculate_risk_confidence"
+        },
+        {
+          "file": "src/core/pipeline/risk_synthesis.py",
+          "is_method": false,
+          "line": 189,
+          "name": "_calculate_security_risk"
+        },
+        {
+          "file": "src/core/pipeline/risk_synthesis.py",
+          "is_method": false,
+          "line": 147,
+          "name": "_calculate_semantic_risk"
+        },
+        {
+          "file": "src/core/pipeline/risk_synthesis.py",
+          "is_method": false,
+          "line": 104,
+          "name": "_calculate_structural_risk"
+        },
+        {
+          "file": "src/core/pipeline/risk_synthesis.py",
+          "is_method": false,
+          "line": 297,
+          "name": "_calculate_testing_risk"
+        },
+        {
+          "file": "src/core/pipeline/determinism_verification.py",
+          "is_method": false,
+          "line": 92,
+          "name": "_canonicalize_dict"
+        },
+        {
+          "file": "src/core/pipeline/misleading_signal_detection.py",
+          "is_method": false,
+          "line": 66,
+          "name": "_detect_code_quality_inconsistencies"
+        },
+        {
+          "file": "src/core/pipeline/misleading_signal_detection.py",
+          "is_method": false,
+          "line": 110,
+          "name": "_detect_documentation_discrepancies"
+        },
+        {
+          "file": "src/core/pipeline/misleading_signal_detection.py",
+          "is_method": false,
+          "line": 141,
+          "name": "_detect_governance_conflicts"
+        },
+        {
+          "file": "src/core/pipeline/misleading_signal_detection.py",
+          "is_method": false,
+          "line": 166,
+          "name": "_detect_intent_mismatches"
+        },
+        {
+          "file": "src/core/pipeline/misleading_signal_detection.py",
+          "is_method": false,
+          "line": 194,
+          "name": "_detect_maintenance_indicators"
+        },
+        {
+          "file": "src/core/pipeline/misleading_signal_detection.py",
+          "is_method": false,
+          "line": 220,
+          "name": "_detect_security_deceptions"
+        },
+        {
+          "file": "src/core/pipeline/decision_artifact_generation.py",
+          "is_method": false,
+          "line": 149,
+          "name": "_determine_authority_ceiling"
+        },
+        {
+          "file": "src/core/pipeline/authority_ceiling_evaluation.py",
+          "is_method": false,
+          "line": 199,
+          "name": "_determine_final_authority_ceiling"
+        },
+        {
+          "file": "src/core/pipeline/decision_artifact_generation.py",
+          "is_method": false,
+          "line": 266,
+          "name": "_estimate_effort"
+        },
+        {
+          "file": "src/core/pipeline/authority_ceiling_evaluation.py",
+          "is_method": false,
+          "line": 62,
+          "name": "_evaluate_authority_constraints"
+        },
+        {
+          "file": "src/core/pipeline/decision_artifact_generation.py",
+          "is_method": false,
+          "line": 101,
+          "name": "_generate_action_plan"
+        },
+        {
+          "file": "src/core/quality/output_contract.py",
+          "is_method": false,
+          "line": 848,
+          "name": "_generate_authority_ceiling_summary"
+        },
+        {
+          "file": "src/core/pipeline/authority_ceiling_evaluation.py",
+          "is_method": false,
+          "line": 263,
+          "name": "_generate_authority_rationale"
+        },
+        {
+          "file": "src/core/pipeline/determinism_verification.py",
+          "is_method": false,
+          "line": 64,
+          "name": "_generate_canonical_analysis_data"
+        },
+        {
+          "file": "src/core/pipeline/decision_artifact_generation.py",
+          "is_method": false,
+          "line": 183,
+          "name": "_generate_confidence_assessment"
+        },
+        {
+          "file": "src/core/quality/output_contract.py",
+          "is_method": false,
+          "line": 774,
+          "name": "_generate_decision_artifacts_summary"
+        },
+        {
+          "file": "src/core/pipeline/decision_artifact_generation.py",
+          "is_method": false,
+          "line": 57,
+          "name": "_generate_decision_framework"
+        },
+        {
+          "file": "src/core/pipeline/determinism_verification.py",
+          "is_method": false,
+          "line": 205,
+          "name": "_generate_determinism_report"
+        },
+        {
+          "file": "src/core/quality/output_contract.py",
+          "is_method": false,
+          "line": 131,
+          "name": "_generate_evidence_highlights"
+        },
+        {
+          "file": "src/core/quality/output_contract.py",
+          "is_method": false,
+          "line": 655,
+          "name": "_generate_misleading_summary"
+        },
+        {
+          "file": "src/core/pipeline/decision_artifact_generation.py",
+          "is_method": false,
+          "line": 217,
+          "name": "_generate_next_steps"
+        },
+        {
+          "file": "src/core/pipeline/risk_synthesis.py",
+          "is_method": false,
+          "line": 532,
+          "name": "_generate_risk_recommendations"
+        },
+        {
+          "file": "src/core/quality/output_contract.py",
+          "is_method": false,
+          "line": 718,
+          "name": "_generate_risk_synthesis_summary"
+        },
+        {
+          "file": "src/core/pipeline/safe_change_surface_modeling.py",
+          "is_method": false,
+          "line": 280,
+          "name": "_generate_safe_changes"
+        },
+        {
+          "file": "src/core/quality/output_contract.py",
+          "is_method": false,
+          "line": 682,
+          "name": "_generate_safe_changes_summary"
+        },
+        {
+          "file": "src/core/quality/output_contract.py",
+          "is_method": false,
+          "line": 34,
+          "name": "_generate_system_characterization"
+        },
+        {
+          "file": "src/core/pipeline/safe_change_surface_modeling.py",
+          "is_method": false,
+          "line": 310,
+          "name": "_generate_unsafe_changes"
+        },
+        {
+          "file": "src/core/quality/output_contract.py",
+          "is_method": false,
+          "line": 702,
+          "name": "_generate_what_not_to_fix_summary"
+        },
+        {
+          "file": "src/core/pipeline/risk_synthesis.py",
+          "is_method": false,
+          "line": 664,
+          "name": "_identify_critical_issues"
+        },
+        {
+          "file": "src/core/pipeline/determinism_verification.py",
+          "is_method": false,
+          "line": 237,
+          "name": "_summarize_canonical_data"
+        },
+        {
+          "file": "src/core/pipeline/risk_synthesis.py",
+          "is_method": false,
+          "line": 472,
+          "name": "_synthesize_overall_risk"
+        },
+        {
+          "file": "src/core/pipeline/determinism_verification.py",
+          "is_method": false,
+          "line": 125,
+          "name": "_verify_internal_consistency"
+        },
+        {
+          "file": "src/core/pipeline/api_analysis.py",
+          "is_method": false,
+          "line": 509,
+          "name": "analyze_api_definitions"
+        },
+        {
+          "file": "src/core/pipeline/code_comprehension/__init__.py",
+          "is_method": false,
+          "line": 406,
+          "name": "analyze_code_comprehension"
+        },
+        {
+          "file": "src/core/pipeline/code_duplication_analysis.py",
+          "is_method": false,
+          "line": 392,
+          "name": "analyze_code_duplication"
+        },
+        {
+          "file": "src/core/pipeline/intent_posture_classification.py",
+          "is_method": false,
+          "line": 379,
+          "name": "analyze_code_patterns"
+        },
+        {
+          "file": "src/core/pipeline/compliance_analysis.py",
+          "is_method": false,
+          "line": 494,
+          "name": "analyze_compliance"
+        },
+        {
+          "file": "src/core/pipeline/dependency_analysis.py",
+          "is_method": false,
+          "line": 365,
+          "name": "analyze_dependencies"
+        },
+        {
+          "file": "src/core/pipeline/governance_signal_analysis.py",
+          "is_method": false,
+          "line": 8,
+          "name": "analyze_governance_signals"
+        },
+        {
+          "file": "src/core/pipeline/static_semantic_analysis.py",
+          "is_method": false,
+          "line": 249,
+          "name": "analyze_java_codebase"
+        },
+        {
+          "file": "src/core/pipeline/static_semantic_analysis.py",
+          "is_method": false,
+          "line": 355,
+          "name": "analyze_java_file"
+        },
+        {
+          "file": "src/core/pipeline/static_semantic_analysis.py",
+          "is_method": false,
+          "line": 164,
+          "name": "analyze_java_files"
+        },
+        {
+          "file": "src/core/pipeline/static_semantic_analysis.py",
+          "is_method": false,
+          "line": 175,
+          "name": "analyze_javascript_codebase"
+        },
+        {
+          "file": "src/core/pipeline/static_semantic_analysis.py",
+          "is_method": false,
+          "line": 295,
+          "name": "analyze_javascript_file"
+        },
+        {
+          "file": "src/core/pipeline/static_semantic_analysis.py",
+          "is_method": false,
+          "line": 142,
+          "name": "analyze_javascript_files"
+        },
+        {
+          "file": "src/core/pipeline/misleading_signal_detection.py",
+          "is_method": false,
+          "line": 6,
+          "name": "analyze_misleading_signals"
+        },
+        {
+          "file": "src/core/pipeline/static_semantic_analysis.py",
+          "is_method": false,
+          "line": 54,
+          "name": "analyze_python_codebase"
+        },
+        {
+          "file": "src/core/pipeline/static_semantic_analysis.py",
+          "is_method": false,
+          "line": 95,
+          "name": "analyze_python_file"
+        },
+        {
+          "file": "src/core/pipeline/static_semantic_analysis.py",
+          "is_method": false,
+          "line": 43,
+          "name": "analyze_python_files"
+        },
+        {
+          "file": "src/core/pipeline/structural_modeling.py",
+          "is_method": false,
+          "line": 8,
+          "name": "analyze_repository_structure"
+        },
+        {
+          "file": "src/core/pipeline/safe_change_surface_modeling.py",
+          "is_method": false,
+          "line": 6,
+          "name": "analyze_safe_change_surface"
+        },
+        {
+          "file": "src/core/pipeline/security_analysis/__init__.py",
+          "is_method": false,
+          "line": 341,
+          "name": "analyze_security_vulnerabilities"
+        },
+        {
+          "file": "src/core/pipeline/static_semantic_analysis.py",
+          "is_method": false,
+          "line": 10,
+          "name": "analyze_semantic_structure"
+        },
+        {
+          "file": "src/core/pipeline/test_signal_analysis.py",
+          "is_method": false,
+          "line": 8,
+          "name": "analyze_test_signals"
+        },
+        {
+          "file": "src/core/pipeline/static_semantic_analysis.py",
+          "is_method": false,
+          "line": 216,
+          "name": "analyze_typescript_codebase"
+        },
+        {
+          "file": "src/core/pipeline/static_semantic_analysis.py",
+          "is_method": false,
+          "line": 153,
+          "name": "analyze_typescript_files"
+        },
+        {
+          "file": "src/core/principles/trust.py",
+          "is_method": false,
+          "line": 18,
+          "name": "apply_conservative_bias"
+        },
+        {
+          "file": "src/core/pipeline/governance_signal_analysis.py",
+          "is_method": false,
+          "line": 106,
+          "name": "assess_ci_cd_governance"
+        },
+        {
+          "file": "src/core/pipeline/governance_signal_analysis.py",
+          "is_method": false,
+          "line": 24,
+          "name": "assess_code_quality_governance"
+        },
+        {
+          "file": "src/core/pipeline/governance_signal_analysis.py",
+          "is_method": false,
+          "line": 190,
+          "name": "assess_dependency_governance"
+        },
+        {
+          "file": "src/core/pipeline/governance_signal_analysis.py",
+          "is_method": false,
+          "line": 148,
+          "name": "assess_documentation_governance"
+        },
+        {
+          "file": "src/core/pipeline/intent_posture_classification.py",
+          "is_method": false,
+          "line": 259,
+          "name": "assess_risk_posture"
+        },
+        {
+          "file": "src/core/pipeline/governance_signal_analysis.py",
+          "is_method": false,
+          "line": 67,
+          "name": "assess_security_governance"
+        },
+        {
+          "file": "src/core/pipeline/intent_posture_classification.py",
+          "is_method": false,
+          "line": 99,
+          "name": "assess_security_posture"
+        },
+        {
+          "file": "src/core/pipeline/test_signal_analysis.py",
+          "is_method": false,
+          "line": 125,
+          "name": "assess_test_coverage"
+        },
+        {
+          "file": "src/core/pipeline/governance_signal_analysis.py",
+          "is_method": false,
+          "line": 264,
+          "name": "calculate_governance_maturity"
+        },
+        {
+          "file": "src/core/pipeline/intent_posture_classification.py",
+          "is_method": false,
+          "line": 416,
+          "name": "calculate_intent_confidence"
+        },
+        {
+          "file": "src/core/pipeline/test_signal_analysis.py",
+          "is_method": false,
+          "line": 205,
+          "name": "calculate_testing_maturity"
+        },
+        {
+          "file": "src/core/principles/behavioral.py",
+          "is_method": false,
+          "line": 24,
+          "name": "check_never_force_action"
+        },
+        {
+          "file": "src/core/principles/behavioral.py",
+          "is_method": false,
+          "line": 11,
+          "name": "check_never_guess_intent"
+        },
+        {
+          "file": "src/core/principles/behavioral.py",
+          "is_method": false,
+          "line": 20,
+          "name": "check_never_mask_unknowns"
+        },
+        {
+          "file": "src/core/principles/behavioral.py",
+          "is_method": false,
+          "line": 16,
+          "name": "check_never_optimize_for_output_volume"
+        },
+        {
+          "file": "src/core/principles/behavioral.py",
+          "is_method": false,
+          "line": 28,
+          "name": "check_never_require_manual_intervention"
+        },
+        {
+          "file": "src/core/quality/assurance.py",
+          "is_method": false,
+          "line": 34,
+          "name": "check_success_criteria"
+        },
+        {
+          "file": "src/core/pipeline/intent_posture_classification.py",
+          "is_method": false,
+          "line": 6,
+          "name": "classify_intent_posture"
+        },
+        {
+          "file": "src/core/safety/intent_classification.py",
+          "is_method": false,
+          "line": 22,
+          "name": "classify_intent_posture"
+        },
+        {
+          "file": "src/core/pipeline/intent_posture_classification.py",
+          "is_method": false,
+          "line": 184,
+          "name": "classify_maturity_level"
+        },
+        {
+          "file": "src/core/pipeline/intent_posture_classification.py",
+          "is_method": false,
+          "line": 34,
+          "name": "classify_primary_intent"
+        },
+        {
+          "file": "src/core/ai/training/lightweight_trainer.py",
+          "is_method": false,
+          "line": 302,
+          "name": "create_fallback_models"
+        },
+        {
+          "file": "src/core/safety/refusal_artifact.py",
+          "is_method": false,
+          "line": 19,
+          "name": "create_refusal_artifact"
+        },
+        {
+          "file": "tests/test_determinism.py",
+          "is_method": false,
+          "line": 12,
+          "name": "create_test_repo"
+        },
+        {
+          "file": "src/core/pipeline/structural_modeling.py",
+          "is_method": false,
+          "line": 83,
+          "name": "detect_build_systems"
+        },
+        {
+          "file": "src/core/pipeline/structural_modeling.py",
+          "is_method": false,
+          "line": 136,
+          "name": "detect_configuration"
+        },
+        {
+          "file": "src/core/pipeline/structural_modeling.py",
+          "is_method": false,
+          "line": 122,
+          "name": "detect_documentation"
+        },
+        {
+          "file": "src/core/pipeline/structural_modeling.py",
+          "is_method": false,
+          "line": 54,
+          "name": "detect_frameworks"
+        },
+        {
+          "file": "src/core/pipeline/structural_modeling.py",
+          "is_method": false,
+          "line": 22,
+          "name": "detect_languages"
+        },
+        {
+          "file": "src/core/pipeline/structural_modeling.py",
+          "is_method": false,
+          "line": 99,
+          "name": "detect_test_frameworks"
+        },
+        {
+          "file": "src/core/pipeline/test_signal_analysis.py",
+          "is_method": false,
+          "line": 72,
+          "name": "detect_test_frameworks_detailed"
+        },
+        {
+          "file": "src/core/pipeline/intent_posture_classification.py",
+          "is_method": false,
+          "line": 317,
+          "name": "determine_development_stage"
+        },
+        {
+          "file": "src/core/pipeline/repository_discovery.py",
+          "is_method": false,
+          "line": 13,
+          "name": "discover_repository_root"
+        },
+        {
+          "file": "src/core/safety/authority_ceiling.py",
+          "is_method": false,
+          "line": 27,
+          "name": "emit_refusal_artifact"
+        },
+        {
+          "file": "src/core/principles/trust.py",
+          "is_method": false,
+          "line": 22,
+          "name": "enforce_authority_limits"
+        },
+        {
+          "file": "src/core/principles/trust.py",
+          "is_method": false,
+          "line": 10,
+          "name": "enforce_determinism"
+        },
+        {
+          "file": "src/core/constraints/operating.py",
+          "is_method": false,
+          "line": 44,
+          "name": "enforce_determinism_guarantees"
+        },
+        {
+          "file": "src/core/quality/assurance.py",
+          "is_method": false,
+          "line": 30,
+          "name": "enforce_quality_bar"
+        },
+        {
+          "file": "src/core/principles/trust.py",
+          "is_method": false,
+          "line": 14,
+          "name": "enforce_reproducibility"
+        },
+        {
+          "file": "src/core/pipeline/authority_ceiling_evaluation.py",
+          "is_method": false,
+          "line": 6,
+          "name": "evaluate_authority_ceiling"
+        },
+        {
+          "file": "src/core/safety/authority_ceiling.py",
+          "is_method": false,
+          "line": 22,
+          "name": "evaluate_authority_ceiling"
+        },
+        {
+          "file": "src/core/risk/confidence_model.py",
+          "is_method": false,
+          "line": 15,
+          "name": "evaluate_confidence"
+        },
+        {
+          "file": "src/core/pipeline/test_signal_analysis.py",
+          "is_method": false,
+          "line": 164,
+          "name": "evaluate_test_quality"
+        },
+        {
+          "file": "src/core/pipeline/analysis.py",
+          "is_method": false,
+          "line": 83,
+          "name": "execute_pipeline"
+        },
+        {
+          "file": "src/core/pipeline/decision_artifact_generation.py",
+          "is_method": false,
+          "line": 6,
+          "name": "generate_decision_artifacts"
+        },
+        {
+          "file": "src/core/risk/decision_artifacts.py",
+          "is_method": false,
+          "line": 14,
+          "name": "generate_decision_artifacts"
+        },
+        {
+          "file": "src/core/quality/output_contract.py",
+          "is_method": false,
+          "line": 897,
+          "name": "generate_executive_verdict"
+        },
+        {
+          "file": "src/core/quality/output_contract.py",
+          "is_method": false,
+          "line": 606,
+          "name": "generate_machine_output"
+        },
+        {
+          "file": "src/core/quality/output_contract.py",
+          "is_method": false,
+          "line": 190,
+          "name": "generate_primary_report"
+        },
+        {
+          "file": "src/core/pipeline/intent_posture_classification.py",
+          "is_method": false,
+          "line": 450,
+          "name": "generate_risk_mitigations"
+        },
+        {
+          "file": "src/core/ai/inference_pipeline.py",
+          "is_method": false,
+          "line": 244,
+          "name": "get_ai_pipeline"
+        },
+        {
+          "file": "src/core/pipeline/repository_discovery.py",
+          "is_method": false,
+          "line": 81,
+          "name": "get_canonical_file_list"
+        },
+        {
+          "file": "tests/test_determinism.py",
+          "is_method": false,
+          "line": 40,
+          "name": "get_dir_hash"
+        },
+        {
+          "file": "src/core/pipeline/structural_modeling.py",
+          "is_method": false,
+          "line": 148,
+          "name": "get_file_counts"
+        },
+        {
+          "file": "tests/test_determinism.py",
+          "is_method": false,
+          "line": 34,
+          "name": "get_file_hash"
+        },
+        {
+          "file": "src/core/ai/training/lightweight_trainer.py",
+          "is_method": false,
+          "line": 295,
+          "name": "get_pattern_model"
+        },
+        {
+          "file": "src/core/constraints/operating.py",
+          "is_method": false,
+          "line": 48,
+          "name": "handle_unexpected_conditions"
+        },
+        {
+          "file": "tests/fixtures/minimal_repo/sample.py",
+          "is_method": false,
+          "line": 4,
+          "name": "hello"
+        },
+        {
+          "file": "src/core/pipeline/governance_signal_analysis.py",
+          "is_method": false,
+          "line": 238,
+          "name": "identify_compliance_artifacts"
+        },
+        {
+          "file": "src/core/pipeline/governance_signal_analysis.py",
+          "is_method": false,
+          "line": 310,
+          "name": "identify_governance_gaps"
+        },
+        {
+          "file": "src/core/pipeline/test_signal_analysis.py",
+          "is_method": false,
+          "line": 22,
+          "name": "identify_test_files"
+        },
+        {
+          "file": "src/core/pipeline/test_signal_analysis.py",
+          "is_method": false,
+          "line": 241,
+          "name": "identify_test_gaps"
+        },
+        {
+          "file": "src/core/pipeline/test_signal_analysis.py",
+          "is_method": false,
+          "line": 48,
+          "name": "is_test_file"
+        },
+        {
+          "file": "src/core/risk/confidence_model.py",
+          "is_method": false,
+          "line": 20,
+          "name": "justify_confidence"
+        },
+        {
+          "file": "enhanced_scanner/baseline_assessment.py",
+          "is_method": false,
+          "line": 286,
+          "name": "main"
+        },
+        {
+          "file": "src/api_server.py",
+          "is_method": false,
+          "line": 48,
+          "name": "main"
+        },
+        {
+          "file": "src/cli.py",
+          "is_method": false,
+          "line": 13,
+          "name": "main"
+        },
+        {
+          "file": "src/core/ai/training/bootstrap_trainer.py",
+          "is_method": false,
+          "line": 305,
+          "name": "main"
+        },
+        {
+          "file": "src/core/safety/safe_change_surface.py",
+          "is_method": false,
+          "line": 22,
+          "name": "model_safe_change_surface"
+        },
+        {
+          "file": "tests/test_scanner_cli.py",
+          "is_method": false,
+          "line": 34,
+          "name": "output_dir"
+        },
+        {
+          "file": "tests/test_scanner_cli.py",
+          "is_method": false,
+          "line": 41,
+          "name": "run_scanner"
+        },
+        {
+          "file": "tests/test_determinism.py",
+          "is_method": false,
+          "line": 52,
+          "name": "run_scanner_deterministic"
+        },
+        {
+          "file": "src/core/ai/setup_registry.py",
+          "is_method": false,
+          "line": 13,
+          "name": "setup_ai_registry"
+        },
+        {
+          "file": "src/core/pipeline/risk_synthesis.py",
+          "is_method": false,
+          "line": 6,
+          "name": "synthesize_risks"
+        },
+        {
+          "file": "src/core/risk/synthesis.py",
+          "is_method": false,
+          "line": 18,
+          "name": "synthesize_risks_and_gaps"
+        },
+        {
+          "file": "tests/test_scanner_cli.py",
+          "is_method": false,
+          "line": 74,
+          "name": "test_cli_file_as_repo"
+        },
+        {
+          "file": "tests/test_scanner_cli.py",
+          "is_method": false,
+          "line": 65,
+          "name": "test_cli_invalid_repository"
+        },
+        {
+          "file": "tests/test_scanner_cli.py",
+          "is_method": false,
+          "line": 98,
+          "name": "test_cli_json_only"
+        },
+        {
+          "file": "tests/test_scanner_cli.py",
+          "is_method": false,
+          "line": 89,
+          "name": "test_cli_markdown_only"
+        },
+        {
+          "file": "tests/test_scanner_cli.py",
+          "is_method": false,
+          "line": 262,
+          "name": "test_cli_report_type_both"
+        },
+        {
+          "file": "tests/test_scanner_cli.py",
+          "is_method": false,
+          "line": 229,
+          "name": "test_cli_report_type_comprehensive"
+        },
+        {
+          "file": "tests/test_scanner_cli.py",
+          "is_method": false,
+          "line": 277,
+          "name": "test_cli_report_type_default"
+        },
+        {
+          "file": "tests/test_scanner_cli.py",
+          "is_method": false,
+          "line": 243,
+          "name": "test_cli_report_type_verdict"
+        },
+        {
+          "file": "tests/test_scanner_cli.py",
+          "is_method": false,
+          "line": 53,
+          "name": "test_cli_valid_repository"
+        },
+        {
+          "file": "tests/test_scanner_cli.py",
+          "is_method": false,
+          "line": 160,
+          "name": "test_determinism"
+        },
+        {
+          "file": "tests/test_determinism.py",
+          "is_method": false,
+          "line": 85,
+          "name": "test_determinism_different_output_dirs"
+        },
+        {
+          "file": "tests/test_determinism.py",
+          "is_method": false,
+          "line": 174,
+          "name": "test_determinism_file_ordering"
+        },
+        {
+          "file": "tests/test_determinism.py",
+          "is_method": false,
+          "line": 126,
+          "name": "test_determinism_json_canonical_sorting"
+        },
+        {
+          "file": "tests/test_determinism.py",
+          "is_method": false,
+          "line": 66,
+          "name": "test_determinism_multiple_runs"
+        },
+        {
+          "file": "tests/test_determinism.py",
+          "is_method": false,
+          "line": 149,
+          "name": "test_determinism_no_timestamps"
+        },
+        {
+          "file": "tests/test_determinism.py",
+          "is_method": false,
+          "line": 102,
+          "name": "test_determinism_repository_content"
+        },
+        {
+          "file": "tests/test_repository_discovery.py",
+          "is_method": false,
+          "line": 12,
+          "name": "test_discover_repository_root_git"
+        },
+        {
+          "file": "tests/test_repository_discovery.py",
+          "is_method": false,
+          "line": 98,
+          "name": "test_discover_repository_root_invalid_path"
+        },
+        {
+          "file": "tests/test_repository_discovery.py",
+          "is_method": false,
+          "line": 37,
+          "name": "test_discover_repository_root_non_git"
+        },
+        {
+          "file": "tests/test_pipeline.py",
+          "is_method": false,
+          "line": 9,
+          "name": "test_execute_pipeline_basic"
+        },
+        {
+          "file": "tests/test_pipeline.py",
+          "is_method": false,
+          "line": 56,
+          "name": "test_execute_pipeline_empty_repo"
+        },
+        {
+          "file": "tests/test_pipeline.py",
+          "is_method": false,
+          "line": 90,
+          "name": "test_execute_pipeline_file_sorting"
+        },
+        {
+          "file": "tests/test_pipeline.py",
+          "is_method": false,
+          "line": 30,
+          "name": "test_execute_pipeline_git_repo"
+        },
+        {
+          "file": "tests/test_pipeline.py",
+          "is_method": false,
+          "line": 68,
+          "name": "test_execute_pipeline_nested_structure"
+        },
+        {
+          "file": "tests/test_pipeline.py",
+          "is_method": false,
+          "line": 106,
+          "name": "test_execute_pipeline_subdirectory_start"
+        },
+        {
+          "file": "tests/test_output_contract.py",
+          "is_method": false,
+          "line": 168,
+          "name": "test_generate_executive_verdict_fail"
+        },
+        {
+          "file": "tests/test_output_contract.py",
+          "is_method": false,
+          "line": 202,
+          "name": "test_generate_executive_verdict_insufficient_evidence"
+        },
+        {
+          "file": "tests/test_output_contract.py",
+          "is_method": false,
+          "line": 135,
+          "name": "test_generate_executive_verdict_pass"
+        },
+        {
+          "file": "tests/test_output_contract.py",
+          "is_method": false,
+          "line": 225,
+          "name": "test_generate_executive_verdict_word_limit"
+        },
+        {
+          "file": "tests/test_output_contract.py",
+          "is_method": false,
+          "line": 51,
+          "name": "test_generate_machine_output_basic"
+        },
+        {
+          "file": "tests/test_output_contract.py",
+          "is_method": false,
+          "line": 84,
+          "name": "test_generate_machine_output_fallback"
+        },
+        {
+          "file": "tests/test_output_contract.py",
+          "is_method": false,
+          "line": 8,
+          "name": "test_generate_primary_report_basic"
+        },
+        {
+          "file": "tests/test_output_contract.py",
+          "is_method": false,
+          "line": 40,
+          "name": "test_generate_primary_report_fallback"
+        },
+        {
+          "file": "tests/test_repository_discovery.py",
+          "is_method": false,
+          "line": 49,
+          "name": "test_get_canonical_file_list"
+        },
+        {
+          "file": "tests/test_repository_discovery.py",
+          "is_method": false,
+          "line": 71,
+          "name": "test_get_canonical_file_list_empty"
+        },
+        {
+          "file": "tests/test_repository_discovery.py",
+          "is_method": false,
+          "line": 107,
+          "name": "test_get_canonical_file_list_invalid_path"
+        },
+        {
+          "file": "tests/test_repository_discovery.py",
+          "is_method": false,
+          "line": 80,
+          "name": "test_get_canonical_file_list_nested"
+        },
+        {
+          "file": "tests/test_output_contract.py",
+          "is_method": false,
+          "line": 96,
+          "name": "test_machine_output_json_serializable"
+        },
+        {
+          "file": "tests/test_output_contract.py",
+          "is_method": false,
+          "line": 112,
+          "name": "test_machine_output_schema_compliance"
+        },
+        {
+          "file": "tests/test_scanner_cli.py",
+          "is_method": false,
+          "line": 130,
+          "name": "test_output_json_schema"
+        },
+        {
+          "file": "tests/test_scanner_cli.py",
+          "is_method": false,
+          "line": 107,
+          "name": "test_output_markdown_structure"
+        },
+        {
+          "file": "tests/test_scanner_cli.py",
+          "is_method": false,
+          "line": 15,
+          "name": "test_repo"
+        },
+        {
+          "file": "tests/test_scanner_cli.py",
+          "is_method": false,
+          "line": 186,
+          "name": "test_repository_discovery_git_repo"
+        },
+        {
+          "file": "tests/test_scanner_cli.py",
+          "is_method": false,
+          "line": 205,
+          "name": "test_repository_discovery_non_git"
+        },
+        {
+          "file": "tests/test_scanner_cli.py",
+          "is_method": false,
+          "line": 223,
+          "name": "test_scanner_cli_invocation"
+        },
+        {
+          "file": "src/core/ai/training/model_trainer.py",
+          "is_method": false,
+          "line": 382,
+          "name": "train_bootstrap_models"
+        },
+        {
+          "file": "src/core/constraints/operating.py",
+          "is_method": false,
+          "line": 40,
+          "name": "validate_execution_constraints"
+        },
+        {
+          "file": "src/core/pipeline/analysis.py",
+          "is_method": false,
+          "line": 172,
+          "name": "validate_parallelism_guarantees"
+        },
+        {
+          "file": "src/core/pipeline/determinism_verification.py",
+          "is_method": false,
+          "line": 8,
+          "name": "verify_determinism"
+        }
+      ],
+      "imports": [
+        "abc.ABC",
+        "abc.abstractmethod",
+        "ai.inference_pipeline.AIModelRegistry",
+        "ai.inference_pipeline.ModelMetadata",
+        "ai.inference_pipeline.get_ai_pipeline",
+        "argparse",
+        "ast",
+        "collections.defaultdict",
+        "concurrent.futures",
+        "concurrent.futures.ThreadPoolExecutor",
+        "dataclasses.dataclass",
+        "datasets",
+        "datetime.datetime",
+        "datetime.timedelta",
+        "functools",
+        "hashlib",
+        "http.server.BaseHTTPRequestHandler",
+        "http.server.HTTPServer",
+        "inference_pipeline.BaseAIModel",
+        "inference_pipeline.InferenceResult",
+        "inference_pipeline.ModelMetadata",
+        "json",
+        "llama_cpp.Llama",
+        "logging",
+        "os",
+        "pathlib.Path",
+        "pickle",
+        "pytest",
+        "re",
+        "shutil",
+        "src.core.ai.training.data_pipeline.TrainingDataPipeline",
+        "src.core.ai.training.lightweight_trainer.LightweightTrainer",
+        "src.core.ai.training.lightweight_trainer.create_fallback_models",
+        "src.core.exceptions.AnalysisError",
+        "src.core.exceptions.FileAccessError",
+        "src.core.exceptions.OutputGenerationError",
+        "src.core.exceptions.RepositoryDiscoveryError",
+        "src.core.exceptions.ScannerError",
+        "src.core.exceptions.ValidationError",
+        "src.core.pipeline.analysis.execute_pipeline",
+        "src.core.pipeline.api_analysis.analyze_api_definitions",
+        "src.core.pipeline.authority_ceiling_evaluation.evaluate_authority_ceiling",
+        "src.core.pipeline.code_comprehension.analyze_code_comprehension",
+        "src.core.pipeline.code_duplication_analysis.analyze_code_duplication",
+        "src.core.pipeline.compliance_analysis.analyze_compliance",
+        "src.core.pipeline.decision_artifact_generation.generate_decision_artifacts",
+        "src.core.pipeline.dependency_analysis.analyze_dependencies",
+        "src.core.pipeline.determinism_verification.verify_determinism",
+        "src.core.pipeline.governance_signal_analysis.analyze_governance_signals",
+        "src.core.pipeline.intent_posture_classification.classify_intent_posture",
+        "src.core.pipeline.misleading_signal_detection.analyze_misleading_signals",
+        "src.core.pipeline.repository_discovery.discover_repository_root",
+        "src.core.pipeline.repository_discovery.get_canonical_file_list",
+        "src.core.pipeline.risk_synthesis.synthesize_risks",
+        "src.core.pipeline.safe_change_surface_modeling.analyze_safe_change_surface",
+        "src.core.pipeline.security_analysis.analyze_security_vulnerabilities",
+        "src.core.pipeline.static_semantic_analysis.analyze_semantic_structure",
+        "src.core.pipeline.structural_modeling.analyze_repository_structure",
+        "src.core.pipeline.test_signal_analysis.analyze_test_signals",
+        "src.core.quality.output_contract.generate_executive_verdict",
+        "src.core.quality.output_contract.generate_machine_output",
+        "src.core.quality.output_contract.generate_primary_report",
+        "static_semantic_analysis.analyze_semantic_structure",
+        "subprocess",
+        "sys",
+        "tempfile",
+        "time",
+        "torch",
+        "torch.nn",
+        "torch.optim.AdamW",
+        "torch.utils.data.DataLoader",
+        "torch.utils.data.Dataset",
+        "transformers.AutoModelForCausalLM",
+        "transformers.AutoModelForSequenceClassification",
+        "transformers.AutoTokenizer",
+        "transformers.DataCollatorForLanguageModeling",
+        "transformers.DataCollatorWithPadding",
+        "transformers.Trainer",
+        "transformers.TrainingArguments",
+        "transformers.pipeline",
+        "typing.Any",
+        "typing.Dict",
+        "typing.List",
+        "typing.Optional",
+        "typing.Set",
+        "typing.Tuple",
+        "typing.Union",
+        "urllib.parse.urlparse",
+        "yaml"
+      ],
+      "modules": [
+        "enhanced_scanner/baseline_assessment.py",
+        "src/adapters/java_adapter.py",
+        "src/adapters/python_adapter.py",
+        "src/adapters/rust_adapter.py",
+        "src/api_server.py",
+        "src/cli.py",
+        "src/core/ai/inference_pipeline.py",
+        "src/core/ai/models/llama_cpp_model.py",
+        "src/core/ai/models/transformers_model.py",
+        "src/core/ai/setup_registry.py",
+        "src/core/ai/training/bootstrap_trainer.py",
+        "src/core/ai/training/data_pipeline.py",
+        "src/core/ai/training/lightweight_trainer.py",
+        "src/core/ai/training/model_trainer.py",
+        "src/core/constraints/operating.py",
+        "src/core/exceptions.py",
+        "src/core/pipeline/analysis.py",
+        "src/core/pipeline/api_analysis.py",
+        "src/core/pipeline/authority_ceiling_evaluation.py",
+        "src/core/pipeline/code_comprehension/__init__.py",
+        "src/core/pipeline/code_duplication_analysis.py",
+        "src/core/pipeline/compliance_analysis.py",
+        "src/core/pipeline/decision_artifact_generation.py",
+        "src/core/pipeline/dependency_analysis.py",
+        "src/core/pipeline/determinism_verification.py",
+        "src/core/pipeline/governance_signal_analysis.py",
+        "src/core/pipeline/intent_posture_classification.py",
+        "src/core/pipeline/misleading_signal_detection.py",
+        "src/core/pipeline/repository_discovery.py",
+        "src/core/pipeline/risk_synthesis.py",
+        "src/core/pipeline/safe_change_surface_modeling.py",
+        "src/core/pipeline/security_analysis/__init__.py",
+        "src/core/pipeline/static_semantic_analysis.py",
+        "src/core/pipeline/structural_modeling.py",
+        "src/core/pipeline/test_signal_analysis.py",
+        "src/core/principles/behavioral.py",
+        "src/core/principles/epistemic.py",
+        "src/core/principles/trust.py",
+        "src/core/quality/assurance.py",
+        "src/core/quality/output_contract.py",
+        "src/core/risk/confidence_model.py",
+        "src/core/risk/decision_artifacts.py",
+        "src/core/risk/synthesis.py",
+        "src/core/safety/authority_ceiling.py",
+        "src/core/safety/intent_classification.py",
+        "src/core/safety/refusal_artifact.py",
+        "src/core/safety/safe_change_surface.py",
+        "src/core/system_config.py",
+        "src/core/system_identity.py",
+        "src/core/system_purpose.py",
+        "tests/fixtures/minimal_repo/sample.py",
+        "tests/test_determinism.py",
+        "tests/test_output_contract.py",
+        "tests/test_pipeline.py",
+        "tests/test_repository_discovery.py",
+        "tests/test_scanner_cli.py"
+      ],
+      "test_coverage_signals": [],
+      "total_classes": 42,
+      "total_functions": 208,
+      "total_modules": 56
+    },
+    "typescript_analysis": {
+      "has_config": false,
+      "has_react_components": false,
+      "has_tests": false,
+      "typescript_files_count": 0
+    }
+  },
+  "structure": {
+    "build_systems": [],
+    "configuration": [
+      ".gitignore"
+    ],
+    "documentation": [
+      "README",
+      "docs/ directory",
+      "Markdown files"
+    ],
+    "file_counts": {
+      "code": 96,
+      "config": 37,
+      "docs": 23,
+      "test": 27,
+      "total": 193
+    },
+    "frameworks": [
+      "Python (pyproject.toml)"
+    ],
+    "languages": {
+      "JSON": 33,
+      "Java": 1,
+      "JavaScript": 1,
+      "Markdown": 21,
+      "Python": 56,
+      "Shell": 1,
+      "Text": 9,
+      "Unknown": 69,
+      "YAML": 2
+    },
+    "test_frameworks": [
+      "pytest"
+    ]
+  },
+  "summary": {
+    "files_scanned": 193,
+    "gaps_count": 0,
+    "overall_score": 0.0,
+    "tests_discovered": 27
+  },
+  "tasks": {},
+  "test_signals": {
+    "test_coverage_signals": {
+      "coverage_tools": [],
+      "has_coverage_tools": false,
+      "test_file_percentage": 21.951219512195124,
+      "test_to_code_ratio": 0.28125,
+      "untested_modules": [
+        "enhanced_scanner/baseline_assessment.py",
+        "src/adapters/java_adapter.py",
+        "src/adapters/python_adapter.py",
+        "src/adapters/rust_adapter.py",
+        "src/api_server.py",
+        "src/cli.py",
+        "src/core/ai/inference_pipeline.py",
+        "src/core/ai/models/llama_cpp_model.py",
+        "src/core/ai/models/transformers_model.py",
+        "src/core/ai/setup_registry.py",
+        "src/core/ai/training/bootstrap_trainer.py",
+        "src/core/ai/training/data_pipeline.py",
+        "src/core/ai/training/lightweight_trainer.py",
+        "src/core/ai/training/model_trainer.py",
+        "src/core/constraints/operating.py",
+        "src/core/exceptions.py",
+        "src/core/pipeline/analysis.py",
+        "src/core/pipeline/api_analysis.py",
+        "src/core/pipeline/authority_ceiling_evaluation.py",
+        "src/core/pipeline/code_comprehension/__init__.py",
+        "src/core/pipeline/code_duplication_analysis.py",
+        "src/core/pipeline/compliance_analysis.py",
+        "src/core/pipeline/decision_artifact_generation.py",
+        "src/core/pipeline/dependency_analysis.py",
+        "src/core/pipeline/determinism_verification.py",
+        "src/core/pipeline/governance_signal_analysis.py",
+        "src/core/pipeline/intent_posture_classification.py",
+        "src/core/pipeline/misleading_signal_detection.py",
+        "src/core/pipeline/risk_synthesis.py",
+        "src/core/pipeline/safe_change_surface_modeling.py",
+        "src/core/pipeline/security_analysis/__init__.py",
+        "src/core/pipeline/static_semantic_analysis.py",
+        "src/core/pipeline/structural_modeling.py",
+        "src/core/pipeline/test_signal_analysis.py",
+        "src/core/principles/behavioral.py",
+        "src/core/principles/epistemic.py",
+        "src/core/principles/trust.py",
+        "src/core/quality/assurance.py",
+        "src/core/risk/confidence_model.py",
+        "src/core/risk/decision_artifacts.py",
+        "src/core/risk/synthesis.py",
+        "src/core/safety/authority_ceiling.py",
+        "src/core/safety/intent_classification.py",
+        "src/core/safety/refusal_artifact.py",
+        "src/core/safety/safe_change_surface.py",
+        "src/core/system_config.py",
+        "src/core/system_identity.py",
+        "src/core/system_purpose.py",
+        "tests/fixtures/minimal_repo/sample.py",
+        "tests/test_determinism.py",
+        "tests/test_output_contract.py",
+        "tests/test_pipeline.py",
+        "tests/test_repository_discovery.py",
+        "tests/test_scanner_cli.py"
+      ]
+    },
+    "test_files": {
+      "e2e_tests": [],
+      "integration_tests": [],
+      "other_tests": [
+        "TestService.java",
+        "final_test/scan_report.json",
+        "final_test/scan_report.md",
+        "pytest.ini",
+        "src/core/ai/registry/models/lightweight-classification-1766516788-1.0.0/special_tokens_map.json",
+        "src/core/ai/registry/models/lightweight-summarization-1766516780-1.0.0/special_tokens_map.json",
+        "tests/fixtures/minimal_repo/README.md",
+        "tests/fixtures/minimal_repo/sample.py"
+      ],
+      "total_test_files": 28,
+      "unit_tests": [
+        ".pytest_cache/CACHEDIR.TAG",
+        ".pytest_cache/README.md",
+        ".pytest_cache/v/cache/lastfailed",
+        ".pytest_cache/v/cache/nodeids",
+        "docs/TEST_PLAN.md",
+        "src/core/pipeline/test_signal_analysis.py",
+        "test_component.js",
+        "test_governance/scan_report.json",
+        "test_governance/scan_report.md",
+        "test_semantic/scan_report.json",
+        "test_semantic/scan_report.md",
+        "test_structural/scan_report.json",
+        "test_structural/scan_report.md",
+        "test_testing/scan_report.json",
+        "test_testing/scan_report.md",
+        "tests/test_determinism.py",
+        "tests/test_output_contract.py",
+        "tests/test_pipeline.py",
+        "tests/test_repository_discovery.py",
+        "tests/test_scanner_cli.py"
+      ]
+    },
+    "test_frameworks": [
+      {
+        "confidence": "high",
+        "framework": "pytest",
+        "language": "Python"
+      },
+      {
+        "confidence": "high",
+        "framework": "pytest",
+        "language": "Configuration"
+      }
+    ],
+    "test_gaps": [
+      {
+        "description": "No dedicated test directory found",
+        "gap_type": "missing_test_directory",
+        "severity": "medium"
+      },
+      {
+        "description": "54 modules appear untested",
+        "gap_type": "untested_modules",
+        "severity": "high"
+      }
+    ],
+    "test_quality_signals": [
+      {
+        "count": 57,
+        "quality": "positive",
+        "signal": "test_functions_found"
+      },
+      {
+        "count": 1,
+        "quality": "positive",
+        "signal": "test_setup_methods"
+      }
+    ],
+    "testing_maturity_score": 0.5
+  }
+}

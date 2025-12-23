@@ -1,0 +1,93 @@
+# Repository Intelligence Scanner - Enterprise Configuration
+# Production-ready configuration for enterprise deployments
+
+[scanner]
+# Core scanner settings
+log_level = "INFO"
+max_workers = 4
+timeout_seconds = 900
+enable_determinism = true
+
+[ai]
+# AI/ML configuration
+enabled = true
+model_cache_dir = "./models"
+offline_mode = true
+max_model_memory_mb = 1024
+
+# Model configurations
+[[ai.models]]
+name = "code-summary"
+framework = "transformers"
+model_path = "microsoft/codebert-base"
+max_length = 512
+
+[[ai.models]]
+name = "security-pattern"
+framework = "transformers"
+model_path = "microsoft/DialoGPT-small"
+max_length = 256
+
+[security]
+# Security analysis settings
+enable_vulnerability_scanning = true
+owasp_top_10_check = true
+compliance_rules_enabled = true
+risk_weight_security = 3.0
+
+[performance]
+# Performance optimization settings
+memory_monitoring = true
+lazy_loading = true
+thread_pool_optimization = true
+cache_enabled = true
+
+[output]
+# Output configuration
+format = "both"  # markdown, json, both
+include_evidence = true
+compress_reports = false
+anonymize_paths = false
+
+[api]
+# API server configuration (if enabled)
+enabled = false
+host = "127.0.0.1"
+port = 8080
+cors_enabled = true
+rate_limiting = true
+max_requests_per_minute = 60
+
+[monitoring]
+# Monitoring and observability
+metrics_enabled = true
+health_checks = true
+structured_logging = true
+correlation_ids = true
+
+[enterprise]
+# Enterprise-specific settings
+organization = "Your Organization"
+department = "Security"
+contact_email = "security@yourorg.com"
+data_classification = "internal"
+retention_days = 90
+
+# Compliance settings
+soc2_compliance = true
+gdpr_compliance = true
+hipaa_compliance = false
+pci_compliance = false
+
+[deployment]
+# Deployment configuration
+environment = "production"  # development, staging, production
+region = "us-east-1"
+availability_zone = "us-east-1a"
+instance_type = "c5.large"
+
+# Scaling settings
+min_instances = 1
+max_instances = 10
+scaling_metric = "cpu_utilization"
+scaling_threshold = 70

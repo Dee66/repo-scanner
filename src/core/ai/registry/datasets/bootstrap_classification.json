@@ -1,0 +1,355 @@
+{
+  "task": "classification",
+  "samples": [
+    {
+      "content": "\"\"\"Command-line interface for Repository Intelligence Scanner.\"\"\"\n\nimport argparse\nimport json\nimport sys\nfrom pathlib import Path\n\nfrom src.core.exceptions import ScannerError, RepositoryDiscoveryError, AnalysisError, OutputGenerationError, ValidationError\nfrom src.core.pipeline.analysis import execute_pipeline\nfrom src.core.quality.output_contract import generate_primary_report, generate_machine_output, generate_executive_verdict\n\n\ndef main():\n    \"\"\"Main entry point for the CLI.\"\"\"\n    try:\n        parser = argparse.ArgumentParser(\n            description=\"Repository Intelligence Scanner - Decision-grade repository analysis\"\n        )\n        parser.add_argument(\n            \"repository_path\",\n            type=str,\n            help=\"Path to the repository to scan\"\n        )\n        parser.add_argument(\n            \"--output-dir\",\n            type=str,\n            default=\".\",\n            help=\"Directory to write output files (default: current directory)\"\n        )\n        parser.add",
+      "intent": "application_entry_point",
+      "file_path": "src/cli.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"API server for repository intelligence scanner.\"\"\"\n\nfrom http.server import BaseHTTPRequestHandler, HTTPServer\nimport json\n\n\nclass ScannerAPIHandler(BaseHTTPRequestHandler):\n    \"\"\"HTTP request handler for scanner API.\"\"\"\n\n    def do_POST(self):\n        \"\"\"Handle POST requests for repository scans.\"\"\"\n        if self.path == \"/scan\":\n            content_length = int(self.headers.get(\"Content-Length\", 0))\n            body = self.rfile.read(content_length)\n            \n            # Placeholder response\n            response = {\n                \"status\": \"accepted\",\n                \"message\": \"Scan request received\",\n                \"job_id\": \"placeholder\"\n            }\n            \n            self.send_response(200)\n            self.send_header(\"Content-Type\", \"application/json\")\n            self.end_headers()\n            self.wfile.write(json.dumps(response).encode())\n        else:\n            self.send_response(404)\n            self.end_headers()\n\n    def do_GET(self):\n        \"\"\"H",
+      "intent": "application_entry_point",
+      "file_path": "src/api_server.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Core purpose definitions for Repository Intelligence Scanner.\"\"\"\n\nCORE_PROMISE = (\n    \"Produce an auditable, reproducible snapshot of a repository's structural \"\n    \"condition, change safety, and risk posture, equivalent in discipline and \"\n    \"restraint to a senior reviewer operating under explicit authority bounds.\"\n)\n\nNON_PROMISE = (\n    \"The system does not guarantee completeness, correctness of intent, security \"\n    \"coverage, or fitness for purpose. It guarantees clarity, bounded judgment, \"\n    \"explicit uncertainty, and defensible refusal.\"\n)\n",
+      "intent": "general_purpose",
+      "file_path": "src/core/system_purpose.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"System configuration for Repository Intelligence Scanner.\"\"\"\n\nSYSTEM_CONFIG = {\n    \"name\": \"repository_intelligence_scanner\",\n    \"version\": \"1.1.0\",\n    \"classification\": \"decision_grade_repository_analysis\",\n    \"authority_level\": \"bounded_senior_reviewer\",\n    \"status\": \"canonical\"\n}\n",
+      "intent": "configuration",
+      "file_path": "src/core/system_config.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"System identity definitions for Repository Intelligence Scanner.\"\"\"\n\nPUBLIC_DESCRIPTION = (\n    \"The Repository Intelligence Scanner produces deterministic, evidence-backed, \"\n    \"decision-grade assessments of software repositories to inform safe first \"\n    \"actions and prevent irreversible technical damage. It operates with explicit \"\n    \"restraint, bounded authority, and refusal-first discipline.\"\n)\n\nEXPLICIT_NON_CLAIMS = [\n    \"does_not_execute_application_logic\",\n    \"does_not_prove_business_correctness\",\n    \"does_not_find_all_defects\",\n    \"does_not_replace_human_accountability\",\n    \"does_not_force_action\"\n]\n",
+      "intent": "general_purpose",
+      "file_path": "src/core/system_identity.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Custom exceptions for Repository Intelligence Scanner.\"\"\"\n\nfrom typing import Optional, Dict, Any\n\n\nclass ScannerError(Exception):\n    \"\"\"Base exception for scanner operations.\"\"\"\n    \n    def __init__(self, message: str, details: Optional[Dict[str, Any]] = None):\n        super().__init__(message)\n        self.message = message\n        self.details = details or {}\n\n\nclass RepositoryDiscoveryError(ScannerError):\n    \"\"\"Raised when repository discovery fails.\"\"\"\n    pass\n\n\nclass AnalysisError(ScannerError):\n    \"\"\"Raised when analysis pipeline fails.\"\"\"\n    pass\n\n\nclass OutputGenerationError(ScannerError):\n    \"\"\"Raised when output generation fails.\"\"\"\n    pass\n\n\nclass ValidationError(ScannerError):\n    \"\"\"Raised when input validation fails.\"\"\"\n    pass\n\n\nclass ConfigurationError(ScannerError):\n    \"\"\"Raised when configuration is invalid.\"\"\"\n    pass\n\n\nclass FileAccessError(ScannerError):\n    \"\"\"Raised when file access operations fail.\"\"\"\n    \n    def __init__(self, message: str, file",
+      "intent": "object_oriented_module",
+      "file_path": "src/core/exceptions.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Intent posture classification stage for Repository Intelligence Scanner.\"\"\"\n\nfrom typing import Dict, List, Set\n\n\ndef classify_intent_posture(file_list: List[str], structure: Dict, semantic: Dict, \n                           test_signals: Dict, governance: Dict) -> Dict:\n    \"\"\"Classify the intent and posture of the repository.\"\"\"\n    # Safety checks\n    if not isinstance(file_list, list):\n        file_list = []\n    if not isinstance(structure, dict):\n        structure = {}\n    if not isinstance(semantic, dict):\n        semantic = {}\n    if not isinstance(test_signals, dict):\n        test_signals = {}\n    if not isinstance(governance, dict):\n        governance = {}\n    \n    intent_classification = {\n        \"primary_intent\": classify_primary_intent(file_list, structure, semantic),\n        \"security_posture\": assess_security_posture(file_list, structure, semantic, governance),\n        \"maturity_classification\": classify_maturity_level(structure, test_signals, governance),\n        \"ri",
+      "intent": "general_purpose",
+      "file_path": "src/core/pipeline/intent_posture_classification.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Structural modeling stage for Repository Intelligence Scanner.\"\"\"\n\nimport os\nfrom pathlib import Path\nfrom typing import Dict, List, Set\n\n\ndef analyze_repository_structure(file_list: List[str]) -> Dict:\n    \"\"\"Analyze the structural composition of the repository.\"\"\"\n    structure = {\n        \"languages\": detect_languages(file_list),\n        \"frameworks\": detect_frameworks(file_list),\n        \"build_systems\": detect_build_systems(file_list),\n        \"test_frameworks\": detect_test_frameworks(file_list),\n        \"documentation\": detect_documentation(file_list),\n        \"configuration\": detect_configuration(file_list),\n        \"file_counts\": get_file_counts(file_list)\n    }\n    return structure\n\n\ndef detect_languages(file_list: List[str]) -> Dict[str, int]:\n    \"\"\"Detect programming languages based on file extensions.\"\"\"\n    extensions = {\n        '.py': 'Python',\n        '.js': 'JavaScript',\n        '.ts': 'TypeScript',\n        '.java': 'Java',\n        '.rs': 'Rust',\n        '.go': 'Go",
+      "intent": "general_purpose",
+      "file_path": "src/core/pipeline/structural_modeling.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Governance signal analysis stage for Repository Intelligence Scanner.\"\"\"\n\nimport os\nfrom pathlib import Path\nfrom typing import Dict, List, Set\n\n\ndef analyze_governance_signals(file_list: List[str], structure: Dict, semantic: Dict, test_signals: Dict) -> Dict:\n    \"\"\"Analyze governance and compliance signals in the repository.\"\"\"\n    governance = {\n        \"code_quality_governance\": assess_code_quality_governance(file_list),\n        \"security_governance\": assess_security_governance(file_list),\n        \"ci_cd_governance\": assess_ci_cd_governance(file_list),\n        \"documentation_governance\": assess_documentation_governance(file_list),\n        \"dependency_governance\": assess_dependency_governance(file_list),\n        \"compliance_artifacts\": identify_compliance_artifacts(file_list),\n        \"governance_maturity_score\": calculate_governance_maturity(file_list, structure),\n        \"governance_gaps\": identify_governance_gaps(file_list, structure)\n    }\n    \n    return governance\n\n\ndef ass",
+      "intent": "general_purpose",
+      "file_path": "src/core/pipeline/governance_signal_analysis.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Decision Artifact Generation for Repository Intelligence Scanner.\"\"\"\n\nfrom typing import Dict, List\n\n\ndef generate_decision_artifacts(file_list: List[str], structure: Dict, semantic: Dict,\n                               test_signals: Dict, governance: Dict, intent_posture: Dict,\n                               misleading_signals: Dict, safe_change_surface: Dict,\n                               risk_synthesis: Dict) -> Dict:\n    \"\"\"Generate decision-making artifacts based on comprehensive analysis.\"\"\"\n    # Safety checks\n    if not isinstance(file_list, list):\n        file_list = []\n    if not isinstance(structure, dict):\n        structure = {}\n    if not isinstance(semantic, dict):\n        semantic = {}\n    if not isinstance(test_signals, dict):\n        test_signals = {}\n    if not isinstance(governance, dict):\n        governance = {}\n    if not isinstance(intent_posture, dict):\n        intent_posture = {}\n    if not isinstance(misleading_signals, dict):\n        misleading_signals = {",
+      "intent": "general_purpose",
+      "file_path": "src/core/pipeline/decision_artifact_generation.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Determinism Verification for Repository Intelligence Scanner.\"\"\"\n\nimport hashlib\nimport json\nfrom typing import Dict, List\n\n\ndef verify_determinism(file_list: List[str], structure: Dict, semantic: Dict,\n                      test_signals: Dict, governance: Dict, intent_posture: Dict,\n                      misleading_signals: Dict, safe_change_surface: Dict,\n                      risk_synthesis: Dict, decision_artifacts: Dict,\n                      authority_ceiling_evaluation: Dict) -> Dict:\n    \"\"\"Verify determinism of the analysis pipeline.\"\"\"\n    # Safety checks\n    if not isinstance(file_list, list):\n        file_list = []\n    if not isinstance(structure, dict):\n        structure = {}\n    if not isinstance(semantic, dict):\n        semantic = {}\n    if not isinstance(test_signals, dict):\n        test_signals = {}\n    if not isinstance(governance, dict):\n        governance = {}\n    if not isinstance(intent_posture, dict):\n        intent_posture = {}\n    if not isinstance(misleadin",
+      "intent": "general_purpose",
+      "file_path": "src/core/pipeline/determinism_verification.py",
+      "language": "python"
+    },
+    {
+      "content": "#!/usr/bin/env python3\n\"\"\"\nDependency Analysis Stage\n\nAnalyzes package dependencies for security vulnerabilities, license compliance,\nand maintenance health. Supports multiple package managers and ecosystems.\n\"\"\"\n\nimport json\nimport os\nimport re\nfrom pathlib import Path\nfrom typing import Dict, List, Any, Optional, Set\nfrom datetime import datetime, timedelta\n\nimport logging\n\nlogger = logging.getLogger(__name__)\n\nclass DependencyAnalyzer:\n    \"\"\"Analyzes dependencies for security, license, and maintenance issues.\"\"\"\n\n    def __init__(self):\n        self.supported_files = {\n            'python': ['requirements.txt', 'pyproject.toml', 'setup.py', 'Pipfile', 'Pipfile.lock'],\n            'javascript': ['package.json', 'package-lock.json', 'yarn.lock', 'pnpm-lock.yaml'],\n            'java': ['pom.xml', 'build.gradle', 'build.gradle.kts'],\n            'csharp': ['packages.config', '.csproj'],\n            'php': ['composer.json', 'composer.lock'],\n            'ruby': ['Gemfile', 'Gemfile.lock",
+      "intent": "object_oriented_module",
+      "file_path": "src/core/pipeline/dependency_analysis.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Analysis pipeline stages for Repository Intelligence Scanner.\"\"\"\n\nimport concurrent.futures\nimport functools\nimport time\nfrom pathlib import Path\nfrom typing import Dict, List\n\nfrom src.core.pipeline.repository_discovery import discover_repository_root, get_canonical_file_list\nfrom src.core.pipeline.structural_modeling import analyze_repository_structure\nfrom src.core.pipeline.static_semantic_analysis import analyze_semantic_structure\nfrom src.core.pipeline.code_comprehension import analyze_code_comprehension\nfrom src.core.pipeline.compliance_analysis import analyze_compliance\nfrom src.core.pipeline.dependency_analysis import analyze_dependencies\nfrom src.core.pipeline.code_duplication_analysis import analyze_code_duplication\nfrom src.core.pipeline.api_analysis import analyze_api_definitions\nfrom src.core.pipeline.test_signal_analysis import analyze_test_signals\nfrom src.core.pipeline.governance_signal_analysis import analyze_governance_signals\nfrom src.core.pipeline.intent_posture_",
+      "intent": "object_oriented_module",
+      "file_path": "src/core/pipeline/analysis.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Authority Ceiling Evaluation for Repository Intelligence Scanner.\"\"\"\n\nfrom typing import Dict, List\n\n\ndef evaluate_authority_ceiling(file_list: List[str], structure: Dict, semantic: Dict,\n                              test_signals: Dict, governance: Dict, intent_posture: Dict,\n                              misleading_signals: Dict, safe_change_surface: Dict,\n                              risk_synthesis: Dict, decision_artifacts: Dict) -> Dict:\n    \"\"\"Evaluate and potentially adjust authority ceilings based on comprehensive analysis.\"\"\"\n    # Safety checks\n    if not isinstance(file_list, list):\n        file_list = []\n    if not isinstance(structure, dict):\n        structure = {}\n    if not isinstance(semantic, dict):\n        semantic = {}\n    if not isinstance(test_signals, dict):\n        test_signals = {}\n    if not isinstance(governance, dict):\n        governance = {}\n    if not isinstance(intent_posture, dict):\n        intent_posture = {}\n    if not isinstance(misleading_signals,",
+      "intent": "general_purpose",
+      "file_path": "src/core/pipeline/authority_ceiling_evaluation.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Repository discovery stage for Repository Intelligence Scanner.\"\"\"\n\nimport os\nfrom pathlib import Path\nfrom typing import Optional\n\nfrom src.core.exceptions import RepositoryDiscoveryError, FileAccessError\n\n# Cache for repository root discovery\n_repo_root_cache: dict[str, str] = {}\n\n\ndef discover_repository_root(start_path: str) -> str:\n    \"\"\"Discover the repository root using git or filesystem fallback with caching.\"\"\"\n    if not isinstance(start_path, str) or not start_path.strip():\n        raise RepositoryDiscoveryError(\"Invalid start path provided\", {\"start_path\": start_path})\n    \n    start_path = str(Path(start_path).resolve())\n    \n    # Check cache first\n    if start_path in _repo_root_cache:\n        return _repo_root_cache[start_path]\n    \n    path = Path(start_path)\n    \n    # Try git root first (but only if path exists and we're in a reasonable directory depth)\n    if path.exists():\n        try:\n            if path.stat().st_dev == Path.home().stat().st_dev:  # Only try ",
+      "intent": "general_purpose",
+      "file_path": "src/core/pipeline/repository_discovery.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Misleading Signal Detection for Repository Intelligence Scanner.\"\"\"\n\nfrom typing import Dict, List\n\n\ndef analyze_misleading_signals(file_list: List[str], structure: Dict, semantic: Dict,\n                              test_signals: Dict, governance: Dict, intent_posture: Dict) -> Dict:\n    \"\"\"Analyze repository for misleading or deceptive signals.\"\"\"\n    # Safety checks\n    if not isinstance(file_list, list):\n        file_list = []\n    if not isinstance(structure, dict):\n        structure = {}\n    if not isinstance(semantic, dict):\n        semantic = {}\n    if not isinstance(test_signals, dict):\n        test_signals = {}\n    if not isinstance(governance, dict):\n        governance = {}\n    if not isinstance(intent_posture, dict):\n        intent_posture = {}\n\n    misleading_signals = {\n        \"code_quality_inconsistencies\": [],\n        \"documentation_discrepancies\": [],\n        \"governance_conflicts\": [],\n        \"intent_mismatches\": [],\n        \"maintenance_indicators\": [],\n        \"",
+      "intent": "general_purpose",
+      "file_path": "src/core/pipeline/misleading_signal_detection.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Test signal analysis stage for Repository Intelligence Scanner.\"\"\"\n\nimport os\nfrom pathlib import Path\nfrom typing import Dict, List, Set\n\n\ndef analyze_test_signals(file_list: List[str], structure: Dict, semantic: Dict) -> Dict:\n    \"\"\"Analyze testing signals and coverage in the repository.\"\"\"\n    test_analysis = {\n        \"test_files\": identify_test_files(file_list),\n        \"test_frameworks\": detect_test_frameworks_detailed(file_list),\n        \"test_coverage_signals\": assess_test_coverage(file_list, structure, semantic),\n        \"test_quality_signals\": evaluate_test_quality(file_list, semantic),\n        \"testing_maturity_score\": calculate_testing_maturity(structure, semantic),\n        \"test_gaps\": identify_test_gaps(file_list, structure, semantic)\n    }\n    \n    return test_analysis\n\n\ndef identify_test_files(file_list: List[str]) -> Dict:\n    \"\"\"Identify and categorize test files.\"\"\"\n    test_files = {\n        \"unit_tests\": [],\n        \"integration_tests\": [],\n        \"e2e_tests\":",
+      "intent": "test_code",
+      "file_path": "src/core/pipeline/test_signal_analysis.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Static semantic analysis stage for Repository Intelligence Scanner.\"\"\"\n\nimport ast\nimport os\nimport re\nfrom pathlib import Path\nfrom typing import Dict, List, Set\n\n\ndef analyze_semantic_structure(file_list: List[str], structure: Dict) -> Dict:\n    \"\"\"Analyze the semantic structure of code files in the repository.\"\"\"\n    semantic = {\n        \"python_analysis\": analyze_python_files(file_list),\n        \"javascript_analysis\": analyze_javascript_files(file_list),\n        \"typescript_analysis\": analyze_typescript_files(file_list),\n        \"java_analysis\": analyze_java_files(file_list),\n        \"imports\": {},\n        \"exports\": {},\n        \"dependencies\": {},\n        \"code_quality_signals\": []\n    }\n\n    # Analyze files by language\n    python_files = [f for f in file_list if f.endswith('.py')]\n    if python_files:\n        semantic[\"python_analysis\"] = analyze_python_codebase(python_files)\n\n    js_files = [f for f in file_list if f.endswith(('.js', '.jsx'))]\n    if js_files:\n        semanti",
+      "intent": "general_purpose",
+      "file_path": "src/core/pipeline/static_semantic_analysis.py",
+      "language": "python"
+    },
+    {
+      "content": "#!/usr/bin/env python3\n\"\"\"\nAPI Analysis Stage\n\nAnalyzes API definitions, REST endpoints, and API design patterns for security,\ndesign quality, and compliance issues. Supports OpenAPI/Swagger, GraphQL,\nand common API frameworks.\n\"\"\"\n\nimport json\nimport re\nimport yaml\nfrom pathlib import Path\nfrom typing import Dict, List, Any, Optional, Set\nfrom urllib.parse import urlparse\n\nimport logging\n\nlogger = logging.getLogger(__name__)\n\nclass APIAnalyzer:\n    \"\"\"Analyzes API definitions and patterns for security and quality issues.\"\"\"\n\n    def __init__(self):\n        self.api_files = {\n            'openapi': ['openapi.yaml', 'openapi.yml', 'swagger.yaml', 'swagger.yml'],\n            'postman': ['*.postman_collection.json'],\n            'insomnia': ['*.insomnia.json'],\n            'graphql': ['schema.graphql', '*.graphql'],\n            'raml': ['*.raml'],\n            'api_blueprint': ['*.apib']\n        }\n\n        # Common API security issues\n        self.security_patterns = {\n            'insecur",
+      "intent": "api_service",
+      "file_path": "src/core/pipeline/api_analysis.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Risk Synthesis for Repository Intelligence Scanner.\"\"\"\n\nfrom typing import Dict, List\n\n\ndef synthesize_risks(file_list: List[str], structure: Dict, semantic: Dict,\n                    test_signals: Dict, governance: Dict, intent_posture: Dict,\n                    misleading_signals: Dict, safe_change_surface: Dict, security_analysis: Dict = None,\n                    code_comprehension: Dict = None, compliance_analysis: Dict = None, dependency_analysis: Dict = None, code_duplication_analysis: Dict = None, api_analysis: Dict = None) -> Dict:\n    \"\"\"Synthesize all analysis data into comprehensive risk assessment.\"\"\"\n    # Safety checks\n    if not isinstance(file_list, list):\n        file_list = []\n    if not isinstance(structure, dict):\n        structure = {}\n    if not isinstance(semantic, dict):\n        semantic = {}\n    if not isinstance(test_signals, dict):\n        test_signals = {}\n    if not isinstance(governance, dict):\n        governance = {}\n    if not isinstance(intent_postur",
+      "intent": "api_service",
+      "file_path": "src/core/pipeline/risk_synthesis.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Safe Change Surface Modeling for Repository Intelligence Scanner.\"\"\"\n\nfrom typing import Dict, List\n\n\ndef analyze_safe_change_surface(file_list: List[str], structure: Dict, semantic: Dict,\n                               test_signals: Dict, governance: Dict, intent_posture: Dict,\n                               misleading_signals: Dict) -> Dict:\n    \"\"\"Analyze which parts of the codebase are safe to modify.\"\"\"\n    # Safety checks\n    if not isinstance(file_list, list):\n        file_list = []\n    if not isinstance(structure, dict):\n        structure = {}\n    if not isinstance(semantic, dict):\n        semantic = {}\n    if not isinstance(test_signals, dict):\n        test_signals = {}\n    if not isinstance(governance, dict):\n        governance = {}\n    if not isinstance(intent_posture, dict):\n        intent_posture = {}\n    if not isinstance(misleading_signals, dict):\n        misleading_signals = {}\n\n    # Analyze different aspects of change safety\n    test_coverage_safety = _analyze_test",
+      "intent": "general_purpose",
+      "file_path": "src/core/pipeline/safe_change_surface_modeling.py",
+      "language": "python"
+    },
+    {
+      "content": "#!/usr/bin/env python3\n\"\"\"\nCode Duplication Analysis Stage\n\nAnalyzes code for duplication, clones, and copy-paste patterns that indicate\nmaintenance issues, technical debt, and potential refactoring opportunities.\n\"\"\"\n\nimport hashlib\nimport re\nfrom collections import defaultdict\nfrom typing import Dict, List, Any, Set, Tuple\nfrom pathlib import Path\n\nimport logging\n\nlogger = logging.getLogger(__name__)\n\nclass CodeDuplicationAnalyzer:\n    \"\"\"Analyzes code for duplication and clone detection.\"\"\"\n\n    def __init__(self):\n        self.min_block_size = 6  # Minimum lines for a code block\n        self.min_clone_length = 10  # Minimum characters for clone detection\n        self.similarity_threshold = 0.8  # Similarity threshold for clone detection\n\n    def analyze_code_duplication(self, file_list: List[str], semantic_data: Dict[str, Any]) -> Dict[str, Any]:\n        \"\"\"\n        Perform comprehensive code duplication analysis.\n\n        Args:\n            file_list: List of files to analyze\n     ",
+      "intent": "object_oriented_module",
+      "file_path": "src/core/pipeline/code_duplication_analysis.py",
+      "language": "python"
+    },
+    {
+      "content": "#!/usr/bin/env python3\n\"\"\"\nCompliance Rule Sets Analysis Stage\n\nChecks code against industry standards and security compliance requirements.\nSupports multiple compliance frameworks and generates compliance reports.\n\"\"\"\n\nimport logging\nimport re\nfrom pathlib import Path\nfrom typing import Dict, List, Any, Optional\n\nlogger = logging.getLogger(__name__)\n\nclass ComplianceRule:\n    \"\"\"Represents a single compliance rule.\"\"\"\n\n    def __init__(self, rule_id: str, name: str, description: str,\n                 severity: str, framework: str, language: str = \"any\"):\n        self.rule_id = rule_id\n        self.name = name\n        self.description = description\n        self.severity = severity  # 'critical', 'high', 'medium', 'low', 'info'\n        self.framework = framework\n        self.language = language\n        self.check_function = None\n\n    def set_check_function(self, func):\n        \"\"\"Set the function that performs the compliance check.\"\"\"\n        self.check_function = func\n        return se",
+      "intent": "object_oriented_module",
+      "file_path": "src/core/pipeline/compliance_analysis.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Security vulnerability analysis stage for Repository Intelligence Scanner.\"\"\"\n\nimport re\nimport os\nfrom pathlib import Path\nfrom typing import Dict, List, Any, Set\nfrom dataclasses import dataclass\n\n@dataclass\nclass SecurityFinding:\n    \"\"\"Represents a security vulnerability finding.\"\"\"\n    vulnerability_type: str\n    severity: str  # 'critical', 'high', 'medium', 'low', 'info'\n    file_path: str\n    line_number: int\n    description: str\n    code_snippet: str\n    cwe_id: str = \"\"  # Common Weakness Enumeration ID\n    owasp_category: str = \"\"  # OWASP Top 10 category\n\nclass SecurityAnalyzer:\n    \"\"\"Analyzes code for security vulnerabilities using static analysis.\"\"\"\n\n    def __init__(self):\n        # Common vulnerability patterns\n        self.vulnerability_patterns = {\n            'sql_injection': {\n                'patterns': [\n                    r'\\.execute\\s*\\(\\s*[\"\\']?\\s*SELECT.*%s.*[\"\\']?\\s*\\)',\n                    r'\\.execute\\s*\\(\\s*[\"\\']?\\s*INSERT.*%s.*[\"\\']?\\s*\\)',\n         ",
+      "intent": "object_oriented_module",
+      "file_path": "src/core/pipeline/security_analysis/__init__.py",
+      "language": "python"
+    },
+    {
+      "content": "#!/usr/bin/env python3\n\"\"\"\nCode Comprehension Analysis Stage\n\nUses AI models to understand code patterns, intent, and potential issues.\nIntegrates with the AI inference pipeline for offline operation.\n\"\"\"\n\nimport logging\nfrom pathlib import Path\nfrom typing import Dict, List, Any, Optional\nfrom dataclasses import dataclass\n\nfrom ...ai.inference_pipeline import get_ai_pipeline\nfrom ..static_semantic_analysis import analyze_semantic_structure\n\nlogger = logging.getLogger(__name__)\n\n@dataclass\nclass CodeUnderstanding:\n    \"\"\"Understanding of a code file or component.\"\"\"\n    file_path: str\n    summary: str\n    intent: str\n    complexity: str\n    patterns: List[str]\n    potential_issues: List[str]\n    confidence: float\n\n@dataclass\nclass ComprehensionResult:\n    \"\"\"Result of code comprehension analysis.\"\"\"\n    overall_summary: str\n    key_components: List[CodeUnderstanding]\n    architecture_patterns: List[str]\n    quality_assessment: Dict[str, Any]\n    risk_indicators: List[str]\n\nclass CodeCo",
+      "intent": "application_entry_point",
+      "file_path": "src/core/pipeline/code_comprehension/__init__.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Intent posture classification for Repository Intelligence Scanner.\"\"\"\n\nINTENT_POSTURE_CLASSIFICATION_PURPOSE = (\n    \"Classify observable architectural posture, not human intent.\"\n)\n\nCLASSIFICATION_CONSTRAINTS = [\n    \"inference_must_be_evidence_anchored\",\n    \"classification_must_be_downgradable\"\n]\n\nINTENT_POSTURES = [\n    \"prototype\",\n    \"productized_service\",\n    \"internal_tool\",\n    \"legacy_system\",\n    \"platform_core\"\n]\n\nCONFIDENCE_REQUIRED = True\n\ndef classify_intent_posture(repository_analysis: dict) -> dict:\n    \"\"\"Classify the repository's intent posture.\"\"\"\n    # Placeholder implementation\n    return {\n        \"posture\": \"unknown\",\n        \"confidence\": \"LOW\",\n        \"evidence\": []\n    }\n",
+      "intent": "general_purpose",
+      "file_path": "src/core/safety/intent_classification.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Refusal artifact for Repository Intelligence Scanner.\"\"\"\n\nREFUSAL_ARTIFACT_DEFINITION = (\n    \"A first-class output stating that responsible guidance cannot be rendered.\"\n)\n\nREQUIRED_REFUSAL_FIELDS = [\n    \"reason_for_refusal\",\n    \"missing_or_unknowable_information\",\n    \"blast_radius_unbounded_statement\",\n    \"responsible_human_role_required\"\n]\n\nREFUSAL_GUARANTEES = [\n    \"refusal_is_success\",\n    \"refusal_is_auditable\"\n]\n\ndef create_refusal_artifact(reason: str, missing_info: list) -> dict:\n    \"\"\"Create a refusal artifact.\"\"\"\n    return {\n        \"refusal\": True,\n        \"reason_for_refusal\": reason,\n        \"missing_or_unknowable_information\": missing_info,\n        \"blast_radius_unbounded_statement\": True,\n        \"responsible_human_role_required\": \"senior_reviewer\"\n    }\n",
+      "intent": "general_purpose",
+      "file_path": "src/core/safety/refusal_artifact.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Authority ceiling and safety mechanisms for Repository Intelligence Scanner.\"\"\"\n\nAUTHORITY_CEILING_DEFINITION = (\n    \"The maximum complexity, ambiguity, or risk beyond which the system refuses \"\n    \"to render actionable guidance.\"\n)\n\nAUTHORITY_TRIGGERS = [\n    \"unbounded_blast_radius\",\n    \"contradictory_governance_signals\",\n    \"missing_ownership_artifacts\",\n    \"excessive_polyglot_sprawl\",\n    \"critical_paths_unverifiable\"\n]\n\nBEHAVIOR_ON_TRIGGER = [\n    \"emit_refusal_artifact\",\n    \"suppress_recommendations\",\n    \"downgrade_all_confidence_levels\"\n]\n\ndef evaluate_authority_ceiling(repository_analysis: dict) -> dict:\n    \"\"\"Evaluate if analysis exceeds authority ceiling.\"\"\"\n    # Placeholder implementation\n    return {\"within_authority\": True, \"triggers\": []}\n\ndef emit_refusal_artifact(reason: str) -> dict:\n    \"\"\"Emit a refusal artifact.\"\"\"\n    return {\n        \"refusal\": True,\n        \"reason\": reason,\n        \"missing_information\": [],\n        \"blast_radius_unbounded\": True,\n  ",
+      "intent": "general_purpose",
+      "file_path": "src/core/safety/authority_ceiling.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Safe change surface modeling for Repository Intelligence Scanner.\"\"\"\n\nSAFE_CHANGE_SURFACE_DEFINITION = (\n    \"A bounded model identifying areas where change can be applied with acceptable \"\n    \"risk under current observable conditions.\"\n)\n\nSAFE_CHANGE_PROPERTIES = [\n    \"explicit_safe_zones\",\n    \"explicit_no_touch_zones\",\n    \"blast_radius_characterization\",\n    \"evidence_references\",\n    \"expiry_conditions\"\n]\n\nSAFE_CHANGE_RULES = [\n    \"absence_is_valid_outcome\",\n    \"safe_surface_may_be_empty\",\n    \"first_action_may_be_explicit_non_action\"\n]\n\ndef model_safe_change_surface(repository_analysis: dict) -> dict:\n    \"\"\"Model the safe change surface.\"\"\"\n    # Placeholder implementation\n    return {\n        \"safe_zones\": [],\n        \"no_touch_zones\": [],\n        \"blast_radius\": \"unknown\",\n        \"evidence\": [],\n        \"expiry\": None\n    }\n",
+      "intent": "general_purpose",
+      "file_path": "src/core/safety/safe_change_surface.py",
+      "language": "python"
+    },
+    {
+      "content": "#!/usr/bin/env python3\n\"\"\"\nAI Registry Setup Script\n\nInitializes the AI model registry with placeholder models for offline operation.\nThis allows the system to function even when actual AI models are not available.\n\"\"\"\n\nimport json\nfrom pathlib import Path\nfrom ..ai.inference_pipeline import ModelMetadata, AIModelRegistry\n\ndef setup_ai_registry(registry_path: Path = None):\n    \"\"\"Set up the AI model registry with placeholder models.\"\"\"\n\n    if registry_path is None:\n        registry_path = Path(__file__).parent.parent / \"ai\" / \"registry\"\n\n    registry = AIModelRegistry(registry_path)\n\n    # Define placeholder models for different capabilities\n    placeholder_models = [\n        {\n            \"name\": \"code-summary-model\",\n            \"version\": \"1.0.0\",\n            \"model_type\": \"llm\",\n            \"framework\": \"transformers\",\n            \"parameters\": {\n                \"model_size\": \"placeholder\",\n                \"context_length\": 2048,\n                \"capabilities\": [\"code_summarizatio",
+      "intent": "application_entry_point",
+      "file_path": "src/core/ai/setup_registry.py",
+      "language": "python"
+    },
+    {
+      "content": "#!/usr/bin/env python3\n\"\"\"\nAI Inference Pipeline for Repository Intelligence Scanner\n\nProvides deterministic AI inference capabilities for offline operation.\nSupports multiple model types and ensures reproducible results.\n\"\"\"\n\nimport os\nimport json\nimport hashlib\nimport logging\nfrom pathlib import Path\nfrom typing import Dict, List, Any, Optional, Union\nfrom dataclasses import dataclass\nfrom abc import ABC, abstractmethod\n\nlogger = logging.getLogger(__name__)\n\n@dataclass\nclass ModelMetadata:\n    \"\"\"Metadata for AI models.\"\"\"\n    name: str\n    version: str\n    model_type: str  # 'llm', 'embedding', 'classifier'\n    framework: str   # 'transformers', 'llama_cpp', 'ctransformers'\n    parameters: Dict[str, Any]\n    hash: str\n    created_at: str\n    description: str\n\n@dataclass\nclass InferenceResult:\n    \"\"\"Result of AI inference operation.\"\"\"\n    model_name: str\n    model_version: str\n    input_hash: str\n    output: Any\n    confidence: float\n    processing_time: float\n    timestamp: str\n\nc",
+      "intent": "data_processing",
+      "file_path": "src/core/ai/inference_pipeline.py",
+      "language": "python"
+    },
+    {
+      "content": "#!/usr/bin/env python3\n\"\"\"\nLlama.cpp-based AI Model Implementation\n\nSupports GGUF models for efficient CPU inference.\n\"\"\"\n\nimport time\nimport logging\nfrom pathlib import Path\nfrom typing import Any, Dict, Optional\n\ntry:\n    from llama_cpp import Llama\n    LLAMA_CPP_AVAILABLE = True\nexcept ImportError:\n    LLAMA_CPP_AVAILABLE = False\n\nfrom ..inference_pipeline import BaseAIModel, InferenceResult, ModelMetadata\n\nlogger = logging.getLogger(__name__)\n\nclass LlamaCppModel(BaseAIModel):\n    \"\"\"Llama.cpp-based model implementation for GGUF models.\"\"\"\n\n    def __init__(self, metadata: ModelMetadata, model_path: Path):\n        super().__init__(metadata, model_path)\n        self.model = None\n\n        if not LLAMA_CPP_AVAILABLE:\n            raise ImportError(\"llama-cpp-python library not available\")\n\n        # Find GGUF model file\n        self.model_file = self._find_model_file()\n\n    def _find_model_file(self) -> Optional[Path]:\n        \"\"\"Find the GGUF model file in the model directory.\"\"\"\n    ",
+      "intent": "data_processing",
+      "file_path": "src/core/ai/models/llama_cpp_model.py",
+      "language": "python"
+    },
+    {
+      "content": "#!/usr/bin/env python3\n\"\"\"\nTransformers-based AI Model Implementation\n\nSupports Hugging Face transformers models for offline inference.\n\"\"\"\n\nimport time\nimport logging\nfrom pathlib import Path\nfrom typing import Any, Dict, Optional\n\ntry:\n    from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModelForSequenceClassification\n    from transformers import pipeline as transformers_pipeline\n    import torch\n    TRANSFORMERS_AVAILABLE = True\nexcept ImportError:\n    TRANSFORMERS_AVAILABLE = False\n\nfrom ..inference_pipeline import BaseAIModel, InferenceResult, ModelMetadata\n\nlogger = logging.getLogger(__name__)\n\nclass TransformersModel(BaseAIModel):\n    \"\"\"Transformers-based model implementation.\"\"\"\n\n    def __init__(self, metadata: ModelMetadata, model_path: Path):\n        super().__init__(metadata, model_path)\n        self.model = None\n        self.tokenizer = None\n        self.device = \"cpu\"  # Default to CPU for offline operation\n\n        if not TRANSFORMERS_AVAILABLE:\n       ",
+      "intent": "data_processing",
+      "file_path": "src/core/ai/models/transformers_model.py",
+      "language": "python"
+    },
+    {
+      "content": "#!/usr/bin/env python3\n\"\"\"\nModel Training Framework for Code Understanding\n\nProvides training capabilities for fine-tuning AI models on code understanding tasks.\nSupports offline training with prepared datasets.\n\"\"\"\n\nimport os\nimport json\nimport logging\nimport time\nfrom pathlib import Path\nfrom typing import Dict, List, Any, Optional, Union\nfrom dataclasses import dataclass\nimport tempfile\n\ntry:\n    from transformers import (\n        AutoTokenizer, AutoModelForCausalLM, AutoModelForSequenceClassification,\n        TrainingArguments, Trainer, DataCollatorForLanguageModeling,\n        DataCollatorWithPadding\n    )\n    import torch\n    from torch.utils.data import Dataset\n    import datasets\n    TRANSFORMERS_AVAILABLE = True\nexcept ImportError:\n    TRANSFORMERS_AVAILABLE = False\n    logger = logging.getLogger(__name__)\n    logger.warning(\"Transformers not available - training will be limited\")\n\nlogger = logging.getLogger(__name__)\n\n@dataclass\nclass TrainingConfig:\n    \"\"\"Configuration for m",
+      "intent": "data_processing",
+      "file_path": "src/core/ai/training/model_trainer.py",
+      "language": "python"
+    },
+    {
+      "content": "#!/usr/bin/env python3\n\"\"\"\nLightweight Model Fine-tuning for Code Understanding\n\nProvides efficient fine-tuning capabilities for smaller models and limited datasets.\nOptimized for offline operation and resource constraints.\n\"\"\"\n\nimport os\nimport json\nimport logging\nimport time\nfrom pathlib import Path\nfrom typing import Dict, List, Any, Optional\nimport pickle\n\ntry:\n    from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline\n    import torch\n    import torch.nn as nn\n    from torch.optim import AdamW\n    from torch.utils.data import DataLoader, Dataset\n    TRANSFORMERS_AVAILABLE = True\nexcept ImportError:\n    TRANSFORMERS_AVAILABLE = False\n    # Define mock Dataset class if torch not available\n    class Dataset:\n        pass\n\nlogger = logging.getLogger(__name__)\n\nclass LightweightCodeDataset(Dataset):\n    \"\"\"Lightweight dataset for code understanding tasks.\"\"\"\n\n    def __init__(self, samples: List[Dict[str, Any]], tokenizer, task: str, max_length: int = 256):\n        self",
+      "intent": "application_entry_point",
+      "file_path": "src/core/ai/training/lightweight_trainer.py",
+      "language": "python"
+    },
+    {
+      "content": "#!/usr/bin/env python3\n\"\"\"\nBootstrap Training Script\n\nCreates initial training datasets from repository code and trains lightweight models\nfor code understanding tasks. Optimized for offline operation and limited resources.\n\"\"\"\n\nimport os\nimport sys\nimport json\nimport logging\nfrom pathlib import Path\nfrom typing import Dict, List, Any\n\n# Add src to path for imports\nsys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))\n\nfrom src.core.ai.training.data_pipeline import TrainingDataPipeline\nfrom src.core.ai.training.lightweight_trainer import LightweightTrainer, create_fallback_models\n\nlogger = logging.getLogger(__name__)\n\nclass BootstrapTrainer:\n    \"\"\"Handles bootstrap training of code understanding models.\"\"\"\n\n    def __init__(self, workspace_root: Path, registry_path: Path):\n        self.workspace_root = workspace_root\n        self.registry_path = registry_path\n        self.data_pipeline = TrainingDataPipeline(registry_path / \"training_data\")\n        self.lightweight_train",
+      "intent": "application_entry_point",
+      "file_path": "src/core/ai/training/bootstrap_trainer.py",
+      "language": "python"
+    },
+    {
+      "content": "#!/usr/bin/env python3\n\"\"\"\nTraining Data Pipeline for Code Understanding Models\n\nPrepares and processes code datasets for training AI models.\nSupports multiple programming languages and various code understanding tasks.\n\"\"\"\n\nimport os\nimport json\nimport hashlib\nimport logging\nfrom pathlib import Path\nfrom typing import Dict, List, Any, Optional, Tuple\nfrom dataclasses import dataclass\nfrom concurrent.futures import ThreadPoolExecutor\nimport re\n\nlogger = logging.getLogger(__name__)\n\n@dataclass\nclass CodeSample:\n    \"\"\"Represents a code sample for training.\"\"\"\n    content: str\n    language: str\n    file_path: str\n    summary: Optional[str] = None\n    intent: Optional[str] = None\n    complexity: Optional[str] = None\n    patterns: Optional[List[str]] = None\n    issues: Optional[List[str]] = None\n    metadata: Optional[Dict[str, Any]] = None\n\n@dataclass\nclass TrainingDataset:\n    \"\"\"Represents a training dataset.\"\"\"\n    name: str\n    version: str\n    task: str  # 'summarization', 'classific",
+      "intent": "application_entry_point",
+      "file_path": "src/core/ai/training/data_pipeline.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Quality assurance mechanisms for Repository Intelligence Scanner.\"\"\"\n\nSILENCE_POLICY = {\n    \"allowed_conditions\": [\n        \"no_material_findings\",\n        \"no_safe_action_identified\"\n    ],\n    \"explicit_silence_verdict\": \"No responsible action is recommended under current conditions.\"\n}\n\nQUALITY_BAR = {\n    \"minimum_standard\": \"decision_grade\",\n    \"rejection_conditions\": [\n        \"generic_advice\",\n        \"vanity_metrics\",\n        \"unjustified_opinions\",\n        \"action_bias\",\n        \"hidden_uncertainty\"\n    ]\n}\n\nSUCCESS_CRITERIA = [\n    \"deterministic_verification_passed\",\n    \"refusal_possible_and_clean\",\n    \"blast_radius_explicit\",\n    \"authority_bounds_respected\",\n    \"trust_maintained_over_output_volume\"\n]\n\ndef enforce_quality_bar(assessment: dict) -> bool:\n    \"\"\"Enforce quality bar standards.\"\"\"\n    return True  # Placeholder\n\ndef check_success_criteria(analysis: dict) -> bool:\n    \"\"\"Check if success criteria are met.\"\"\"\n    return False  # Placeholder - not yet imple",
+      "intent": "general_purpose",
+      "file_path": "src/core/quality/assurance.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Output contract and quality assurance for Repository Intelligence Scanner.\"\"\"\n\nPRIMARY_REPORT = {\n    \"format\": \"markdown\",\n    \"tone\": \"senior_human_reviewer\",\n    \"verbosity_rules\": [\n        \"silence_allowed\",\n        \"brevity_preferred\",\n        \"severity_drives_length\"\n    ],\n    \"required_sections\": [\n        \"executive_summary\",\n        \"system_characterization\",\n        \"evidence_highlights\",\n        \"misleading_signals\",\n        \"safe_to_change_surface\",\n        \"risk_synthesis\",\n        \"decision_artifacts\",\n        \"authority_ceiling_evaluation\",\n        \"what_not_to_fix\",\n        \"refusal_or_first_action\",\n        \"confidence_and_limits\",\n        \"validity_and_expiry\"\n    ]\n}\n\nMACHINE_READABLE_OUTPUT = {\n    \"format\": \"json\",\n    \"deterministic\": True,\n    \"canonical_sorting\": True,\n    \"governance_hash_embedded\": True\n}\n\ndef _generate_system_characterization(analysis: dict, repo_root: str, files_count: int) -> str:\n    \"\"\"Generate the system characterization section.\"\"\"",
+      "intent": "data_processing",
+      "file_path": "src/core/quality/output_contract.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Operating constraints for Repository Intelligence Scanner.\"\"\"\n\nEXECUTION_CONSTRAINTS = {\n    \"mode\": \"offline_only\",\n    \"network_access\": \"forbidden\",\n    \"external_services\": \"forbidden\",\n    \"repository_modification\": \"forbidden\",\n    \"execute_application_code\": \"forbidden\"\n}\n\nDETERMINISM_REQUIREMENTS = {\n    \"required\": True,\n    \"guarantees\": [\n        \"identical_input_identical_output\",\n        \"canonical_file_traversal\",\n        \"canonical_sorting_of_all_outputs\",\n        \"no_timestamps\",\n        \"no_random_values\",\n        \"stable_hashes_required\"\n    ],\n    \"verification\": {\n        \"repeated_runs\": 2,\n        \"hash_algorithm\": \"sha256\",\n        \"mismatch_action\": \"invalidate_run\"\n    }\n}\n\nFAILURE_HANDLING = {\n    \"philosophy\": \"fail_soft_never_fail_stop\",\n    \"unexpected_conditions\": {\n        \"actions\": [\n            \"isolate_failure\",\n            \"continue_analysis\",\n            \"downgrade_confidence\",\n            \"emit_explicit_warning\"\n        ]\n    }\n}\n\ndef validate_e",
+      "intent": "general_purpose",
+      "file_path": "src/core/constraints/operating.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Trust guarantees for Repository Intelligence Scanner.\"\"\"\n\nTRUST_GUARANTEES = [\n    \"determinism_is_mandatory\",\n    \"reproducibility_is_required\",\n    \"conservative_bias_on_ambiguity\",\n    \"explicit_limits_of_authority\"\n]\n\ndef enforce_determinism(operation: str) -> bool:\n    \"\"\"Ensure operation maintains determinism.\"\"\"\n    return True  # Placeholder\n\ndef enforce_reproducibility(operation: str) -> bool:\n    \"\"\"Ensure operation is reproducible.\"\"\"\n    return True  # Placeholder\n\ndef apply_conservative_bias(assessment: dict) -> dict:\n    \"\"\"Apply conservative bias on ambiguity.\"\"\"\n    return assessment  # Placeholder\n\ndef enforce_authority_limits(operation: str) -> bool:\n    \"\"\"Ensure operation respects authority limits.\"\"\"\n    return True  # Placeholder\n",
+      "intent": "general_purpose",
+      "file_path": "src/core/principles/trust.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Behavioral principles and refusal checks for Repository Intelligence Scanner.\"\"\"\n\nBEHAVIORAL_PRINCIPLES = [\n    \"never_guess_intent\",\n    \"never_optimize_for_output_volume\",\n    \"never_mask_unknowns\",\n    \"never_force_action\",\n    \"never_require_manual_intervention\"\n]\n\ndef check_never_guess_intent(operation: str) -> bool:\n    \"\"\"Refuse operations that would require guessing intent.\"\"\"\n    # Implementation would analyze if operation guesses intent\n    return True  # Placeholder - allow\n\ndef check_never_optimize_for_output_volume(operation: str) -> bool:\n    \"\"\"Refuse operations that optimize for volume over quality.\"\"\"\n    return True  # Placeholder\n\ndef check_never_mask_unknowns(operation: str) -> bool:\n    \"\"\"Refuse operations that hide unknowns.\"\"\"\n    return True  # Placeholder\n\ndef check_never_force_action(operation: str) -> bool:\n    \"\"\"Refuse operations that force action without justification.\"\"\"\n    return True  # Placeholder\n\ndef check_never_require_manual_intervention(opera",
+      "intent": "general_purpose",
+      "file_path": "src/core/principles/behavioral.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Epistemic principles for Repository Intelligence Scanner.\"\"\"\n\nEPISTEMIC_PRINCIPLES = [\n    \"only_claim_what_is_observable\",\n    \"separate_evidence_from_judgment\",\n    \"uncertainty_must_be_visible\",\n    \"confidence_requires_justification\",\n    \"silence_is_preferable_to_false_precision\"\n]\n",
+      "intent": "general_purpose",
+      "file_path": "src/core/principles/epistemic.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Risk and gap synthesis for Repository Intelligence Scanner.\"\"\"\n\nGAP_TYPES = [\n    \"structural\",\n    \"testing\",\n    \"governance\",\n    \"integration\",\n    \"knowledge_risk\"\n]\n\nPRIORITIZATION_METHOD = \"impact_over_effort\"\n\nOUTPUTS = [\n    \"prioritized_gap_list\",\n    \"negative_roi_optimizations\"\n]\n\ndef synthesize_risks_and_gaps(repository_analysis: dict) -> dict:\n    \"\"\"Synthesize risks and gaps.\"\"\"\n    # Placeholder implementation\n    return {\n        \"gaps\": [],\n        \"prioritized\": [],\n        \"negative_roi\": []\n    }\n",
+      "intent": "general_purpose",
+      "file_path": "src/core/risk/synthesis.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Decision artifacts for Repository Intelligence Scanner.\"\"\"\n\nDECISION_ARTIFACTS = [\n    \"executive_verdict\",\n    \"safe_to_change_surface\",\n    \"no_touch_zones\",\n    \"misleading_signals\",\n    \"what_not_to_fix\",\n    \"refusal_artifact_if_applicable\",\n    \"confidence_and_limits\",\n    \"validity_window\"\n]\n\ndef generate_decision_artifacts(repository_analysis: dict) -> dict:\n    \"\"\"Generate all decision artifacts.\"\"\"\n    risk_synthesis = repository_analysis.get(\"risk_synthesis\", {})\n    confidence_assessment = repository_analysis.get(\"decision_artifacts\", {}).get(\"confidence_assessment\", {})\n    \n    # Compute executive verdict\n    overall_risk = risk_synthesis.get(\"overall_risk_assessment\", {})\n    risk_level = overall_risk.get(\"overall_risk_level\", \"unknown\").lower()\n    confidence_score = confidence_assessment.get(\"confidence_score\", 0.0)\n    \n    if confidence_score < 0.5:\n        executive_verdict = \"INSUFFICIENT_EVIDENCE\"\n    elif risk_level in [\"low\", \"minimal\"]:\n        executive_ver",
+      "intent": "general_purpose",
+      "file_path": "src/core/risk/decision_artifacts.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Confidence model for Repository Intelligence Scanner.\"\"\"\n\nCONFIDENCE_LEVELS = [\n    \"HIGH\",\n    \"MEDIUM\",\n    \"LOW\"\n]\n\nCONFIDENCE_RULES = [\n    \"confidence_must_be_justified\",\n    \"confidence_must_be_downgraded_on_ambiguity\",\n    \"refusal_forces_LOW\"\n]\n\ndef evaluate_confidence(assessment: dict) -> str:\n    \"\"\"Evaluate confidence level for an assessment.\"\"\"\n    # Placeholder implementation\n    return \"LOW\"\n\ndef justify_confidence(confidence: str, evidence: dict) -> bool:\n    \"\"\"Check if confidence is justified.\"\"\"\n    return True  # Placeholder\n",
+      "intent": "general_purpose",
+      "file_path": "src/core/risk/confidence_model.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Rust language adapter for repository analysis.\"\"\"\n\n\nclass RustAdapter:\n    \"\"\"Adapter for analyzing Rust repositories.\"\"\"\n\n    def extract_ast(self, file_path: str) -> dict:\n        \"\"\"Extract AST from Rust file.\"\"\"\n        raise NotImplementedError\n\n    def build_dependency_graph(self, root_path: str) -> dict:\n        \"\"\"Build dependency graph for Rust project.\"\"\"\n        raise NotImplementedError\n\n    def discover_tests(self, root_path: str) -> list:\n        \"\"\"Discover test files and functions.\"\"\"\n        raise NotImplementedError\n\n    def extract_documentation(self, file_path: str) -> dict:\n        \"\"\"Extract documentation from Rust file.\"\"\"\n        raise NotImplementedError\n",
+      "intent": "general_purpose",
+      "file_path": "src/adapters/rust_adapter.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Java language adapter for repository analysis.\"\"\"\n\n\nclass JavaAdapter:\n    \"\"\"Adapter for analyzing Java repositories.\"\"\"\n\n    def extract_ast(self, file_path: str) -> dict:\n        \"\"\"Extract AST from Java file.\"\"\"\n        raise NotImplementedError\n\n    def build_dependency_graph(self, root_path: str) -> dict:\n        \"\"\"Build dependency graph for Java project.\"\"\"\n        raise NotImplementedError\n\n    def discover_tests(self, root_path: str) -> list:\n        \"\"\"Discover test files and functions.\"\"\"\n        raise NotImplementedError\n\n    def extract_documentation(self, file_path: str) -> dict:\n        \"\"\"Extract documentation from Java file.\"\"\"\n        raise NotImplementedError\n",
+      "intent": "general_purpose",
+      "file_path": "src/adapters/java_adapter.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Python language adapter for repository analysis.\"\"\"\n\n\nclass PythonAdapter:\n    \"\"\"Adapter for analyzing Python repositories.\"\"\"\n\n    def extract_ast(self, file_path: str) -> dict:\n        \"\"\"Extract AST from Python file.\"\"\"\n        raise NotImplementedError\n\n    def build_dependency_graph(self, root_path: str) -> dict:\n        \"\"\"Build dependency graph for Python project.\"\"\"\n        raise NotImplementedError\n\n    def discover_tests(self, root_path: str) -> list:\n        \"\"\"Discover test files and functions.\"\"\"\n        raise NotImplementedError\n\n    def extract_documentation(self, file_path: str) -> dict:\n        \"\"\"Extract documentation from Python file.\"\"\"\n        raise NotImplementedError\n",
+      "intent": "general_purpose",
+      "file_path": "src/adapters/python_adapter.py",
+      "language": "python"
+    },
+    {
+      "content": "#!/usr/bin/env python3\n\"\"\"\nBaseline Effectiveness Assessment for Repository Intelligence Scanner\n\nThis script establishes the current effectiveness level of the scanner\nby testing it against known repositories with documented issues.\n\"\"\"\n\nimport os\nimport json\nimport subprocess\nimport time\nfrom pathlib import Path\nfrom typing import Dict, List, Any\nimport tempfile\n\nclass EffectivenessAssessor:\n    \"\"\"Assesses scanner effectiveness against known benchmarks.\"\"\"\n\n    def __init__(self, scanner_path: str):\n        self.scanner_path = Path(scanner_path)\n        self.results_dir = Path(\"enhanced_scanner/baseline_results\")\n        self.results_dir.mkdir(parents=True, exist_ok=True)\n\n    def run_baseline_assessment(self) -> Dict[str, Any]:\n        \"\"\"Run comprehensive baseline assessment.\"\"\"\n        print(\"\ud83d\udd0d Starting Baseline Effectiveness Assessment...\")\n\n        # Test repositories with known issues\n        test_repos = [\n            {\n                \"name\": \"vulnerable_python_app\",\n       ",
+      "intent": "application_entry_point",
+      "file_path": "enhanced_scanner/baseline_assessment.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Tests for determinism verification.\"\"\"\n\nimport hashlib\nimport json\nimport subprocess\nimport tempfile\nfrom pathlib import Path\n\nimport pytest\n\n\ndef create_test_repo(base_path):\n    \"\"\"Create a deterministic test repository.\"\"\"\n    repo_dir = base_path / \"det_repo\"\n    repo_dir.mkdir()\n    \n    # Create files in a specific order to ensure determinism\n    files = [\n        (\"README.md\", \"# Determinism Test\\n\\nThis repo tests determinism.\"),\n        (\"src/main.py\", \"def main():\\n    print('Hello')\\n\\nif __name__ == '__main__':\\n    main()\"),\n        (\"src/utils.py\", \"def helper():\\n    return 42\"),\n        (\"tests/test_main.py\", \"def test_main():\\n    assert True\"),\n        (\".gitignore\", \"*.pyc\\n__pycache__/\\n.pytest_cache/\"),\n    ]\n    \n    for filename, content in files:\n        file_path = repo_dir / filename\n        file_path.parent.mkdir(parents=True, exist_ok=True)\n        file_path.write_text(content)\n    \n    return repo_dir\n\n\ndef get_file_hash(file_path):\n    \"\"\"Get SHA256 has",
+      "intent": "test_code",
+      "file_path": "tests/test_determinism.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Tests for analysis pipeline.\"\"\"\n\nimport tempfile\nfrom pathlib import Path\n\nfrom src.core.pipeline.analysis import execute_pipeline\n\n\ndef test_execute_pipeline_basic(tmp_path):\n    \"\"\"Test basic pipeline execution.\"\"\"\n    # Create a simple test repository\n    repo_dir = tmp_path / \"test_repo\"\n    repo_dir.mkdir()\n    (repo_dir / \"file1.txt\").write_text(\"content1\")\n    (repo_dir / \"file2.txt\").write_text(\"content2\")\n    \n    result = execute_pipeline(str(repo_dir))\n    \n    assert isinstance(result, dict)\n    assert \"repository_root\" in result\n    assert \"files\" in result\n    assert \"status\" in result\n    \n    assert result[\"repository_root\"] == str(repo_dir)\n    assert len(result[\"files\"]) == 2\n    assert \"file1.txt\" in result[\"files\"]\n    assert \"file2.txt\" in result[\"files\"]\n\n\ndef test_execute_pipeline_git_repo(tmp_path):\n    \"\"\"Test pipeline execution on git repository.\"\"\"\n    import subprocess\n    \n    # Create and initialize git repo\n    repo_dir = tmp_path / \"git_repo\"\n    repo",
+      "intent": "test_code",
+      "file_path": "tests/test_pipeline.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Tests for output contract and quality assurance.\"\"\"\n\nimport json\n\nfrom src.core.quality.output_contract import generate_primary_report, generate_machine_output, generate_executive_verdict\n\n\ndef test_generate_primary_report_basic():\n    \"\"\"Test basic primary report generation.\"\"\"\n    analysis = {\n        \"repository_root\": \"/path/to/repo\",\n        \"files\": [\"file1.txt\", \"file2.txt\"]\n    }\n    repository_path = \"/path/to/repo\"\n    \n    report = generate_primary_report(analysis, repository_path)\n    \n    assert isinstance(report, str)\n    assert \"# Repository Analysis Report\" in report\n    assert \"/path/to/repo\" in report\n    assert \"2 files\" in report\n    \n    # Check required sections\n    required_sections = [\n        \"## Executive Summary\",\n        \"## System Characterization\",\n        \"## Evidence Highlights\",\n        \"## Misleading Signals\",\n        \"## Safe to Change Surface\",\n        \"## What Not to Fix\",\n        \"## Refusal or First Action\",\n        \"## Confidence and Limits\",\n",
+      "intent": "test_code",
+      "file_path": "tests/test_output_contract.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Test suite for repository scanner CLI and components.\"\"\"\n\nimport json\nimport os\nimport shutil\nimport subprocess\nimport sys\nimport tempfile\nfrom pathlib import Path\n\nimport pytest\n\n\n@pytest.fixture\ndef test_repo(tmp_path):\n    \"\"\"Create a test repository with known structure.\"\"\"\n    # Create a temporary directory structure\n    repo_dir = tmp_path / \"test_repo\"\n    repo_dir.mkdir()\n    \n    # Create some files\n    (repo_dir / \"README.md\").write_text(\"# Test Repository\\n\\nThis is a test repo.\")\n    (repo_dir / \"src\").mkdir()\n    (repo_dir / \"src\" / \"main.py\").write_text(\"print('Hello, World!')\")\n    (repo_dir / \"src\" / \"utils.py\").write_text(\"def helper():\\n    return 'helper'\")\n    (repo_dir / \"tests\").mkdir()\n    (repo_dir / \"tests\" / \"test_main.py\").write_text(\"def test_hello():\\n    assert True\")\n    (repo_dir / \".gitignore\").write_text(\"*.pyc\\n__pycache__/\")\n    \n    return repo_dir\n\n\n@pytest.fixture\ndef output_dir(tmp_path):\n    \"\"\"Create a temporary output directory.\"\"\"\n    out_",
+      "intent": "test_code",
+      "file_path": "tests/test_scanner_cli.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Tests for repository discovery functionality.\"\"\"\n\nimport subprocess\nimport tempfile\nfrom pathlib import Path\n\nimport pytest\n\nfrom src.core.pipeline.repository_discovery import discover_repository_root, get_canonical_file_list\n\n\ndef test_discover_repository_root_git(tmp_path):\n    \"\"\"Test repository root discovery with git repository.\"\"\"\n    # Create a git repository\n    repo_dir = tmp_path / \"git_repo\"\n    repo_dir.mkdir()\n    \n    # Initialize git\n    subprocess.run([\"git\", \"init\"], cwd=repo_dir, check=True, capture_output=True)\n    subprocess.run([\"git\", \"config\", \"user.email\", \"test@example.com\"], cwd=repo_dir, check=True)\n    subprocess.run([\"git\", \"config\", \"user.name\", \"Test User\"], cwd=repo_dir, check=True)\n    \n    # Create files\n    (repo_dir / \"file1.txt\").write_text(\"content1\")\n    (repo_dir / \"subdir\").mkdir()\n    (repo_dir / \"subdir\" / \"file2.txt\").write_text(\"content2\")\n    \n    # Test from root\n    root = discover_repository_root(str(repo_dir))\n    assert root == str(",
+      "intent": "test_code",
+      "file_path": "tests/test_repository_discovery.py",
+      "language": "python"
+    },
+    {
+      "content": "\"\"\"Minimal Python module for testing.\"\"\"\n\n\ndef hello():\n    \"\"\"Return a greeting.\"\"\"\n    return \"Hello, World!\"\n",
+      "intent": "test_code",
+      "file_path": "tests/fixtures/minimal_repo/sample.py",
+      "language": "python"
+    },
+    {
+      "content": "// Test JavaScript file for multi-language support\nimport React from 'react';\n\nfunction App() {\n  const [count, setCount] = React.useState(0);\n\n  return (\n    <div className=\"App\">\n      <h1>Hello World</h1>\n      <button onClick={() => setCount(count + 1)}>\n        Count: {count}\n      </button>\n    </div>\n  );\n}\n\nexport default App;",
+      "intent": "test_code",
+      "file_path": "test_component.js",
+      "language": "javascript"
+    },
+    {
+      "content": "package com.example;\n\nimport java.util.List;\nimport java.util.ArrayList;\n\npublic class TestService {\n\n    private List<String> items;\n\n    public TestService() {\n        this.items = new ArrayList<>();\n    }\n\n    public void addItem(String item) {\n        this.items.add(item);\n    }\n\n    public List<String> getItems() {\n        return this.items;\n    }\n\n    public static void main(String[] args) {\n        TestService service = new TestService();\n        service.addItem(\"test\");\n        System.out.println(service.getItems());\n    }\n}",
+      "intent": "test_code",
+      "file_path": "TestService.java",
+      "language": "java"
+    }
+  ],
+  "created_at": "2024-01-01T00:00:00Z",
+  "version": "bootstrap-v1"
+}

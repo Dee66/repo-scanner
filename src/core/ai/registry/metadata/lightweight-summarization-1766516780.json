@@ -1,0 +1,16 @@
+{
+  "name": "lightweight-summarization-1766516780",
+  "version": "1.0.0",
+  "model_type": "llm",
+  "framework": "lightweight_transformers",
+  "parameters": {
+    "model_type": "lightweight_fine_tuned",
+    "base_model": "distilgpt2",
+    "task": "summarization",
+    "training_samples": 58,
+    "fine_tuned_at": "2025-12-23T19:06:20Z"
+  },
+  "hash": "lightweight-lightweight-summarization-1766516780-1.0.0",
+  "created_at": "2025-12-23T19:06:28Z",
+  "description": "Lightweight fine-tuned model for summarization"
+}

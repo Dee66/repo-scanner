@@ -1,0 +1,2 @@
+[console_scripts]
+repo-scanner = src.cli:main
