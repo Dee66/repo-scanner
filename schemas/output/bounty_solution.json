@@ -1,0 +1,109 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Bounty Solution",
+  "description": "Schema for generated bounty solutions including PR content",
+  "type": "object",
+  "required": [
+    "bounty_id",
+    "pr_content",
+    "integration_plan",
+    "generated_at",
+    "confidence_score"
+  ],
+  "properties": {
+    "bounty_id": {
+      "type": "string",
+      "description": "Unique identifier for the bounty"
+    },
+    "pr_content": {
+      "type": "object",
+      "description": "Generated PR content and metadata",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "PR title"
+        },
+        "description": {
+          "type": "string",
+          "description": "PR description"
+        },
+        "branch_name": {
+          "type": "string",
+          "description": "Suggested branch name"
+        },
+        "labels": {
+          "type": "array",
+          "description": "Suggested PR labels",
+          "items": {"type": "string"}
+        },
+        "checklist": {
+          "type": "array",
+          "description": "PR checklist items",
+          "items": {
+            "type": "object",
+            "properties": {
+              "item": {"type": "string"},
+              "required": {"type": "boolean"}
+            },
+            "required": ["item", "required"]
+          }
+        },
+        "confidence_score": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Confidence in the generated solution"
+        }
+      },
+      "required": ["title", "description", "branch_name", "labels", "checklist"]
+    },
+    "integration_plan": {
+      "type": "object",
+      "description": "Integration and deployment plan",
+      "properties": {
+        "deployment_strategy": {
+          "type": "string",
+          "enum": ["automated", "manual", "hybrid"],
+          "description": "Recommended deployment strategy"
+        },
+        "ci_cd_platforms": {
+          "type": "array",
+          "description": "Detected CI/CD platforms",
+          "items": {"type": "string"}
+        },
+        "required_checks": {
+          "type": "array",
+          "description": "Required CI/CD checks",
+          "items": {"type": "string"}
+        },
+        "webhook_endpoints": {
+          "type": "array",
+          "description": "Webhook endpoints for integration",
+          "items": {"type": "string"}
+        },
+        "prerequisites": {
+          "type": "array",
+          "description": "Prerequisites for implementation",
+          "items": {"type": "string"}
+        },
+        "post_merge_actions": {
+          "type": "array",
+          "description": "Actions to take after merge",
+          "items": {"type": "string"}
+        }
+      },
+      "required": ["deployment_strategy", "prerequisites", "post_merge_actions"]
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the solution was generated"
+    },
+    "confidence_score": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "Overall confidence in the solution"
+    }
+  }
+}

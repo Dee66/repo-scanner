@@ -1,0 +1,338 @@
+[
+  {
+    "timestamp": "2025-12-23T22:47:51.511875",
+    "step": "Check kubectl",
+    "status": "running",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.512010",
+    "step": "Check kubectl",
+    "status": "passed",
+    "details": "DRY RUN"
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.512069",
+    "step": "Check helm",
+    "status": "running",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.512195",
+    "step": "Check helm",
+    "status": "passed",
+    "details": "DRY RUN"
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.512238",
+    "step": "Check docker",
+    "status": "running",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.512322",
+    "step": "Check docker",
+    "status": "passed",
+    "details": "DRY RUN"
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.512374",
+    "step": "Check git",
+    "status": "running",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.512474",
+    "step": "Check git",
+    "status": "passed",
+    "details": "DRY RUN"
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.512526",
+    "step": "Check python",
+    "status": "running",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.512642",
+    "step": "Check python",
+    "status": "passed",
+    "details": "DRY RUN"
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.512716",
+    "step": "Check Kubernetes access",
+    "status": "running",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.512801",
+    "step": "Check Kubernetes access",
+    "status": "passed",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.512845",
+    "step": "Check Helm repo",
+    "status": "running",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.512940",
+    "step": "Check Helm repo",
+    "status": "passed",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.513062",
+    "step": "Backup Helm values",
+    "status": "running",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.513180",
+    "step": "Backup Helm values",
+    "status": "completed",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.513232",
+    "step": "Backup database",
+    "status": "running",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.513277",
+    "step": "Backup database",
+    "status": "completed",
+    "details": "Database backup completed"
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.513317",
+    "step": "Create Velero backup",
+    "status": "running",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.513447",
+    "step": "Create Velero backup",
+    "status": "completed",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.513537",
+    "step": "Operational readiness assessment",
+    "status": "running",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.513673",
+    "step": "Operational readiness assessment",
+    "status": "passed",
+    "details": "Score: 85%"
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.513727",
+    "step": "Validate Kubernetes manifests",
+    "status": "running",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.513818",
+    "step": "Validate k8s/namespace.yaml",
+    "status": "passed",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.513912",
+    "step": "Validate k8s/configmap.yaml",
+    "status": "passed",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.513998",
+    "step": "Validate k8s/secret.yaml",
+    "status": "passed",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.514085",
+    "step": "Validate k8s/pvc.yaml",
+    "status": "passed",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.514170",
+    "step": "Validate k8s/deployment.yaml",
+    "status": "passed",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.514237",
+    "step": "Validate k8s/service.yaml",
+    "status": "passed",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.514309",
+    "step": "Validate k8s/ingress.yaml",
+    "status": "passed",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.514431",
+    "step": "Validate k8s/hpa.yaml",
+    "status": "passed",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.514526",
+    "step": "Validate k8s/network-policy.yaml",
+    "status": "passed",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.514612",
+    "step": "Validate k8s/rbac.yaml",
+    "status": "passed",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.514655",
+    "step": "Validate Helm chart",
+    "status": "running",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.514743",
+    "step": "Validate Helm chart",
+    "status": "passed",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.514793",
+    "step": "Security scan",
+    "status": "running",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.514894",
+    "step": "Security scan",
+    "status": "passed",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.514992",
+    "step": "Update Helm repo",
+    "status": "running",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.515093",
+    "step": "Update Helm repo",
+    "status": "completed",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.515186",
+    "step": "Helm upgrade",
+    "status": "running",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.515286",
+    "step": "Helm upgrade",
+    "status": "completed",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.515341",
+    "step": "Wait for rollout",
+    "status": "running",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:47:51.515492",
+    "step": "Wait for rollout",
+    "status": "completed",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:48:21.515708",
+    "step": "Check pod status",
+    "status": "running",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:48:21.516178",
+    "step": "Check pod status",
+    "status": "passed",
+    "details": "All pods running"
+  },
+  {
+    "timestamp": "2025-12-23T22:48:21.516250",
+    "step": "Check service endpoints",
+    "status": "running",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:48:21.516416",
+    "step": "Check service endpoints",
+    "status": "passed",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:48:21.516492",
+    "step": "Test health endpoint",
+    "status": "running",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:48:21.516636",
+    "step": "Test health endpoint",
+    "status": "passed",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:48:21.516710",
+    "step": "Test API functionality",
+    "status": "running",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:48:21.516849",
+    "step": "Test API functionality",
+    "status": "passed",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:48:21.516952",
+    "step": "Run comprehensive validation",
+    "status": "running",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:48:21.517084",
+    "step": "Run comprehensive validation",
+    "status": "passed",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:48:21.517156",
+    "step": "Performance testing",
+    "status": "running",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:48:21.517297",
+    "step": "Performance testing",
+    "status": "passed",
+    "details": ""
+  },
+  {
+    "timestamp": "2025-12-23T22:48:21.517402",
+    "step": "Deployment",
+    "status": "completed",
+    "details": "Duration: 0:00:30.005851"
+  }
+]

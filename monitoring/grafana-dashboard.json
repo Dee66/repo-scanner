@@ -1,0 +1,123 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Repository Intelligence Scanner",
+    "tags": ["repo-scanner", "monitoring"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "System Health",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "up{job=\"repo-scanner-monitor\"}",
+            "legendFormat": "API Server"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "mappings": [
+              {
+                "options": {
+                  "0": {
+                    "text": "DOWN",
+                    "color": "red"
+                  },
+                  "1": {
+                    "text": "UP",
+                    "color": "green"
+                  }
+                },
+                "type": "value"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": 2,
+        "title": "Memory Usage",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "100 - (avg_over_time(node_memory_MemAvailable_bytes{job=\"node-exporter\"}[5m]) / node_memory_MemTotal_bytes{job=\"node-exporter\"}) * 100",
+            "legendFormat": "Memory Usage %"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "orange",
+                  "value": 70
+                },
+                {
+                  "color": "red",
+                  "value": 85
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 3,
+        "title": "CPU Usage",
+        "type": "gauge",
+        "targets": [
+          {
+            "expr": "rate(container_cpu_usage_seconds_total{pod=~\"repo-scanner-.*\"}[5m]) * 100",
+            "legendFormat": "CPU Usage %"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Scan Performance",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(repo_scanner_scan_duration_seconds_sum[5m]) / rate(repo_scanner_scan_duration_seconds_count[5m])",
+            "legendFormat": "Average Scan Time"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Scan Success Rate",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "rate(repo_scanner_scans_success_total[5m]) / rate(repo_scanner_scans_total[5m]) * 100",
+            "legendFormat": "Success Rate %"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Active Alerts",
+        "type": "table",
+        "targets": [
+          {
+            "expr": "ALERTS{alertname=~\"RepoScanner.*\"}",
+            "legendFormat": "{{alertname}}"
+          }
+        ]
+      }
+    ],
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "refresh": "30s"
+  }
+}

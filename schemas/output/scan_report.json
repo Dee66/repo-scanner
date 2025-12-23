@@ -45,6 +45,38 @@
         }
       }
     },
+    "bounty_artifacts": {
+      "type": "object",
+      "properties": {
+        "profitability_score": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+        "merge_confidence": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+        "maintainer_compatibility": {
+          "type": "object",
+          "properties": {
+            "compatibility_score": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+            "compatibility_factors": {"type": "array", "items": {"type": "string"}},
+            "recommended_approach": {"type": "string"}
+          },
+          "required": ["compatibility_score", "compatibility_factors", "recommended_approach"]
+        },
+        "bounty_recommendations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "priority": {"type": "string", "enum": ["high", "medium", "low"]},
+              "action": {"type": "string"},
+              "rationale": {"type": "string"},
+              "confidence": {"type": "number", "minimum": 0.0, "maximum": 1.0}
+            },
+            "required": ["priority", "action", "rationale", "confidence"]
+          }
+        },
+        "bounty_timestamp": {"type": "string", "format": "date-time"},
+        "bounty_version": {"type": "string"}
+      },
+      "required": ["profitability_score", "merge_confidence", "maintainer_compatibility", "bounty_recommendations"]
+    },
     "metadata": {
       "type":"object",
       "properties": {

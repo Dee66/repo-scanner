@@ -646,7 +646,7 @@ def generate_machine_output(analysis: dict, repository_path: str) -> dict:
         "gaps": [],
         "metadata": {
             "scanner_version": "1.1.0",
-            "run_timestamp": "2025-12-23T00:00:00Z",  # Placeholder, should be deterministic
+            "run_timestamp": "2025-01-01T00:00:00Z",  # Fixed timestamp for determinism
             "deterministic_hash": "placeholder-hash"
         }
     }

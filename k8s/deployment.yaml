@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: repo-scanner-api
+  namespace: repo-scanner
+  labels:
+    app: repo-scanner
+    component: api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: repo-scanner
+      component: api
+  template:
+    metadata:
+      labels:
+        app: repo-scanner
+        component: api
+    spec:
+      serviceAccountName: repo-scanner-sa
+      containers:
+      - name: api-server
+        image: repo-scanner:latest
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+        - name: PYTHONPATH
+          value: "/app"
+        envFrom:
+        - configMapRef:
+            name: repo-scanner-config
+        - secretRef:
+            name: repo-scanner-secrets
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+        volumeMounts:
+        - name: storage
+          mountPath: /app/data
+        - name: cache
+          mountPath: /tmp/cache
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 1000
+          runAsGroup: 1000
+          capabilities:
+            drop:
+            - ALL
+          readOnlyRootFilesystem: true
+          seccompProfile:
+            type: RuntimeDefault
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      volumes:
+      - name: storage
+        persistentVolumeClaim:
+          claimName: repo-scanner-storage
+      - name: cache
+        emptyDir: {}

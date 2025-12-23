@@ -316,6 +316,37 @@ This section defines the dual report system introduced in v2, supporting both co
 - Confidence scores as floats 0.0-1.0
 - Evidence references as structured objects
 
+### 4. BOUNTY ARTIFACTS (ALGORA INTEGRATION)
+**Purpose**: Provide bounty-specific decision support for Algora bounty hunting platform.
+
+**Required Fields**
+
+profitability_score: float (0.0-1.0)
+
+merge_confidence: float (0.0-1.0)
+
+maintainer_compatibility: object
+- compatibility_score: float (0.0-1.0)
+- compatibility_factors: array of strings
+- recommended_approach: string
+
+bounty_recommendations: array of objects
+- priority: "high" | "medium" | "low"
+- action: string
+- rationale: string
+- confidence: float
+
+**Constraints**
+- Profitability score must use Bayesian probability framework
+- Merge confidence must achieve 99.999% accuracy target
+- All recommendations must be evidence-based
+- Compatibility factors must reference specific maintainer preferences
+
+**Evidence Standards**
+- Profitability calculations must reference risk_synthesis, test_signals, and maintainer_profile
+- Compatibility assessment must reference intent_posture and governance analysis
+- Recommendations must include confidence scores and rationale
+
 ## CLI Interface (v2)
 
 New `--report-type` argument controls output generation:

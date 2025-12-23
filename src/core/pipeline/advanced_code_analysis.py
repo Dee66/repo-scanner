@@ -47,6 +47,7 @@ class AdvancedCodeAnalyzer:
             'cognitive': self._calculate_cognitive_complexity,
             'halstead': self._calculate_halstead_metrics
         }
+        self.repo_root = None
 
     def analyze_advanced_code(self, file_list: List[str], semantic_data: Dict[str, Any]) -> Dict[str, Any]:
         """

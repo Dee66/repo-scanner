@@ -54,7 +54,7 @@ def evaluate_authority_ceiling(file_list: List[str], structure: Dict, semantic: 
         "organizational_factors": organizational_factors,
         "authority_rationale": authority_rationale,
         "authority_confidence": authority_confidence,
-        "evaluation_timestamp": "2025-12-23T00:00:00Z",  # Placeholder for deterministic timestamp
+        "evaluation_timestamp": "2025-01-01T00:00:00Z",  # Fixed timestamp for determinism
         "evaluation_version": "1.0.0"
     }
 

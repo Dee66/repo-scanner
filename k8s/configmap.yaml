@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: repo-scanner-config
+  namespace: repo-scanner
+data:
+  REPO_SCANNER_LOG_LEVEL: "INFO"
+  REPO_SCANNER_MAX_WORKERS: "8"
+  REPO_SCANNER_API_HOST: "0.0.0.0"
+  REPO_SCANNER_API_PORT: "8080"
+  # Monitoring configuration
+  MONITORING_ENABLED: "true"
+  ALERT_MEMORY_THRESHOLD: "80"
+  ALERT_ERROR_RATE_THRESHOLD: "0.1"
+  ALERT_SCAN_TIME_THRESHOLD: "30"

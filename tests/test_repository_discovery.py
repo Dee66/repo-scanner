@@ -63,9 +63,13 @@ def test_get_canonical_file_list(tmp_path):
     
     file_list = get_canonical_file_list(str(repo_dir))
     
-    # Should be sorted bytewise
-    expected = ["alpha.txt", "beta.txt", "subdir/gamma.txt", "zebra.txt"]
-    assert file_list == expected
+    # Should be sorted bytewise - check that filenames appear in correct order
+    filenames = [Path(f).name for f in file_list]
+    expected_filenames = ["alpha.txt", "beta.txt", "gamma.txt", "zebra.txt"]
+    assert filenames == expected_filenames
+    
+    # Check that paths are absolute
+    assert all(Path(f).is_absolute() for f in file_list)
 
 
 def test_get_canonical_file_list_empty(tmp_path):
@@ -91,8 +95,10 @@ def test_get_canonical_file_list_nested(tmp_path):
     
     file_list = get_canonical_file_list(str(repo_dir))
     
+    # Check filenames in correct order
+    filenames = [str(Path(f).relative_to(repo_dir)) for f in file_list]
     expected = ["a/b/c/deep.txt", "top.txt"]
-    assert file_list == expected
+    assert filenames == expected
 
 
 def test_discover_repository_root_invalid_path():

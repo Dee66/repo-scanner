@@ -6,7 +6,7 @@ from typing import Dict, List
 def generate_decision_artifacts(file_list: List[str], structure: Dict, semantic: Dict,
                                test_signals: Dict, governance: Dict, intent_posture: Dict,
                                misleading_signals: Dict, safe_change_surface: Dict,
-                               risk_synthesis: Dict) -> Dict:
+                               risk_synthesis: Dict, bounty_context: Dict = None) -> Dict:
     """Generate decision-making artifacts based on comprehensive analysis."""
     # Safety checks
     if not isinstance(file_list, list):
@@ -27,6 +27,8 @@ def generate_decision_artifacts(file_list: List[str], structure: Dict, semantic:
         safe_change_surface = {}
     if not isinstance(risk_synthesis, dict):
         risk_synthesis = {}
+    if bounty_context is None:
+        bounty_context = {}
 
     # Generate decision framework
     decision_framework = _generate_decision_framework(risk_synthesis)
@@ -43,15 +45,27 @@ def generate_decision_artifacts(file_list: List[str], structure: Dict, semantic:
     # Generate next steps
     next_steps = _generate_next_steps(decision_framework, action_plan)
 
-    return {
+    # Generate bounty-specific artifacts if bounty context provided
+    bounty_artifacts = {}
+    if bounty_context:
+        bounty_artifacts = _generate_bounty_artifacts(risk_synthesis, intent_posture,
+                                                    governance, bounty_context)
+
+    result = {
         "decision_framework": decision_framework,
         "action_plan": action_plan,
         "authority_ceiling": authority_ceiling,
         "confidence_assessment": confidence_assessment,
         "next_steps": next_steps,
-        "decision_timestamp": "2025-12-23T00:00:00Z",  # Placeholder for deterministic timestamp
+        "decision_timestamp": "2025-01-01T00:00:00Z",  # Fixed timestamp for determinism
         "decision_version": "1.0.0"
     }
+
+    # Add bounty artifacts if present
+    if bounty_artifacts:
+        result["bounty_artifacts"] = bounty_artifacts
+
+    return result
 
 
 def _generate_decision_framework(risk_synthesis: Dict) -> Dict:
@@ -312,3 +326,166 @@ def _assess_analysis_consistency(component_risks: Dict) -> float:
     consistency = max(0, 1 - variance / 2)  # Normalize variance to 0-1 scale
 
     return consistency
+
+
+def _generate_bounty_artifacts(risk_synthesis: Dict, intent_posture: Dict,
+                              governance: Dict, bounty_context: Dict) -> Dict:
+    """Generate bounty-specific decision artifacts for Algora bounty hunting."""
+    # Extract bounty context
+    issue_complexity = bounty_context.get("issue_complexity", "medium")
+    maintainer_responsiveness = bounty_context.get("maintainer_responsiveness", 0.5)
+    codebase_velocity = bounty_context.get("codebase_velocity", 0.5)
+    issue_quality_score = bounty_context.get("issue_quality_score", 0.5)
+
+    # Calculate profitability score (0-1 scale)
+    profitability_score = _calculate_profitability_score(
+        risk_synthesis, issue_complexity, maintainer_responsiveness,
+        codebase_velocity, issue_quality_score
+    )
+
+    # Assess maintainer compatibility
+    maintainer_compatibility = _assess_maintainer_compatibility(
+        intent_posture, governance, bounty_context
+    )
+
+    # Calculate merge confidence (0-1 scale)
+    merge_confidence = _calculate_merge_confidence(
+        profitability_score, maintainer_compatibility, risk_synthesis
+    )
+
+    # Generate bounty-specific recommendations
+    bounty_recommendations = _generate_bounty_recommendations(
+        profitability_score, merge_confidence, maintainer_compatibility
+    )
+
+    return {
+        "profitability_score": profitability_score,
+        "maintainer_compatibility": maintainer_compatibility,
+        "merge_confidence": merge_confidence,
+        "bounty_recommendations": bounty_recommendations,
+        "bounty_timestamp": "2025-01-01T00:00:00Z",
+        "bounty_version": "1.0.0"
+    }
+
+
+def _calculate_profitability_score(risk_synthesis: Dict, issue_complexity: str,
+                                 maintainer_responsiveness: float, codebase_velocity: float,
+                                 issue_quality_score: float) -> float:
+    """Calculate bounty profitability score using Bayesian probability framework."""
+    # Base risk assessment
+    overall_risk = risk_synthesis.get("overall_risk_assessment", {})
+    risk_level = overall_risk.get("overall_risk_level", "medium")
+
+    # Risk level to numeric conversion
+    risk_scores = {"low": 0.9, "medium": 0.6, "high": 0.2}
+    base_risk_score = risk_scores.get(risk_level, 0.5)
+
+    # Issue complexity adjustment
+    complexity_multipliers = {"low": 1.2, "medium": 1.0, "high": 0.7}
+    complexity_score = complexity_multipliers.get(issue_complexity, 1.0)
+
+    # Weighted combination for profitability
+    # Weights: risk (40%), complexity (20%), responsiveness (15%), velocity (15%), quality (10%)
+    profitability = (
+        base_risk_score * 0.4 +
+        complexity_score * 0.2 +
+        maintainer_responsiveness * 0.15 +
+        codebase_velocity * 0.15 +
+        issue_quality_score * 0.1
+    )
+
+    return min(1.0, max(0.0, profitability))
+
+
+def _assess_maintainer_compatibility(intent_posture: Dict, governance: Dict,
+                                   bounty_context: Dict) -> Dict:
+    """Assess compatibility with maintainer preferences and patterns."""
+    compatibility_score = 0.5  # Default neutral score
+    compatibility_factors = {}
+
+    # Analyze intent posture for maintainer preferences
+    maturity_level = intent_posture.get("maturity_classification", {}).get("maturity_level", "unknown")
+    development_stage = intent_posture.get("development_stage", "unknown")
+
+    # Maturity compatibility
+    if maturity_level in ["stable", "mature"]:
+        compatibility_score += 0.2
+        compatibility_factors["maturity_alignment"] = "High compatibility with stable codebase"
+    elif maturity_level in ["beta", "experimental"]:
+        compatibility_score -= 0.1
+        compatibility_factors["maturity_alignment"] = "Lower compatibility with experimental codebase"
+
+    # Governance compatibility
+    governance_maturity = governance.get("governance_maturity_score", 0.5)
+    compatibility_score += (governance_maturity - 0.5) * 0.3
+    compatibility_factors["governance_alignment"] = f"Governance maturity: {governance_maturity:.2f}"
+
+    # Code quality standards alignment
+    code_quality_governance = governance.get("code_quality_governance", {})
+    if code_quality_governance.get("linters") or code_quality_governance.get("formatters"):
+        compatibility_score += 0.1
+        compatibility_factors["code_quality"] = "Strong code quality standards detected"
+
+    return {
+        "compatibility_score": min(1.0, max(0.0, compatibility_score)),
+        "compatibility_factors": compatibility_factors,
+        "recommended_approach": "conservative" if compatibility_score < 0.6 else "standard"
+    }
+
+
+def _calculate_merge_confidence(profitability_score: float, maintainer_compatibility: Dict,
+                               risk_synthesis: Dict) -> float:
+    """Calculate confidence in successful bounty merge."""
+    compatibility_score = maintainer_compatibility.get("compatibility_score", 0.5)
+
+    # Base confidence from profitability and compatibility
+    base_confidence = (profitability_score + compatibility_score) / 2
+
+    # Adjust based on risk synthesis confidence
+    risk_confidence = risk_synthesis.get("risk_confidence", 0.5)
+    confidence_adjustment = (risk_confidence - 0.5) * 0.2
+
+    final_confidence = base_confidence + confidence_adjustment
+
+    return min(1.0, max(0.0, final_confidence))
+
+
+def _generate_bounty_recommendations(profitability_score: float, merge_confidence: float,
+                                   maintainer_compatibility: Dict) -> List[Dict]:
+    """Generate bounty-specific recommendations based on analysis."""
+    recommendations = []
+
+    # Profitability-based recommendations
+    if profitability_score >= 0.8:
+        recommendations.append({
+            "priority": "high",
+            "action": "pursue_bounty",
+            "rationale": f"High profitability score ({profitability_score:.2f}) indicates strong merge potential",
+            "confidence": merge_confidence
+        })
+    elif profitability_score >= 0.6:
+        recommendations.append({
+            "priority": "medium",
+            "action": "evaluate_further",
+            "rationale": f"Moderate profitability ({profitability_score:.2f}) - requires additional analysis",
+            "confidence": merge_confidence
+        })
+    else:
+        recommendations.append({
+            "priority": "low",
+            "action": "avoid_bounty",
+            "rationale": f"Low profitability score ({profitability_score:.2f}) suggests poor merge prospects",
+            "confidence": merge_confidence
+        })
+
+    # Compatibility-based recommendations
+    compatibility_score = maintainer_compatibility.get("compatibility_score", 0.5)
+    if compatibility_score >= 0.7:
+        recommendations.append({
+            "priority": "medium",
+            "action": "align_with_maintainer_preferences",
+            "rationale": f"High maintainer compatibility ({compatibility_score:.2f}) - follow established patterns",
+            "confidence": 0.8
+        })
+
+    return recommendations

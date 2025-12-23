@@ -78,6 +78,12 @@ _repo_root_cache: dict[str, str] = {}
 _file_list_cache: dict[str, list[str]] = {}
 
 
+def clear_caches():
+    """Clear all caches to ensure fresh analysis."""
+    _repo_root_cache.clear()
+    _file_list_cache.clear()
+
+
 def get_canonical_file_list(repository_root: str) -> list[str]:
     """Get a canonical, sorted list of all files in the repository with caching."""
     if repository_root in _file_list_cache:
@@ -97,9 +103,8 @@ def get_canonical_file_list(repository_root: str) -> list[str]:
             
             for filename in filenames:
                 file_path = Path(dirpath) / filename
-                # Get relative path and normalize separators
-                rel_path = file_path.relative_to(root_path)
-                files.append(str(rel_path))
+                # Get absolute path for consistent file access
+                files.append(str(file_path.resolve()))
     except (OSError, ValueError):
         pass
     

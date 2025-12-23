@@ -40,7 +40,7 @@ def output_dir(tmp_path):
 
 def run_scanner(repo_path, output_dir, format="both", report_type=None):
     """Run the scanner CLI and return the result."""
-    cmd = [sys.executable, "-m", "src.cli", str(repo_path), "--output-dir", str(output_dir)]
+    cmd = [sys.executable, "-m", "src.cli", "scan", str(repo_path), "--output-dir", str(output_dir)]
     if format != "both":
         cmd.extend(["--format", format])
     if report_type:

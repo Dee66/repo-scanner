@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "repo-scanner.fullname" . }}
+  labels:
+    {{- include "repo-scanner.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.api.replicas }}
+  selector:
+    matchLabels:
+      {{- include "repo-scanner.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "repo-scanner.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: api-server
+        image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.api.port }}
+          name: http
+        env:
+        - name: PYTHONPATH
+          value: "/app"
+        - name: REPO_SCANNER_API_PORT
+          value: "{{ .Values.api.port }}"
+        - name: REPO_SCANNER_LOG_LEVEL
+          value: "{{ .Values.config.logLevel }}"
+        - name: REPO_SCANNER_MAX_WORKERS
+          value: "{{ .Values.config.maxWorkers }}"
+        {{- if .Values.monitoring.enabled }}
+        - name: MONITORING_ENABLED
+          value: "true"
+        - name: ALERT_MEMORY_THRESHOLD
+          value: "{{ .Values.alerting.memoryThreshold }}"
+        - name: ALERT_ERROR_RATE_THRESHOLD
+          value: "{{ .Values.alerting.errorRateThreshold }}"
+        - name: ALERT_SCAN_TIME_THRESHOLD
+          value: "{{ .Values.alerting.scanTimeThreshold }}"
+        {{- end }}
+        resources:
+          {{- toYaml .Values.api.resources | nindent 10 }}
+        {{- if .Values.api.healthCheck.enabled }}
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.api.healthCheck.path }}
+            port: {{ .Values.api.port }}
+          initialDelaySeconds: {{ .Values.api.healthCheck.initialDelaySeconds }}
+          periodSeconds: {{ .Values.api.healthCheck.periodSeconds }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.api.healthCheck.path }}
+            port: {{ .Values.api.port }}
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        {{- end }}
+        volumeMounts:
+        {{- if .Values.storage.enabled }}
+        - name: storage
+          mountPath: /app/data
+        {{- end }}
+        - name: cache
+          mountPath: /tmp/cache
+        {{- if .Values.security.enabled }}
+        securityContext:
+          allowPrivilegeEscalation: {{ .Values.security.allowPrivilegeEscalation }}
+          runAsNonRoot: {{ .Values.security.runAsNonRoot }}
+          runAsUser: {{ .Values.security.runAsUser }}
+          runAsGroup: {{ .Values.security.runAsGroup }}
+          capabilities:
+            drop: {{ .Values.security.capabilities.drop }}
+          readOnlyRootFilesystem: {{ .Values.security.readOnlyRootFilesystem }}
+          seccompProfile:
+            type: {{ .Values.security.seccompProfile.type }}
+        {{- end }}
+      {{- if .Values.security.enabled }}
+      securityContext:
+        runAsNonRoot: {{ .Values.security.runAsNonRoot }}
+        runAsUser: {{ .Values.security.runAsUser }}
+        runAsGroup: {{ .Values.security.runAsGroup }}
+        fsGroup: {{ .Values.security.fsGroup }}
+      {{- end }}
+      {{- if .Values.rbac.enabled }}
+      serviceAccountName: {{ include "repo-scanner.serviceAccountName" . }}
+      {{- end }}
+      {{- if .Values.storage.enabled }}
+      - name: storage
+        persistentVolumeClaim:
+          claimName: {{ include "repo-scanner.fullname" . }}-storage
+      {{- end }}
+      - name: cache
+        emptyDir: {}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

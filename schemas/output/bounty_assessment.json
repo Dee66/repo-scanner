@@ -1,0 +1,100 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Bounty Assessment",
+  "description": "Schema for bounty opportunity assessment results",
+  "type": "object",
+  "required": [
+    "bounty_id",
+    "repository_url",
+    "assessment_timestamp",
+    "overall_recommendation",
+    "components",
+    "risk_factors",
+    "success_probability",
+    "estimated_effort",
+    "next_steps"
+  ],
+  "properties": {
+    "bounty_id": {
+      "type": "string",
+      "description": "Unique identifier for the bounty"
+    },
+    "repository_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL of the repository being analyzed"
+    },
+    "assessment_timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the assessment was generated"
+    },
+    "overall_recommendation": {
+      "type": "string",
+      "enum": ["PURSUE_IMMEDIATELY", "EVALUATE_FURTHER", "AVOID", "REQUIRES_MORE_INFO"],
+      "description": "High-level recommendation for pursuing the bounty"
+    },
+    "components": {
+      "type": "object",
+      "description": "Detailed analysis components",
+      "properties": {
+        "maintainer_profile": {
+          "type": "object",
+          "description": "Maintainer profile analysis results"
+        },
+        "profitability_triage": {
+          "type": "object",
+          "description": "Profitability triage results"
+        },
+        "integration_analysis": {
+          "type": "object",
+          "description": "API integration analysis results"
+        }
+      },
+      "required": ["maintainer_profile", "profitability_triage", "integration_analysis"]
+    },
+    "risk_factors": {
+      "type": "array",
+      "description": "Identified risk factors",
+      "items": {
+        "type": "object",
+        "properties": {
+          "factor": {"type": "string"},
+          "severity": {"type": "string", "enum": ["high", "medium", "low"]},
+          "description": {"type": "string"},
+          "mitigation": {"type": "string"}
+        },
+        "required": ["factor", "severity", "description"]
+      }
+    },
+    "success_probability": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "Estimated probability of successful bounty completion"
+    },
+    "estimated_effort": {
+      "type": "object",
+      "description": "Estimated effort requirements",
+      "properties": {
+        "person_days": {"type": "number", "minimum": 0},
+        "complexity_level": {"type": "string", "enum": ["low", "medium", "high", "very_high"]},
+        "skill_requirements": {"type": "array", "items": {"type": "string"}}
+      },
+      "required": ["person_days", "complexity_level"]
+    },
+    "next_steps": {
+      "type": "array",
+      "description": "Recommended next steps",
+      "items": {
+        "type": "object",
+        "properties": {
+          "step": {"type": "string"},
+          "priority": {"type": "string", "enum": ["immediate", "short_term", "long_term"]},
+          "description": {"type": "string"}
+        },
+        "required": ["step", "priority", "description"]
+      }
+    }
+  }
+}

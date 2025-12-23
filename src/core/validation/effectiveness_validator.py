@@ -143,6 +143,9 @@ class EffectivenessValidator:
             original_cwd = os.getcwd()
             try:
                 os.chdir(str(repo_path))
+                # Clear file list cache to prevent stale data from previous runs
+                from src.core.pipeline.repository_discovery import _file_list_cache
+                _file_list_cache.clear()
                 analysis_result = execute_pipeline('.')
             finally:
                 os.chdir(original_cwd)

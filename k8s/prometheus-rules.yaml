@@ -1,0 +1,47 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: repo-scanner-alerts
+  namespace: repo-scanner
+  labels:
+    app: repo-scanner
+    prometheus: kube-prometheus
+spec:
+  groups:
+  - name: repo-scanner
+    rules:
+    - alert: RepoScannerDown
+      expr: up{job="repo-scanner-monitor"} == 0
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Repo Scanner API is down"
+        description: "Repo Scanner API has been down for more than 5 minutes."
+
+    - alert: RepoScannerHighMemoryUsage
+      expr: (1 - rate(node_memory_MemAvailable_bytes{job="node-exporter"}[5m]) / node_memory_MemTotal_bytes{job="node-exporter"}) * 100 > 85
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High memory usage on Repo Scanner node"
+        description: "Memory usage is above 85% for more than 5 minutes."
+
+    - alert: RepoScannerHighCPUUsage
+      expr: rate(container_cpu_usage_seconds_total{pod=~"repo-scanner-.*"}[5m]) * 100 > 80
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High CPU usage on Repo Scanner pods"
+        description: "CPU usage is above 80% for more than 5 minutes."
+
+    - alert: RepoScannerScanFailures
+      expr: increase(repo_scanner_scans_failed_total[10m]) > 5
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High scan failure rate"
+        description: "More than 5 scan failures in the last 10 minutes."

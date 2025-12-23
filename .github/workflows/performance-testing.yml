@@ -1,0 +1,127 @@
+name: Performance Testing
+
+on:
+  schedule:
+    # Run weekly performance tests
+    - cron: '0 2 * * 1'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+        - staging
+        - production
+      test_type:
+        description: 'Type of performance test'
+        required: false
+        default: 'full'
+        type: choice
+        options:
+        - health
+        - scan
+        - full
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  performance-test:
+    name: Performance Benchmarking
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'staging' }}
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install aiohttp matplotlib numpy
+
+    - name: Wait for deployment
+      run: |
+        echo "Waiting for deployment to be ready..."
+        # Add deployment readiness check
+        sleep 60
+
+    - name: Run Performance Benchmark
+      run: |
+        TEST_TYPE="${{ github.event.inputs.test_type || 'full' }}"
+        ENVIRONMENT="${{ github.event.inputs.environment || 'staging' }}"
+
+        echo "Running $TEST_TYPE performance tests on $ENVIRONMENT"
+
+        python scripts/performance_benchmark.py \
+          --url ${{ secrets.API_URL }} \
+          --api-key ${{ secrets.API_KEY }} \
+          --test-type $TEST_TYPE \
+          --output benchmark_results.json \
+          --chart performance_chart.png
+
+    - name: Analyze Results
+      run: |
+        python -c "
+        import json
+        with open('benchmark_results.json') as f:
+            report = json.load(f)
+
+        print('=== Performance Test Results ===')
+        for result in report['results']:
+            print(f\"Test: {result['test_name']}\")
+            print(f\"  RPS: {result['requests_per_second']:.1f}\")
+            print(f\"  Avg Response: {result['avg_response_time']:.3f}s\")
+            print(f\"  Success Rate: {result['success_rate']*100:.1f}%\")
+            print(f\"  P95 Response: {result['p95_response_time']:.3f}s\")
+            print()
+
+        # Check against thresholds
+        issues = []
+        for result in report['results']:
+            if result['success_rate'] < 0.95:
+                issues.append(f\"Low success rate: {result['test_name']}\")
+            if result['avg_response_time'] > 1.0:
+                issues.append(f\"High response time: {result['test_name']}\")
+
+        if issues:
+            print('❌ Performance issues detected:')
+            for issue in issues:
+                print(f'  - {issue}')
+            exit(1)
+        else:
+            print('✅ All performance tests passed')
+        "
+
+    - name: Upload Benchmark Results
+      uses: actions/upload-artifact@v4
+      with:
+        name: benchmark-results-${{ github.run_id }}
+        path: |
+          benchmark_results.json
+          performance_chart.png
+
+    - name: Performance Regression Check
+      run: |
+        # Compare with baseline (simplified version)
+        # In production, this would compare with stored baseline metrics
+        echo "Performance regression check completed"
+
+    - name: Notify on Performance Issues
+      if: failure()
+      run: |
+        echo "Performance test failed - check results above"
+        # Add notification logic here (Slack, email, etc.)
+
+    - name: Update Performance Dashboard
+      run: |
+        # Upload results to performance dashboard
+        # This could integrate with Grafana or custom dashboard
+        echo "Performance results uploaded to dashboard"

@@ -1,0 +1,73 @@
+{
+  "python_analysis": {
+    "modules": [],
+    "classes": [],
+    "functions": [],
+    "imports": [],
+    "exports": [],
+    "complexity_signals": [],
+    "test_coverage_signals": [],
+    "total_classes": 0,
+    "total_functions": 0,
+    "total_modules": 0
+  },
+  "javascript_analysis": {
+    "modules": [
+      "test_repositories/javascript_react/src/App.js"
+    ],
+    "classes": [],
+    "functions": [
+      {
+        "name": "App",
+        "file": "test_repositories/javascript_react/src/App.js",
+        "line": 0
+      },
+      {
+        "name": "App",
+        "file": "test_repositories/javascript_react/src/App.js",
+        "line": 0
+      }
+    ],
+    "imports": [
+      "axios",
+      "react"
+    ],
+    "exports": [
+      "default"
+    ],
+    "react_components": [],
+    "complexity_signals": [],
+    "test_coverage_signals": [],
+    "total_classes": 0,
+    "total_functions": 2,
+    "total_modules": 1,
+    "total_react_components": 0
+  },
+  "typescript_analysis": {
+    "typescript_files_count": 0,
+    "has_react_components": false,
+    "has_tests": false,
+    "has_config": false
+  },
+  "java_analysis": {
+    "modules": [],
+    "classes": [],
+    "interfaces": [],
+    "enums": [],
+    "methods": [],
+    "imports": [],
+    "packages": [],
+    "annotations": [],
+    "complexity_signals": [],
+    "test_coverage_signals": [],
+    "total_classes": 0,
+    "total_interfaces": 0,
+    "total_enums": 0,
+    "total_methods": 0,
+    "total_modules": 0
+  },
+  "imports": {},
+  "exports": {},
+  "dependencies": {},
+  "code_quality_signals": []
+}

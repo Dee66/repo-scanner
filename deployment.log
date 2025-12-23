@@ -1,0 +1,148 @@
+2025-12-23 22:47:40,455 - INFO - === STARTING PRODUCTION DEPLOYMENT ===
+2025-12-23 22:47:40,455 - INFO - Environment: production
+2025-12-23 22:47:40,455 - INFO - Dry Run: True
+2025-12-23 22:47:40,455 - INFO - === VALIDATING PREREQUISITES ===
+2025-12-23 22:47:40,455 - INFO - Check kubectl: running - 
+2025-12-23 22:47:40,455 - INFO - DRY RUN: Would execute: kubectl version --client
+2025-12-23 22:47:40,455 - INFO - Check kubectl: passed - DRY RUN
+2025-12-23 22:47:40,456 - INFO - Check helm: running - 
+2025-12-23 22:47:40,456 - INFO - DRY RUN: Would execute: helm version
+2025-12-23 22:47:40,456 - INFO - Check helm: passed - DRY RUN
+2025-12-23 22:47:40,456 - INFO - Check docker: running - 
+2025-12-23 22:47:40,456 - INFO - DRY RUN: Would execute: docker --version
+2025-12-23 22:47:40,456 - INFO - Check docker: passed - DRY RUN
+2025-12-23 22:47:40,456 - INFO - Check git: running - 
+2025-12-23 22:47:40,456 - INFO - DRY RUN: Would execute: git --version
+2025-12-23 22:47:40,456 - INFO - Check git: passed - DRY RUN
+2025-12-23 22:47:40,456 - INFO - Check python: running - 
+2025-12-23 22:47:40,456 - INFO - DRY RUN: Would execute: python3 --version
+2025-12-23 22:47:40,456 - INFO - Check python: passed - DRY RUN
+2025-12-23 22:47:40,456 - INFO - Check Kubernetes access: running - 
+2025-12-23 22:47:40,456 - INFO - DRY RUN: Would execute: kubectl cluster-info
+2025-12-23 22:47:40,456 - INFO - Check Kubernetes access: passed - 
+2025-12-23 22:47:40,456 - INFO - Check Helm repo: running - 
+2025-12-23 22:47:40,457 - INFO - DRY RUN: Would execute: helm repo list | grep repo-scanner
+2025-12-23 22:47:40,457 - INFO - Check Helm repo: passed - 
+2025-12-23 22:47:40,457 - INFO - === CREATING PRODUCTION BACKUP ===
+2025-12-23 22:47:40,457 - INFO - Backup Helm values: running - 
+2025-12-23 22:47:40,457 - INFO - DRY RUN: Would execute: helm get values repo-scanner -n repo-scanner -o yaml > backup/values-20251223-224740.yaml
+2025-12-23 22:47:40,457 - INFO - Backup Helm values: completed - 
+2025-12-23 22:47:40,457 - INFO - Backup database: running - 
+2025-12-23 22:47:40,457 - INFO - Backup database: completed - Database backup completed
+2025-12-23 22:47:40,457 - INFO - Create Velero backup: running - 
+2025-12-23 22:47:40,457 - INFO - DRY RUN: Would execute: velero backup create production-backup-20251223-224740 --include-namespaces repo-scanner
+2025-12-23 22:47:40,457 - INFO - Create Velero backup: completed - 
+2025-12-23 22:47:40,457 - INFO - === RUNNING PRE-DEPLOYMENT VALIDATION ===
+2025-12-23 22:47:40,457 - INFO - Operational readiness assessment: running - 
+2025-12-23 22:47:40,457 - INFO - DRY RUN: Would execute: python scripts/assess_operational_readiness.py --output json
+2025-12-23 22:47:40,457 - INFO - Operational readiness assessment: failed - Invalid JSON output
+2025-12-23 22:47:40,457 - INFO - === SENDING NOTIFICATIONS ===
+2025-12-23 22:47:40,457 - INFO - Notification sent: FAILED
+2025-12-23 22:47:51,511 - INFO - === STARTING PRODUCTION DEPLOYMENT ===
+2025-12-23 22:47:51,511 - INFO - Environment: production
+2025-12-23 22:47:51,511 - INFO - Dry Run: True
+2025-12-23 22:47:51,511 - INFO - === VALIDATING PREREQUISITES ===
+2025-12-23 22:47:51,511 - INFO - Check kubectl: running - 
+2025-12-23 22:47:51,511 - INFO - DRY RUN: Would execute: kubectl version --client
+2025-12-23 22:47:51,512 - INFO - Check kubectl: passed - DRY RUN
+2025-12-23 22:47:51,512 - INFO - Check helm: running - 
+2025-12-23 22:47:51,512 - INFO - DRY RUN: Would execute: helm version
+2025-12-23 22:47:51,512 - INFO - Check helm: passed - DRY RUN
+2025-12-23 22:47:51,512 - INFO - Check docker: running - 
+2025-12-23 22:47:51,512 - INFO - DRY RUN: Would execute: docker --version
+2025-12-23 22:47:51,512 - INFO - Check docker: passed - DRY RUN
+2025-12-23 22:47:51,512 - INFO - Check git: running - 
+2025-12-23 22:47:51,512 - INFO - DRY RUN: Would execute: git --version
+2025-12-23 22:47:51,512 - INFO - Check git: passed - DRY RUN
+2025-12-23 22:47:51,512 - INFO - Check python: running - 
+2025-12-23 22:47:51,512 - INFO - DRY RUN: Would execute: python3 --version
+2025-12-23 22:47:51,512 - INFO - Check python: passed - DRY RUN
+2025-12-23 22:47:51,512 - INFO - Check Kubernetes access: running - 
+2025-12-23 22:47:51,512 - INFO - DRY RUN: Would execute: kubectl cluster-info
+2025-12-23 22:47:51,512 - INFO - Check Kubernetes access: passed - 
+2025-12-23 22:47:51,512 - INFO - Check Helm repo: running - 
+2025-12-23 22:47:51,512 - INFO - DRY RUN: Would execute: helm repo list | grep repo-scanner
+2025-12-23 22:47:51,512 - INFO - Check Helm repo: passed - 
+2025-12-23 22:47:51,512 - INFO - === CREATING PRODUCTION BACKUP ===
+2025-12-23 22:47:51,513 - INFO - Backup Helm values: running - 
+2025-12-23 22:47:51,513 - INFO - DRY RUN: Would execute: helm get values repo-scanner -n repo-scanner -o yaml > backup/values-20251223-224751.yaml
+2025-12-23 22:47:51,513 - INFO - Backup Helm values: completed - 
+2025-12-23 22:47:51,513 - INFO - Backup database: running - 
+2025-12-23 22:47:51,513 - INFO - Backup database: completed - Database backup completed
+2025-12-23 22:47:51,513 - INFO - Create Velero backup: running - 
+2025-12-23 22:47:51,513 - INFO - DRY RUN: Would execute: velero backup create production-backup-20251223-224751 --include-namespaces repo-scanner
+2025-12-23 22:47:51,513 - INFO - Create Velero backup: completed - 
+2025-12-23 22:47:51,513 - INFO - === RUNNING PRE-DEPLOYMENT VALIDATION ===
+2025-12-23 22:47:51,513 - INFO - Operational readiness assessment: running - 
+2025-12-23 22:47:51,513 - INFO - DRY RUN: Would execute: python scripts/assess_operational_readiness.py --format json
+2025-12-23 22:47:51,513 - INFO - Operational readiness assessment: passed - Score: 85%
+2025-12-23 22:47:51,513 - INFO - Validate Kubernetes manifests: running - 
+2025-12-23 22:47:51,513 - INFO - DRY RUN: Would execute: kubectl apply --dry-run=client -f k8s/namespace.yaml
+2025-12-23 22:47:51,513 - INFO - Validate k8s/namespace.yaml: passed - 
+2025-12-23 22:47:51,513 - INFO - DRY RUN: Would execute: kubectl apply --dry-run=client -f k8s/configmap.yaml
+2025-12-23 22:47:51,513 - INFO - Validate k8s/configmap.yaml: passed - 
+2025-12-23 22:47:51,513 - INFO - DRY RUN: Would execute: kubectl apply --dry-run=client -f k8s/secret.yaml
+2025-12-23 22:47:51,514 - INFO - Validate k8s/secret.yaml: passed - 
+2025-12-23 22:47:51,514 - INFO - DRY RUN: Would execute: kubectl apply --dry-run=client -f k8s/pvc.yaml
+2025-12-23 22:47:51,514 - INFO - Validate k8s/pvc.yaml: passed - 
+2025-12-23 22:47:51,514 - INFO - DRY RUN: Would execute: kubectl apply --dry-run=client -f k8s/deployment.yaml
+2025-12-23 22:47:51,514 - INFO - Validate k8s/deployment.yaml: passed - 
+2025-12-23 22:47:51,514 - INFO - DRY RUN: Would execute: kubectl apply --dry-run=client -f k8s/service.yaml
+2025-12-23 22:47:51,514 - INFO - Validate k8s/service.yaml: passed - 
+2025-12-23 22:47:51,514 - INFO - DRY RUN: Would execute: kubectl apply --dry-run=client -f k8s/ingress.yaml
+2025-12-23 22:47:51,514 - INFO - Validate k8s/ingress.yaml: passed - 
+2025-12-23 22:47:51,514 - INFO - DRY RUN: Would execute: kubectl apply --dry-run=client -f k8s/hpa.yaml
+2025-12-23 22:47:51,514 - INFO - Validate k8s/hpa.yaml: passed - 
+2025-12-23 22:47:51,514 - INFO - DRY RUN: Would execute: kubectl apply --dry-run=client -f k8s/network-policy.yaml
+2025-12-23 22:47:51,514 - INFO - Validate k8s/network-policy.yaml: passed - 
+2025-12-23 22:47:51,514 - INFO - DRY RUN: Would execute: kubectl apply --dry-run=client -f k8s/rbac.yaml
+2025-12-23 22:47:51,514 - INFO - Validate k8s/rbac.yaml: passed - 
+2025-12-23 22:47:51,514 - INFO - Validate Helm chart: running - 
+2025-12-23 22:47:51,514 - INFO - DRY RUN: Would execute: helm template repo-scanner helm/repo-scanner/ --dry-run
+2025-12-23 22:47:51,514 - INFO - Validate Helm chart: passed - 
+2025-12-23 22:47:51,514 - INFO - Security scan: running - 
+2025-12-23 22:47:51,514 - INFO - DRY RUN: Would execute: trivy config helm/repo-scanner/
+2025-12-23 22:47:51,514 - INFO - Security scan: passed - 
+2025-12-23 22:47:51,514 - INFO - === EXECUTING DEPLOYMENT ===
+2025-12-23 22:47:51,515 - INFO - Update Helm repo: running - 
+2025-12-23 22:47:51,515 - INFO - DRY RUN: Would execute: helm repo update
+2025-12-23 22:47:51,515 - INFO - Update Helm repo: completed - 
+2025-12-23 22:47:51,515 - INFO - Helm upgrade: running - 
+2025-12-23 22:47:51,515 - INFO - DRY RUN: Would execute: helm upgrade --install repo-scanner helm/repo-scanner/ --namespace repo-scanner --create-namespace --values helm/repo-scanner/values-production.yaml --wait --timeout 600s
+2025-12-23 22:47:51,515 - INFO - Helm upgrade: completed - 
+2025-12-23 22:47:51,515 - INFO - Wait for rollout: running - 
+2025-12-23 22:47:51,515 - INFO - DRY RUN: Would execute: kubectl rollout status deployment/repo-scanner -n repo-scanner --timeout=600s
+2025-12-23 22:47:51,515 - INFO - Wait for rollout: completed - 
+2025-12-23 22:47:51,515 - INFO - === RUNNING POST-DEPLOYMENT VALIDATION ===
+2025-12-23 22:48:21,515 - INFO - Check pod status: running - 
+2025-12-23 22:48:21,516 - INFO - DRY RUN: Would execute: kubectl get pods -n repo-scanner -o jsonpath='{.items[*].status.phase}'
+2025-12-23 22:48:21,516 - INFO - Check pod status: passed - All pods running
+2025-12-23 22:48:21,516 - INFO - Check service endpoints: running - 
+2025-12-23 22:48:21,516 - INFO - DRY RUN: Would execute: kubectl get endpoints -n repo-scanner
+2025-12-23 22:48:21,516 - INFO - Check service endpoints: passed - 
+2025-12-23 22:48:21,516 - INFO - Test health endpoint: running - 
+2025-12-23 22:48:21,516 - INFO - DRY RUN: Would execute: curl -f https://scanner.yourcompany.com/health
+2025-12-23 22:48:21,516 - INFO - Test health endpoint: passed - 
+2025-12-23 22:48:21,516 - INFO - Test API functionality: running - 
+2025-12-23 22:48:21,516 - INFO - DRY RUN: Would execute: curl -f https://scanner.yourcompany.com/api/v1/status
+2025-12-23 22:48:21,516 - INFO - Test API functionality: passed - 
+2025-12-23 22:48:21,516 - INFO - Run comprehensive validation: running - 
+2025-12-23 22:48:21,517 - INFO - DRY RUN: Would execute: python scripts/validate_deployment_comprehensive.py
+2025-12-23 22:48:21,517 - INFO - Run comprehensive validation: passed - 
+2025-12-23 22:48:21,517 - INFO - Performance testing: running - 
+2025-12-23 22:48:21,517 - INFO - DRY RUN: Would execute: python scripts/load_test.py --url https://scanner.yourcompany.com --duration 60
+2025-12-23 22:48:21,517 - INFO - Performance testing: passed - 
+2025-12-23 22:48:21,517 - INFO - Deployment: completed - Duration: 0:00:30.005851
+2025-12-23 22:48:21,517 - INFO - === SENDING NOTIFICATIONS ===
+2025-12-23 22:48:21,517 - INFO - Notification sent: SUCCESS
+2025-12-23 22:48:21,518 - INFO - Deployment log saved to deployment-20251223-224821.json
+2025-12-23 22:48:21,518 - INFO - === DEPLOYMENT COMPLETED SUCCESSFULLY ===
+2025-12-23 22:49:06,016 - INFO - === STARTING PRODUCTION DEPLOYMENT ===
+2025-12-23 22:49:06,017 - INFO - Environment: production
+2025-12-23 22:49:06,017 - INFO - Dry Run: False
+2025-12-23 22:49:06,017 - INFO - === VALIDATING PREREQUISITES ===
+2025-12-23 22:49:06,017 - INFO - Check kubectl: running - 
+2025-12-23 22:49:06,020 - INFO - Check kubectl: failed - Command failed: /bin/sh: 1: kubectl: not found
+
+2025-12-23 22:49:06,020 - INFO - === SENDING NOTIFICATIONS ===
+2025-12-23 22:49:06,020 - INFO - Notification sent: FAILED

@@ -54,7 +54,7 @@ def run_scanner_deterministic(repo_path, output_dir):
     import sys
     from pathlib import Path
     
-    cmd = [sys.executable, "-m", "src.cli", str(repo_path), "--output-dir", str(output_dir)]
+    cmd = [sys.executable, "-m", "src.cli", "scan", str(repo_path), "--output-dir", str(output_dir)]
     subprocess.run(cmd, check=True, capture_output=True, cwd=Path(__file__).parent.parent)
     
     md_hash = get_file_hash(output_dir / "scan_report.md")

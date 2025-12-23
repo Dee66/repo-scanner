@@ -21,6 +21,7 @@ try:
     from src.core.pipeline.analysis import execute_pipeline
     from src.core.quality.output_contract import generate_primary_report, generate_machine_output, generate_executive_verdict
     from src.core.exceptions import ScannerError, RepositoryDiscoveryError, AnalysisError, OutputGenerationError, ValidationError
+    from src.core.monitoring import get_metrics_collector, get_health_checker, get_performance_monitor, get_alert_manager
 except ImportError as e:
     logging.error(f"Failed to import scanner components: {e}")
     raise
@@ -81,6 +82,36 @@ async def health_check():
         "version": "1.1.0",
         "uptime": "operational"
     }
+
+@app.get("/health/detailed")
+async def detailed_health_check():
+    """Detailed health check with system metrics."""
+    health_checker = get_health_checker()
+    return await health_checker.check_system_health()
+
+@app.get("/metrics")
+async def get_metrics():
+    """Get system metrics."""
+    metrics_collector = get_metrics_collector()
+    return await metrics_collector.collect_metrics()
+
+@app.get("/performance")
+async def get_performance_stats():
+    """Get performance monitoring statistics."""
+    performance_monitor = get_performance_monitor()
+    return await performance_monitor.get_performance_stats()
+
+@app.get("/alerts")
+async def get_alerts():
+    """Get active alerts."""
+    alert_manager = get_alert_manager()
+    return {"active_alerts": [alert.__dict__ for alert in alert_manager.get_active_alerts()]}
+
+@app.get("/alerts/history")
+async def get_alert_history(hours: int = 24):
+    """Get alert history for the last N hours."""
+    alert_manager = get_alert_manager()
+    return {"alert_history": [alert.__dict__ for alert in alert_manager.get_alert_history(hours)]}
 
 @app.post("/scan", response_model=ScanResponse)
 async def start_scan(request: ScanRequest, background_tasks: BackgroundTasks):
@@ -159,6 +190,12 @@ async def cancel_job(job_id: str):
 
 async def process_scan_job(job_id: str):
     """Process a scan job in the background."""
+    performance_monitor = get_performance_monitor()
+    metrics_collector = get_metrics_collector()
+
+    # Start job performance tracking
+    performance_monitor.start_operation("scan_job", {"job_id": job_id})
+
     job = jobs[job_id]
     job["status"] = "running"
     job["started_at"] = datetime.utcnow()
@@ -232,6 +269,17 @@ async def process_scan_job(job_id: str):
             "execution_time": (job["completed_at"] - job["started_at"]).total_seconds()
         }
 
+        # Complete performance tracking
+        performance_monitor.complete_operation("scan_job", {
+            "job_id": job_id,
+            "status": "success",
+            "files_analyzed": len(analysis_result.get("files", [])),
+            "execution_time": job["result"]["execution_time"]
+        })
+
+        # Update metrics
+        await metrics_collector.record_scan_completion(job["result"])
+
         logger.info(f"Job {job_id} completed successfully")
 
     except Exception as e:
@@ -240,6 +288,16 @@ async def process_scan_job(job_id: str):
         job["message"] = f"Scan failed: {str(e)}"
         job["error"] = str(e)
         job["completed_at"] = datetime.utcnow()
+
+        # Track failed operation
+        performance_monitor.complete_operation("scan_job", {
+            "job_id": job_id,
+            "status": "failed",
+            "error": str(e)
+        })
+
+        # Update metrics for failed scan
+        await metrics_collector.record_scan_failure({"error": str(e)})
 
 @app.on_event("startup")
 async def startup_event():

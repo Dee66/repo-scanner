@@ -1,0 +1,66 @@
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: repo-scanner-psp
+  labels:
+    app: repo-scanner
+spec:
+  privileged: false
+  allowPrivilegeEscalation: false
+  requiredDropCapabilities:
+    - ALL
+  allowedCapabilities: []
+  runAsUser:
+    rule: MustRunAsNonRoot
+  runAsGroup:
+    rule: MustRunAs
+    ranges:
+    - min: 1000
+      max: 1000
+  supplementalGroups:
+    rule: MustRunAs
+    ranges:
+    - min: 1000
+      max: 1000
+  fsGroup:
+    rule: MustRunAs
+    ranges:
+    - min: 1000
+      max: 1000
+  readOnlyRootFilesystem: true
+  seLinux:
+    rule: RunAsAny
+  volumes:
+    - configMap
+    - downwardAPI
+    - emptyDir
+    - persistentVolumeClaim
+    - secret
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: repo-scanner-psp-role
+  labels:
+    app: repo-scanner
+rules:
+- apiGroups: ['policy']
+  resources: ['podsecuritypolicies']
+  verbs: ['use']
+  resourceNames:
+  - repo-scanner-psp
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: repo-scanner-psp-binding
+  labels:
+    app: repo-scanner
+subjects:
+- kind: ServiceAccount
+  name: repo-scanner-sa
+  namespace: repo-scanner
+roleRef:
+  kind: ClusterRole
+  name: repo-scanner-psp-role
+  apiGroup: rbac.authorization.k8s.io
