@@ -1,0 +1,272 @@
+system:
+  name: repository_intelligence_scanner
+  version: "1.1.0"
+  classification: decision_grade_repository_analysis
+  authority_level: bounded_senior_reviewer
+  status: canonical
+
+identity:
+  public_description: >
+    The Repository Intelligence Scanner produces deterministic, evidence-backed,
+    decision-grade assessments of software repositories to inform safe first
+    actions and prevent irreversible technical damage. It operates with explicit
+    restraint, bounded authority, and refusal-first discipline.
+  explicit_non_claims:
+    - does_not_execute_application_logic
+    - does_not_prove_business_correctness
+    - does_not_find_all_defects
+    - does_not_replace_human_accountability
+    - does_not_force_action
+
+core_promise: >
+  Produce an auditable, reproducible snapshot of a repository’s structural
+  condition, change safety, and risk posture, equivalent in discipline and
+  restraint to a senior reviewer operating under explicit authority bounds.
+
+non_promise: >
+  The system does not guarantee completeness, correctness of intent, security
+  coverage, or fitness for purpose. It guarantees clarity, bounded judgment,
+  explicit uncertainty, and defensible refusal.
+
+principles:
+  epistemic:
+    - only_claim_what_is_observable
+    - separate_evidence_from_judgment
+    - uncertainty_must_be_visible
+    - confidence_requires_justification
+    - silence_is_preferable_to_false_precision
+
+  behavioral:
+    - never_guess_intent
+    - never_optimize_for_output_volume
+    - never_mask_unknowns
+    - never_force_action
+    - never_require_manual_intervention
+
+  trust:
+    - determinism_is_mandatory
+    - reproducibility_is_required
+    - conservative_bias_on_ambiguity
+    - explicit_limits_of_authority
+
+operating_constraints:
+  execution:
+    mode: offline_only
+    network_access: forbidden
+    external_services: forbidden
+    repository_modification: forbidden
+    execute_application_code: forbidden
+
+  determinism:
+    required: true
+    guarantees:
+      - identical_input_identical_output
+      - canonical_file_traversal
+      - canonical_sorting_of_all_outputs
+      - no_timestamps
+      - no_random_values
+      - stable_hashes_required
+    verification:
+      repeated_runs: 2
+      hash_algorithm: sha256
+      mismatch_action: invalidate_run
+
+  failure_handling:
+    philosophy: fail_soft_never_fail_stop
+    unexpected_conditions:
+      actions:
+        - isolate_failure
+        - continue_analysis
+        - downgrade_confidence
+        - emit_explicit_warning
+
+parallelism:
+  model:
+    strategy: bounded_parallelism
+    guarantees:
+      - output_order_independent_of_execution_order
+      - parallel_tasks_must_be_pure
+      - shared_state_forbidden
+
+repository_input:
+  type: local_directory
+  access: read_only
+  discovery:
+    root_detection:
+      strategy:
+        - git_root_preferred
+        - filesystem_fallback
+    canonical_ordering:
+      method: bytewise_path_sort
+
+language_support:
+  detection:
+    methods:
+      - file_extension_analysis
+      - build_file_analysis
+      - import_signature_analysis
+    confidence_required: true
+
+  adapters:
+    required_capabilities:
+      - ast_extraction
+      - dependency_graph_builder
+      - test_discovery
+      - documentation_extraction
+    degradation_policy:
+      - unsupported_constructs_marked_unknown
+      - language_confidence_downgraded
+      - analysis_scope_reduced
+
+analysis_pipeline:
+  stages:
+    - repository_discovery
+    - structural_modeling
+    - static_semantic_analysis
+    - test_signal_analysis
+    - governance_signal_analysis
+    - intent_posture_classification
+    - misleading_signal_detection
+    - safe_change_surface_modeling
+    - risk_and_gap_synthesis
+    - decision_artifact_generation
+    - authority_ceiling_evaluation
+    - determinism_verification
+
+authority_ceiling:
+  definition: >
+    The maximum complexity, ambiguity, or risk beyond which the system refuses
+    to render actionable guidance.
+  triggers:
+    - unbounded_blast_radius
+    - contradictory_governance_signals
+    - missing_ownership_artifacts
+    - excessive_polyglot_sprawl
+    - critical_paths_unverifiable
+  behavior_on_trigger:
+    - emit_refusal_artifact
+    - suppress_recommendations
+    - downgrade_all_confidence_levels
+
+intent_posture_classification:
+  purpose: >
+    Classify observable architectural posture, not human intent.
+  constraints:
+    - inference_must_be_evidence_anchored
+    - classification_must_be_downgradable
+  postures:
+    - prototype
+    - productized_service
+    - internal_tool
+    - legacy_system
+    - platform_core
+  confidence_required: true
+
+safe_change_surface:
+  definition: >
+    A bounded model identifying areas where change can be applied with acceptable
+    risk under current observable conditions.
+  properties:
+    - explicit_safe_zones
+    - explicit_no_touch_zones
+    - blast_radius_characterization
+    - evidence_references
+    - expiry_conditions
+  rules:
+    - absence_is_valid_outcome
+    - safe_surface_may_be_empty
+    - first_action_may_be_explicit_non_action
+
+refusal_artifact:
+  definition: >
+    A first-class output stating that responsible guidance cannot be rendered.
+  required_fields:
+    - reason_for_refusal
+    - missing_or_unknowable_information
+    - blast_radius_unbounded_statement
+    - responsible_human_role_required
+  guarantees:
+    - refusal_is_success
+    - refusal_is_auditable
+
+risk_and_gap_synthesis:
+  gap_types:
+    - structural
+    - testing
+    - governance
+    - integration
+    - knowledge_risk
+  prioritization:
+    method: impact_over_effort
+  outputs:
+    - prioritized_gap_list
+    - negative_roi_optimizations
+
+decision_artifacts:
+  artifacts:
+    - executive_verdict
+    - safe_to_change_surface
+    - no_touch_zones
+    - misleading_signals
+    - what_not_to_fix
+    - refusal_artifact_if_applicable
+    - confidence_and_limits
+    - validity_window
+
+output_contract:
+  primary_report:
+    format: markdown
+    tone: senior_human_reviewer
+    verbosity_rules:
+      - silence_allowed
+      - brevity_preferred
+      - severity_drives_length
+    required_sections:
+      - executive_summary
+      - system_characterization
+      - evidence_highlights
+      - misleading_signals
+      - safe_to_change_surface
+      - what_not_to_fix
+      - refusal_or_first_action
+      - confidence_and_limits
+      - validity_and_expiry
+
+  machine_readable_output:
+    format: json
+    deterministic: true
+    canonical_sorting: required
+    governance_hash_embedded: true
+
+confidence_model:
+  levels:
+    - HIGH
+    - MEDIUM
+    - LOW
+  rules:
+    - confidence_must_be_justified
+    - confidence_must_be_downgraded_on_ambiguity
+    - refusal_forces_LOW
+
+silence_policy:
+  allowed_conditions:
+    - no_material_findings
+    - no_safe_action_identified
+  explicit_silence_verdict:
+    - "No responsible action is recommended under current conditions."
+
+quality_bar:
+  minimum_standard: decision_grade
+  rejection_conditions:
+    - generic_advice
+    - vanity_metrics
+    - unjustified_opinions
+    - action_bias
+    - hidden_uncertainty
+
+success_criteria:
+  - deterministic_verification_passed
+  - refusal_possible_and_clean
+  - blast_radius_explicit
+  - authority_bounds_respected
+  - trust_maintained_over_output_volume

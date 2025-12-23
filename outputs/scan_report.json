@@ -1,0 +1,21 @@
+{
+  "report_version": "1.1.0",
+  "scan_timestamp": null,
+  "repository": {
+    "root_path": "unknown",
+    "detected_languages": []
+  },
+  "executive_summary": {
+    "verdict": "INSUFFICIENT_EVIDENCE",
+    "confidence": "LOW",
+    "safe_to_change": false,
+    "first_action": "Implement scanner core logic"
+  },
+  "evidence": {},
+  "safe_change_surface": [],
+  "no_touch_zones": [],
+  "misleading_signals": [],
+  "refusal_reason": null,
+  "validity_window_days": null,
+  "governance_hash": "placeholder"
+}

@@ -1,0 +1,50 @@
+[Project Name] | Technical Intelligence Report
+Date: December 22, 2025 Architect: Deon P. Verdict: [🟢 KEEP | 🟡 REFACTOR | 🔴 PIVOT]
+
+1. Executive Summary
+A high-level briefing for founders and stakeholders.
+
+Objective: Evaluation of the [System Name] repository for architectural stability, AWS alignment, and technical risk.
+
+Key Finding: [One sentence summarizing the biggest risk or strength].
+
+Confidence Score: [e.g., 85%] (Based on test coverage and documentation quality).
+
+2. Structural & Deterministic Analysis
+Analysis of the code's internal health using the PatternAuthority framework.
+
+Dependency Graph & Fragility
+State: [e.g., Monolithic / Decoupled / Fragmented]
+
+Risk: [e.g., Circular dependencies detected in the core module.]
+
+Observation: [Briefly note if the system follows standard patterns like MVC, Hexagonal, or Layered].
+
+Language Specifics ([Java/Python/TypeScript])
+Code Quality: [Observation on naming conventions, type safety, and error handling].
+
+Technical Debt: [Quantifiable issues like deprecated libraries or lack of interfaces].
+
+3. AWS Infrastructure Alignment
+Mapping the code to the cloud primitives.
+
+Compute/Orchestration: [e.g., Lambda/EC2/ECS alignment].
+
+Security & IAM: [Critical: Note any "Privilege Escalation" risks or hardcoded credentials].
+
+Networking & Performance: * EFA Check: [Note: High-throughput training clusters require Linux-based EFA nodes. Current alignment is: Optimized/Not Optimized].
+
+Database/Storage: [e.g., RDS/S3 integration efficiency].
+
+4. Risk Hotspots (The "Red Zone")
+Specific files or modules that are likely to break during the next feature sprint.
+
+5. The Verdict & Roadmap
+[VERDICT: e.g., REFACTOR]
+Immediate Next Steps (Next 14 Days):
+
+[Action 1: e.g., Update Node.js runtime to latest LTS]
+
+[Action 2: e.g., Tighten IAM policies to Principle of Least Privilege]
+
+[Action 3: e.g., Implement unit tests for the Payment Gateway]

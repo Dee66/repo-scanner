@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Evidence Bundle",
+  "type": "object",
+  "required": ["run_id","timestamp","inputs","agent_manifest","outputs","signatures","deterministic_verification"],
+  "properties": {
+    "run_id": {"type":"string"},
+    "timestamp": {"type":"string","format":"date-time"},
+    "inputs": {
+      "type":"object",
+      "description":"Canonical inputs (e.g., canonical_spec.yaml hash, raw repo metadata)"
+    },
+    "agent_manifest": {
+      "type":"array",
+      "items":{"type":"object"}
+    },
+    "outputs": {
+      "type":"object",
+      "properties": {
+        "scan_report_hash": {"type":"string"},
+        "artifact_paths": {"type":"array","items":{"type":"string"}}
+      },
+      "required":["scan_report_hash"]
+    },
+    "deterministic_verification": {
+      "type":"object",
+      "properties": {
+        "runs_executed": {"type":"integer"},
+        "consistent": {"type":"boolean"},
+        "hashes": {"type":"array","items":{"type":"string"}}
+      }
+    },
+    "signatures": {
+      "type":"object",
+      "properties": {
+        "ed25519": {"type":"string"},
+        "kms_id": {"type":"string"}
+      }
+    }
+  }
+}

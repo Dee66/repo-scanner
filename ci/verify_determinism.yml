@@ -1,0 +1,33 @@
+name: Verify Determinism
+on:
+  workflow_dispatch:
+
+jobs:
+  determinism:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install deps
+        run: pip install poetry && poetry install -v
+      - name: Run deterministic scans (3 runs)
+        run: |
+          rm -rf outputs || true
+          for i in 1 2 3; do
+            python -m src.cli . --output outputs/scan_report.json --quiet
+            sha=$(sha256sum outputs/scan_report.json | awk '{print $1}')
+            echo "$sha" >> ci/_hashes.txt
+            sleep 1
+          done
+          sort -u ci/_hashes.txt | wc -l > ci/_hash_count.txt
+          if [ "$(cat ci/_hash_count.txt)" -ne 1 ]; then
+            echo "DETERMINISM FAILED"; exit 1
+          fi
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: deterministic-check
+          path: outputs/

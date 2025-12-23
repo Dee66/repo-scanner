@@ -1,0 +1,23 @@
+[project]
+name = "repository-intelligence-scanner"
+version = "1.1.0"
+description = "Decision-grade repository analysis system"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project.scripts]
+repo-scanner = "src.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*", "tests*"]

@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Scan Report",
+  "type": "object",
+  "required": ["run_id","repository","summary","tasks","gaps","metadata"],
+  "properties": {
+    "run_id": {"type":"string"},
+    "repository": {
+      "type":"object",
+      "properties": {
+        "name":{"type":"string"},
+        "path":{"type":"string"}
+      }
+    },
+    "summary": {
+      "type":"object",
+      "properties": {
+        "overall_score":{"type":"number"},
+        "files_scanned":{"type":"integer"},
+        "tests_discovered":{"type":"integer"},
+        "gaps_count":{"type":"integer"}
+      }
+    },
+    "tasks": {
+      "type":"object",
+      "additionalProperties": {
+        "type":"object",
+        "properties": {
+          "task_id":{"type":"string"},
+          "implemented": {"type":"boolean"},
+          "evidence": {"type":"array","items":{"type":"string"}}
+        }
+      }
+    },
+    "gaps": {
+      "type":"array",
+      "items": {
+        "type":"object",
+        "properties": {
+          "id":{"type":"string"},
+          "type":{"type":"string"},
+          "priority":{"type":"string"},
+          "description":{"type":"string"},
+          "file_path":{"type":"string"}
+        }
+      }
+    },
+    "metadata": {
+      "type":"object",
+      "properties": {
+        "scanner_version":{"type":"string"},
+        "run_timestamp":{"type":"string","format":"date-time"},
+        "deterministic_hash":{"type":"string"}
+      }
+    }
+  }
+}
