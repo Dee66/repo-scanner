@@ -13,6 +13,7 @@ from src.core.bounty.profitability_triage import ProfitabilityTriageEngine, tria
 from src.core.bounty.api_integration_engine import APIIntegrationEngine, analyze_api_integration_points
 from src.core.bounty.pr_automation import PRAutomationEngine, generate_pr_for_bounty
 from src.core.bounty.accuracy_validator import BountyAccuracyValidator, validate_bounty_accuracy
+from src.core.bounty.reputation_monitor import ReputationMonitor
 from src.core.bounty.bounty_performance_optimizer import ParallelBountyAnalyzer, BountyAnalysisBatch
 
 logger = logging.getLogger(__name__)
@@ -27,6 +28,7 @@ class BountyService:
         self.api_engine = APIIntegrationEngine()
         self.pr_engine = PRAutomationEngine()
         self.validator = BountyAccuracyValidator()
+        self.reputation_monitor = ReputationMonitor()
         self.parallel_analyzer = ParallelBountyAnalyzer(max_workers=max_workers) if enable_parallel else None
 
     def analyze_bounty_opportunity(self, repository_url: str, bounty_data: Dict,
@@ -36,11 +38,11 @@ class BountyService:
         logger.info(f"Analyzing bounty opportunity: {bounty_data.get('id', 'unknown')}")
 
         # Extract analysis results
-        intent_posture = analysis_results.get('intent_posture', {})
-        governance = analysis_results.get('governance', {})
-        risk_synthesis = analysis_results.get('risk_synthesis', {})
-        test_signals = analysis_results.get('test_signals', {})
-        api_analysis = analysis_results.get('api_analysis', {})
+        intent_posture = analysis_results.get('intent_posture') or {}
+        governance = analysis_results.get('governance') or {}
+        risk_synthesis = analysis_results.get('risk_synthesis') or {}
+        test_signals = analysis_results.get('test_signals') or {}
+        api_analysis = analysis_results.get('api_analysis') or {}
 
         # Step 1: Generate maintainer profile
         maintainer_profile = self._generate_maintainer_profile(
@@ -67,14 +69,17 @@ class BountyService:
         return bounty_assessment
 
     def generate_bounty_solution(self, bounty_data: Dict, maintainer_profile: Dict,
-                               governance: Dict, solution_code: Dict) -> Dict:
+                               governance: Dict, solution_code: Dict,
+                               adr_analysis: Dict = None, forensics_data: Dict = None,
+                               repo_path: str = None) -> Dict:
         """Generate complete bounty solution including PR content."""
 
         logger.info(f"Generating bounty solution for: {bounty_data.get('id', 'unknown')}")
 
         # Generate PR content
         pr_content = self._generate_pr_content(
-            bounty_data, maintainer_profile, governance, solution_code
+            bounty_data, maintainer_profile, governance, solution_code,
+            adr_analysis, forensics_data, repo_path
         )
 
         # Generate integration plan
@@ -141,9 +146,12 @@ class BountyService:
         return analyze_api_integration_points(file_list, api_analysis, governance)
 
     def _generate_pr_content(self, bounty_data: Dict, maintainer_profile: Dict,
-                           governance: Dict, solution_code: Dict) -> Dict:
+                           governance: Dict, solution_code: Dict,
+                           adr_analysis: Dict = None, forensics_data: Dict = None,
+                           repo_path: str = None) -> Dict:
         """Generate PR content."""
-        return generate_pr_for_bounty(bounty_data, maintainer_profile, governance, solution_code)
+        return generate_pr_for_bounty(bounty_data, maintainer_profile, governance, solution_code,
+                                    adr_analysis=adr_analysis, forensics_data=forensics_data, repo_path=repo_path)
 
     def _generate_integration_plan(self, governance: Dict, pr_content: Dict) -> Dict:
         """Generate integration plan based on governance and PR content."""

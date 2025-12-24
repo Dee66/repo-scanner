@@ -17,8 +17,14 @@ class ProfitabilityTriageEngine:
 
     def triage_bounty(self, repository_url: str, bounty_data: Dict,
                      risk_synthesis: Dict, test_signals: Dict,
-                     maintainer_profile: Dict = None, competition_data: Dict = None) -> Dict:
+                     maintainer_profile: Dict = None, competition_data: Dict = None,
+                     forensics_data: Dict = None) -> Dict:
         """Perform comprehensive bounty profitability triage."""
+
+        # Handle None inputs safely
+        maintainer_profile = maintainer_profile or {}
+        competition_data = competition_data or {}
+        forensics_data = forensics_data or {}
 
         # Extract bounty characteristics
         bounty_complexity = self._assess_bounty_complexity(bounty_data)
@@ -36,7 +42,8 @@ class ProfitabilityTriageEngine:
         # Calculate profitability score
         profitability_score = self._calculate_profitability_score(
             bounty_complexity, bounty_scope, bounty_quality,
-            repository_risk, testing_maturity, maintainer_factors, competition_analysis
+            repository_risk, testing_maturity, maintainer_factors, competition_analysis,
+            forensics_data
         )
 
         # Generate triage decision
@@ -190,7 +197,8 @@ class ProfitabilityTriageEngine:
     def _analyze_testing_maturity(self, test_signals: Dict) -> Dict:
         """Analyze testing maturity and its impact on bounty success."""
         testing_maturity = test_signals.get("testing_maturity_score", 0.5)
-        test_coverage = test_signals.get("test_coverage_signals", {}).get("estimated_coverage", 0.5)
+        test_coverage_signals = test_signals.get("test_coverage_signals", {}) or {}
+        test_coverage = test_coverage_signals.get("estimated_coverage", 0.5)
 
         # Higher testing maturity = higher bounty success potential
         maturity_score = (testing_maturity + test_coverage) / 2
@@ -236,8 +244,10 @@ class ProfitabilityTriageEngine:
     def _calculate_profitability_score(self, bounty_complexity: Dict, bounty_scope: Dict,
                                     bounty_quality: Dict, repository_risk: Dict,
                                     testing_maturity: Dict, maintainer_factors: Dict,
-                                    competition_analysis: Dict) -> float:
+                                    competition_analysis: Dict, forensics_data: Dict = None) -> float:
         """Calculate overall bounty profitability score using Bayesian approach with competition weighting."""
+
+        forensics_data = forensics_data or {}
 
         # Extract individual scores
         complexity_score = bounty_complexity["complexity_score"]
@@ -248,16 +258,20 @@ class ProfitabilityTriageEngine:
         maintainer_score = maintainer_factors["maintainer_score"]
         competition_score = competition_analysis["competition_score"]
 
-        # Weighted combination for profitability with competition factor
-        # Weights: complexity (15%), scope (12%), quality (12%), risk (15%), testing (12%), maintainer (12%), competition (22%)
+        # Calculate forensics-based adjustments
+        forensics_adjustment = self._calculate_forensics_adjustment(forensics_data)
+
+        # Weighted combination for profitability with competition factor and forensics
+        # Weights: complexity (13%), scope (10%), quality (10%), risk (13%), testing (10%), maintainer (10%), competition (20%), forensics (14%)
         profitability = (
-            (1 - complexity_score) * 0.15 +  # Lower complexity = higher profitability
-            (1 - scope_score) * 0.12 +       # Smaller scope = higher profitability
-            quality_score * 0.12 +           # Higher quality = higher profitability
-            risk_score * 0.15 +              # Lower risk = higher profitability
-            maturity_score * 0.12 +          # Higher testing maturity = higher profitability
-            maintainer_score * 0.12 +        # Better maintainer factors = higher profitability
-            competition_score * 0.22         # Lower competition = higher profitability
+            (1 - complexity_score) * 0.13 +  # Lower complexity = higher profitability
+            (1 - scope_score) * 0.10 +       # Smaller scope = higher profitability
+            quality_score * 0.10 +           # Higher quality = higher profitability
+            risk_score * 0.13 +              # Lower risk = higher profitability
+            maturity_score * 0.10 +          # Higher testing maturity = higher profitability
+            maintainer_score * 0.10 +        # Better maintainer factors = higher profitability
+            competition_score * 0.20 +       # Lower competition = higher profitability
+            forensics_adjustment * 0.14      # Forensics-based adjustment
         )
 
         return max(0.0, min(1.0, profitability))
@@ -431,6 +445,46 @@ class ProfitabilityTriageEngine:
             "high_quality_competitors": high_quality_competitors
         }
 
+    def _calculate_forensics_adjustment(self, forensics_data: Dict) -> float:
+        """Calculate profitability adjustment based on forensics data."""
+        if not forensics_data:
+            return 0.5  # Neutral score
+
+        adjustment = 0.5  # Base neutral score
+
+        # Adjust based on commit activity (recent activity = higher score)
+        confidence_score = forensics_data.get("confidence_score", 0.5)
+        adjustment += (confidence_score - 0.5) * 0.3  # ±0.3 based on confidence
+
+        # Adjust based on merge patterns (faster merges = higher score)
+        merge_patterns = forensics_data.get("merge_patterns", {})
+        avg_merge_time = merge_patterns.get("avg_merge_time_hours", 24)
+        if avg_merge_time < 4:
+            adjustment += 0.2  # Fast reviews = good
+        elif avg_merge_time > 72:
+            adjustment -= 0.2  # Slow reviews = bad
+
+        # Adjust based on technical decision history (more decisions = higher score)
+        technical_decisions = forensics_data.get("technical_decisions", [])
+        decision_score = min(1.0, len(technical_decisions) / 50)  # Normalize to 50 decisions
+        adjustment += (decision_score - 0.5) * 0.2  # ±0.2 based on decision volume
+
+        # Adjust based on code churn (balanced churn = higher score)
+        code_churn = forensics_data.get("code_churn", {})
+        total_lines = code_churn.get("total_lines", 0)
+        insertions = code_churn.get("insertions", 0)
+        deletions = code_churn.get("deletions", 0)
+
+        if total_lines > 0:
+            churn_ratio = (insertions + deletions) / total_lines
+            # Optimal churn ratio around 0.1-0.2
+            if 0.05 <= churn_ratio <= 0.3:
+                adjustment += 0.1
+            elif churn_ratio > 0.5:
+                adjustment -= 0.1  # Too much churn = risky
+
+        return max(0.0, min(1.0, adjustment))
+
 
 def triage_bounty_profitability(repository_url: str, bounty_data: Dict,
                               risk_synthesis: Dict, test_signals: Dict,
@@ -438,4 +492,4 @@ def triage_bounty_profitability(repository_url: str, bounty_data: Dict,
     """Convenience function for bounty profitability triage."""
     engine = ProfitabilityTriageEngine()
     return engine.triage_bounty(repository_url, bounty_data, risk_synthesis,
-                              test_signals, maintainer_profile, competition_data)
+                              test_signals, maintainer_profile, competition_data, None)

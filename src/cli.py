@@ -287,6 +287,8 @@ def handle_bounty_command(args):
     # Execute repository analysis first
     try:
         analysis_result = execute_pipeline(str(repo_path))
+        if analysis_result is None:
+            analysis_result = {}
     except Exception as e:
         raise AnalysisError(f"Repository analysis failed: {e}", {"error": str(e)}) from e
 
@@ -314,8 +316,14 @@ def handle_bounty_command(args):
                 maintainer_profile = bounty_assessment["components"]["maintainer_profile"]
                 governance = analysis_result.get("governance", {})
 
+                # Generate ADR analysis for the repository
+                from src.core.bounty.adr_engine import ADREngine
+                adr_engine = ADREngine()
+                adr_analysis = adr_engine.analyze_repository_adrs(str(repo_path))
+
                 bounty_solution = bounty_service.generate_bounty_solution(
-                    bounty_data, maintainer_profile, governance, solution_code
+                    bounty_data, maintainer_profile, governance, solution_code,
+                    adr_analysis, None, str(repo_path)
                 )
             else:
                 bounty_solution = None

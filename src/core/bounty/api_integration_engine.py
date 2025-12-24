@@ -423,6 +423,9 @@ class APIIntegrationEngine:
 
     def _calculate_integration_score(self, integration_analysis: Dict) -> float:
         """Calculate overall integration capability score."""
+        if not integration_analysis:
+            return 0.0
+
         score = 0.0
 
         # Webhook endpoints (30% weight)
@@ -445,6 +448,9 @@ class APIIntegrationEngine:
 
     def _calculate_integration_confidence(self, integration_analysis: Dict) -> float:
         """Calculate confidence in integration analysis."""
+        if not integration_analysis:
+            return 0.0
+        
         confidence_factors = []
 
         # Data completeness
@@ -490,6 +496,9 @@ class APIIntegrationEngine:
 
     def _determine_integration_strategy(self, integration_analysis: Dict) -> str:
         """Determine the optimal integration strategy."""
+        if not integration_analysis:
+            return "manual_integration"
+
         automation_level = integration_analysis.get("automation_capabilities", {}).get("readiness_level", "manual_only")
 
         if automation_level in ["fully_automated", "highly_automated"]:
@@ -501,6 +510,9 @@ class APIIntegrationEngine:
 
     def _generate_integration_steps(self, integration_analysis: Dict, bounty_requirements: Dict) -> List[Dict]:
         """Generate step-by-step integration plan."""
+        if not integration_analysis:
+            return []
+
         steps = []
 
         strategy = self._determine_integration_strategy(integration_analysis)
@@ -555,6 +567,9 @@ class APIIntegrationEngine:
 
     def _estimate_integration_effort(self, integration_analysis: Dict) -> Dict:
         """Estimate the effort required for integration."""
+        if not integration_analysis:
+            return {"time": "unknown", "complexity": "unknown"}
+
         automation_level = integration_analysis.get("automation_capabilities", {}).get("readiness_level", "manual_only")
 
         effort_estimates = {
@@ -569,6 +584,9 @@ class APIIntegrationEngine:
 
     def _assess_integration_risks(self, integration_analysis: Dict) -> List[Dict]:
         """Assess risks associated with integration approach."""
+        if not integration_analysis:
+            return [{"risk": "unknown_integration", "level": "high", "description": "Integration analysis unavailable", "mitigation": "Manual review required"}]
+        
         risks = []
 
         automation_level = integration_analysis.get("automation_capabilities", {}).get("readiness_level", "manual_only")

@@ -456,9 +456,22 @@ class OptimizedAnalysisPipeline:
 
     def _execute_standard_pipeline(self, repository_path: str) -> Dict[str, Any]:
         """Fallback to standard pipeline for small repos or failures."""
-        # Import and run the standard pipeline
-        from .analysis import execute_pipeline
-        return execute_pipeline(repository_path)
+        # Import and run the standard pipeline directly, not through the main dispatcher
+        from .analysis import _execute_standard_pipeline as execute_standard
+        from .repository_discovery import discover_repository_root, get_canonical_file_list
+        from ..performance_optimizer import get_performance_optimizer
+        
+        # Get the required parameters
+        repo_root = discover_repository_root(repository_path)
+        file_list = get_canonical_file_list(repo_root)
+        if not isinstance(file_list, list):
+            file_list = []
+        
+        start_time = time.time()
+        performance_optimizer = get_performance_optimizer()
+        initial_memory = performance_optimizer.get_memory_usage()
+        
+        return execute_standard(repository_path, repo_root, file_list, start_time, initial_memory)
 
     # Individual analysis method stubs - these would delegate to the actual analysis modules
     def _run_advanced_code_analysis(self, file_list, structure, semantic):

@@ -6,6 +6,9 @@ for optimal bounty submission alignment.
 
 from typing import Dict, List, Set, Optional
 from datetime import datetime
+from .style_analyzer import StyleAnalyzer
+from .adr_engine import ADREngine
+from .historical_forensics import HistoricalForensicsEngine
 
 
 class MaintainerProfileEngine:
@@ -14,6 +17,9 @@ class MaintainerProfileEngine:
     def __init__(self):
         self.profile_cache = {}
         self.confidence_threshold = 0.8
+        self.style_analyzer = StyleAnalyzer()
+        self.adr_engine = ADREngine()
+        self.forensics_engine = HistoricalForensicsEngine()
 
         # Hard-coded maintainer persona profiles
         self.persona_profiles = {
@@ -87,8 +93,16 @@ class MaintainerProfileEngine:
         }
 
     def generate_maintainer_profile(self, repository_url: str, intent_posture: Dict,
-                                  governance: Dict, historical_data: Dict = None) -> Dict:
+                                  governance: Dict, historical_data: Dict = None,
+                                  forensics_data: Dict = None, style_data: Dict = None) -> Dict:
         """Generate a comprehensive maintainer preference profile."""
+        # Handle None inputs safely
+        intent_posture = intent_posture or {}
+        governance = governance or {}
+        historical_data = historical_data or {}
+        forensics_data = forensics_data or {}
+        style_data = style_data or {}
+
         # Extract repository identifier
         repo_id = self._extract_repo_id(repository_url)
 
@@ -114,6 +128,24 @@ class MaintainerProfileEngine:
             )
             review_patterns = self._incorporate_historical_patterns(
                 review_patterns, historical_data.get("review", {})
+            )
+
+        # Incorporate forensics data for enhanced profiling
+        if forensics_data:
+            code_style_preferences = self._incorporate_forensics_patterns(
+                code_style_preferences, forensics_data
+            )
+            review_patterns = self._incorporate_forensics_review_patterns(
+                review_patterns, forensics_data
+            )
+            communication_style = self._incorporate_forensics_communication(
+                communication_style, forensics_data
+            )
+
+        # Incorporate style data for enhanced profiling
+        if style_data:
+            code_style_preferences = self._incorporate_style_patterns(
+                code_style_preferences, style_data
             )
 
         # Calculate overall confidence
@@ -167,7 +199,8 @@ class MaintainerProfileEngine:
             return True
 
         # Check intent posture for functional programming indicators
-        maturity = intent_posture.get("maturity_classification", {}).get("paradigm", "")
+        maturity_classification = intent_posture.get("maturity_classification", {}) or {}
+        maturity = maturity_classification.get("paradigm", "")
         if "functional" in maturity.lower():
             return True
 
@@ -260,7 +293,8 @@ class MaintainerProfileEngine:
         preferences["type_checking"] = "mypy" in str(code_quality.get("static_analyzers", []))
 
         # Analyze intent posture for structural preferences
-        maturity = intent_posture.get("maturity_classification", {}).get("maturity_level", "unknown")
+        maturity_classification = intent_posture.get("maturity_classification", {}) or {}
+        maturity = maturity_classification.get("maturity_level", "unknown")
         if maturity in ["stable", "mature"]:
             preferences["code_structure_patterns"].append("modular_architecture")
             preferences["confidence"] = 0.8
@@ -331,7 +365,8 @@ class MaintainerProfileEngine:
         }
 
         # Infer from maturity and governance
-        maturity = intent_posture.get("maturity_classification", {}).get("maturity_level", "unknown")
+        maturity_classification = intent_posture.get("maturity_classification", {}) or {}
+        maturity = maturity_classification.get("maturity_level", "unknown")
         if maturity in ["stable", "mature"]:
             patterns["review_depth"] = "thorough"
             patterns["approval_requirements"] = "multiple_approvers"
@@ -347,6 +382,15 @@ class MaintainerProfileEngine:
 
     def _analyze_communication_style(self, intent_posture: Dict) -> Dict:
         """Analyze maintainer communication style preferences."""
+        if not intent_posture:
+            return {
+                "tone": "professional",
+                "detail_level": "standard",
+                "response_pattern": "responsive",
+                "feedback_style": "constructive",
+                "confidence": 0.5
+            }
+
         style = {
             "tone": "professional",
             "detail_level": "standard",
@@ -356,7 +400,8 @@ class MaintainerProfileEngine:
         }
 
         # Infer from repository characteristics
-        maturity = intent_posture.get("maturity_classification", {}).get("maturity_level", "unknown")
+        maturity_classification = intent_posture.get("maturity_classification", {}) or {}
+        maturity = maturity_classification.get("maturity_level", "unknown")
         if maturity in ["stable", "mature"]:
             style["tone"] = "formal"
             style["detail_level"] = "comprehensive"
@@ -420,10 +465,120 @@ class MaintainerProfileEngine:
             self.profile_cache[repo_id].update(updates)
             self.profile_cache[repo_id]["updated_at"] = datetime.now().isoformat()
 
+    def _incorporate_forensics_patterns(self, code_style: Dict, forensics_data: Dict) -> Dict:
+        """Incorporate forensics data into code style preferences."""
+        enhanced_style = code_style.copy()
+
+        # Use commit style analysis from forensics
+        commit_patterns = forensics_data.get("commit_patterns", {})
+        if commit_patterns:
+            # Update import style based on conventional commits ratio
+            conventional_ratio = commit_patterns.get("conventional_commits_ratio", 0)
+            if conventional_ratio > 0.7:
+                enhanced_style["commit_style"] = "conventional"
+            elif conventional_ratio < 0.3:
+                enhanced_style["commit_style"] = "freeform"
+
+            # Update emoji usage preference
+            emoji_ratio = commit_patterns.get("emoji_usage_ratio", 0)
+            enhanced_style["emoji_in_commits"] = emoji_ratio > 0.2
+
+        # Use code churn patterns
+        code_churn = forensics_data.get("code_churn", {})
+        if code_churn.get("total_lines", 0) > 10000:  # Large codebase
+            enhanced_style["large_codebase"] = True
+            enhanced_style["prefer_incremental_changes"] = True
+
+        return enhanced_style
+
+    def _incorporate_style_patterns(self, code_style: Dict, style_data: Dict) -> Dict:
+        """Incorporate style analysis data into code style preferences."""
+        enhanced_style = code_style.copy()
+
+        # Incorporate import hygiene preferences
+        import_hygiene = style_data.get("import_hygiene", {})
+        if import_hygiene:
+            grouping = import_hygiene.get("import_grouping")
+            if grouping == "separated":
+                enhanced_style["import_grouping"] = "separated"
+                enhanced_style["blank_lines_between_imports"] = True
+            elif grouping == "mixed":
+                enhanced_style["import_grouping"] = "mixed"
+
+            preference = import_hygiene.get("import_preference", {})
+            if preference.get("stdlib_ratio", 0) > 0.5:
+                enhanced_style["prefer_stdlib"] = True
+            if preference.get("local_ratio", 0) > 0.3:
+                enhanced_style["frequent_local_imports"] = True
+
+        # Incorporate code grafting patterns
+        code_grafting = style_data.get("code_grafting", {})
+        if code_grafting:
+            func_naming = code_grafting.get("function_naming")
+            if func_naming == "prefers_private":
+                enhanced_style["prefer_private_functions"] = True
+
+            documentation = code_grafting.get("documentation")
+            if documentation == "well_documented":
+                enhanced_style["require_docstrings"] = True
+            elif documentation == "minimal":
+                enhanced_style["minimal_documentation"] = True
+
+            class_naming = code_grafting.get("class_naming")
+            if class_naming == "pascal_case":
+                enhanced_style["class_naming"] = "pascal_case"
+
+        return enhanced_style
+
+    def _incorporate_forensics_review_patterns(self, review_patterns: Dict, forensics_data: Dict) -> Dict:
+        """Incorporate forensics data into review pattern analysis."""
+        enhanced_patterns = review_patterns.copy()
+
+        # Use merge patterns to infer review requirements
+        merge_patterns = forensics_data.get("merge_patterns", {})
+        avg_merge_time = merge_patterns.get("avg_merge_time_hours", 0)
+
+        if avg_merge_time > 48:  # Long review cycles
+            enhanced_patterns["thorough_reviews"] = True
+            enhanced_patterns["requires_detailed_testing"] = True
+        elif avg_merge_time < 2:  # Fast reviews
+            enhanced_patterns["fast_iterations"] = True
+
+        # Use reviewer patterns
+        reviewer_patterns = forensics_data.get("reviewer_patterns", {})
+        if reviewer_patterns.get("avg_review_time", 0) > 24:
+            enhanced_patterns["requires_comprehensive_docs"] = True
+
+        return enhanced_patterns
+
+    def _incorporate_forensics_communication(self, communication_style: Dict, forensics_data: Dict) -> Dict:
+        """Incorporate forensics data into communication style analysis."""
+        enhanced_style = communication_style.copy()
+
+        # Use commit message patterns
+        commit_patterns = forensics_data.get("commit_patterns") or {}
+        avg_length = commit_patterns.get("avg_message_length", 50)
+
+        if avg_length < 30:
+            enhanced_style["detail_level"] = "concise"
+        elif avg_length > 80:
+            enhanced_style["detail_level"] = "comprehensive"
+        else:
+            enhanced_style["detail_level"] = "standard"
+
+        # Use technical decision patterns
+        technical_decisions = forensics_data.get("technical_decisions") or []
+        if technical_decisions:
+            enhanced_style["technical_depth"] = "deep"
+            enhanced_style["prefers_architecture_discussions"] = True
+
+        return enhanced_style
+
 
 def generate_maintainer_profile(repository_url: str, intent_posture: Dict,
-                              governance: Dict, historical_data: Dict = None) -> Dict:
+                              governance: Dict, historical_data: Dict = None,
+                              forensics_data: Dict = None, style_data: Dict = None) -> Dict:
     """Convenience function for generating maintainer profiles."""
     engine = MaintainerProfileEngine()
     return engine.generate_maintainer_profile(repository_url, intent_posture,
-                                            governance, historical_data)
+                                            governance, historical_data, forensics_data, style_data)

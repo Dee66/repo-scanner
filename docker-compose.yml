@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   repo-scanner:
+    image: repo-scanner:latest
     build:
       context: .
       target: production
@@ -27,6 +28,7 @@ services:
 
   # Optional: API server for web interface
   api-server:
+    image: repo-scanner-api:latest
     build:
       context: .
       target: production
