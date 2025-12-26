@@ -1,0 +1,12 @@
+{
+  "sme_validations": [
+    {
+      "claim": "99.999% SME accuracy",
+      "verified": false,
+      "notes": "Placeholder SME validation record. Replace with authoritative SME evidence.",
+      "verified_by": "Example SME",
+      "verified_at": "2025-12-26T00:00:00Z"
+    }
+  ],
+  "last_updated": "2025-12-26T00:00:00Z"
+}

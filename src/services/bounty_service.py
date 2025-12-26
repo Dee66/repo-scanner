@@ -82,6 +82,11 @@ class BountyService:
             adr_analysis, forensics_data, repo_path
         )
 
+        # Defensive: ensure PR content is a dict (some engines may return None on failure)
+        if pr_content is None:
+            logger.warning("PR content generation returned None; substituting empty content")
+            pr_content = {}
+
         # Generate integration plan
         integration_plan = self._generate_integration_plan(
             governance, pr_content

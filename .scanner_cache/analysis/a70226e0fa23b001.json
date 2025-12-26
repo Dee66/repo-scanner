@@ -1,0 +1,556 @@
+{
+  "python_analysis": {
+    "python_files_count": 0,
+    "has_main_files": false,
+    "has_init_files": false,
+    "has_tests": false
+  },
+  "javascript_analysis": {
+    "modules": [
+      "/home/dee/workspace/algora/zio-schema/docs/sidebars.js"
+    ],
+    "classes": [],
+    "functions": [],
+    "imports": [],
+    "exports": [],
+    "react_components": [],
+    "complexity_signals": [],
+    "test_coverage_signals": [],
+    "total_classes": 0,
+    "total_functions": 0,
+    "total_modules": 1,
+    "total_react_components": 0
+  },
+  "typescript_analysis": {
+    "typescript_files_count": 0,
+    "has_react_components": false,
+    "has_tests": false,
+    "has_config": false
+  },
+  "java_analysis": {
+    "modules": [
+      "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicDouble.java",
+      "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicInt.java",
+      "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicString.java",
+      "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BoolValue.java",
+      "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Color.java",
+      "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Embedded.java",
+      "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/EnumValue.java",
+      "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Enumeration.java",
+      "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/HighArity.java",
+      "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/IntList.java",
+      "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/IntValue.java",
+      "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/MapValue.java",
+      "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/OneOf.java",
+      "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Record.java",
+      "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/SetValue.java",
+      "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/StringList.java",
+      "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/StringValue.java"
+    ],
+    "classes": [
+      {
+        "name": "BasicDouble",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicDouble.java",
+        "line": 0
+      },
+      {
+        "name": "BasicDoubleStandardSchemeFactory",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicDouble.java",
+        "line": 0
+      },
+      {
+        "name": "BasicDoubleStandardScheme",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicDouble.java",
+        "line": 0
+      },
+      {
+        "name": "BasicDoubleTupleSchemeFactory",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicDouble.java",
+        "line": 0
+      },
+      {
+        "name": "BasicDoubleTupleScheme",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicDouble.java",
+        "line": 0
+      },
+      {
+        "name": "BasicInt",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicInt.java",
+        "line": 0
+      },
+      {
+        "name": "BasicIntStandardSchemeFactory",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicInt.java",
+        "line": 0
+      },
+      {
+        "name": "BasicIntStandardScheme",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicInt.java",
+        "line": 0
+      },
+      {
+        "name": "BasicIntTupleSchemeFactory",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicInt.java",
+        "line": 0
+      },
+      {
+        "name": "BasicIntTupleScheme",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicInt.java",
+        "line": 0
+      },
+      {
+        "name": "BasicString",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicString.java",
+        "line": 0
+      },
+      {
+        "name": "BasicStringStandardSchemeFactory",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicString.java",
+        "line": 0
+      },
+      {
+        "name": "BasicStringStandardScheme",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicString.java",
+        "line": 0
+      },
+      {
+        "name": "BasicStringTupleSchemeFactory",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicString.java",
+        "line": 0
+      },
+      {
+        "name": "BasicStringTupleScheme",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicString.java",
+        "line": 0
+      },
+      {
+        "name": "BoolValue",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BoolValue.java",
+        "line": 0
+      },
+      {
+        "name": "BoolValueStandardSchemeFactory",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BoolValue.java",
+        "line": 0
+      },
+      {
+        "name": "BoolValueStandardScheme",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BoolValue.java",
+        "line": 0
+      },
+      {
+        "name": "BoolValueTupleSchemeFactory",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BoolValue.java",
+        "line": 0
+      },
+      {
+        "name": "BoolValueTupleScheme",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BoolValue.java",
+        "line": 0
+      },
+      {
+        "name": "Embedded",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Embedded.java",
+        "line": 0
+      },
+      {
+        "name": "EmbeddedStandardSchemeFactory",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Embedded.java",
+        "line": 0
+      },
+      {
+        "name": "EmbeddedStandardScheme",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Embedded.java",
+        "line": 0
+      },
+      {
+        "name": "EmbeddedTupleSchemeFactory",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Embedded.java",
+        "line": 0
+      },
+      {
+        "name": "EmbeddedTupleScheme",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Embedded.java",
+        "line": 0
+      },
+      {
+        "name": "EnumValue",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/EnumValue.java",
+        "line": 0
+      },
+      {
+        "name": "EnumValueStandardSchemeFactory",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/EnumValue.java",
+        "line": 0
+      },
+      {
+        "name": "EnumValueStandardScheme",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/EnumValue.java",
+        "line": 0
+      },
+      {
+        "name": "EnumValueTupleSchemeFactory",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/EnumValue.java",
+        "line": 0
+      },
+      {
+        "name": "EnumValueTupleScheme",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/EnumValue.java",
+        "line": 0
+      },
+      {
+        "name": "Enumeration",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Enumeration.java",
+        "line": 0
+      },
+      {
+        "name": "EnumerationStandardSchemeFactory",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Enumeration.java",
+        "line": 0
+      },
+      {
+        "name": "EnumerationStandardScheme",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Enumeration.java",
+        "line": 0
+      },
+      {
+        "name": "EnumerationTupleSchemeFactory",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Enumeration.java",
+        "line": 0
+      },
+      {
+        "name": "EnumerationTupleScheme",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Enumeration.java",
+        "line": 0
+      },
+      {
+        "name": "HighArity",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/HighArity.java",
+        "line": 0
+      },
+      {
+        "name": "HighArityStandardSchemeFactory",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/HighArity.java",
+        "line": 0
+      },
+      {
+        "name": "HighArityStandardScheme",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/HighArity.java",
+        "line": 0
+      },
+      {
+        "name": "HighArityTupleSchemeFactory",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/HighArity.java",
+        "line": 0
+      },
+      {
+        "name": "HighArityTupleScheme",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/HighArity.java",
+        "line": 0
+      },
+      {
+        "name": "IntList",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/IntList.java",
+        "line": 0
+      },
+      {
+        "name": "IntListStandardSchemeFactory",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/IntList.java",
+        "line": 0
+      },
+      {
+        "name": "IntListStandardScheme",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/IntList.java",
+        "line": 0
+      },
+      {
+        "name": "IntListTupleSchemeFactory",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/IntList.java",
+        "line": 0
+      },
+      {
+        "name": "IntListTupleScheme",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/IntList.java",
+        "line": 0
+      },
+      {
+        "name": "IntValue",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/IntValue.java",
+        "line": 0
+      },
+      {
+        "name": "IntValueStandardSchemeFactory",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/IntValue.java",
+        "line": 0
+      },
+      {
+        "name": "IntValueStandardScheme",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/IntValue.java",
+        "line": 0
+      },
+      {
+        "name": "IntValueTupleSchemeFactory",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/IntValue.java",
+        "line": 0
+      },
+      {
+        "name": "IntValueTupleScheme",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/IntValue.java",
+        "line": 0
+      },
+      {
+        "name": "MapValue",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/MapValue.java",
+        "line": 0
+      },
+      {
+        "name": "MapValueStandardSchemeFactory",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/MapValue.java",
+        "line": 0
+      },
+      {
+        "name": "MapValueStandardScheme",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/MapValue.java",
+        "line": 0
+      },
+      {
+        "name": "MapValueTupleSchemeFactory",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/MapValue.java",
+        "line": 0
+      },
+      {
+        "name": "MapValueTupleScheme",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/MapValue.java",
+        "line": 0
+      },
+      {
+        "name": "OneOf",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/OneOf.java",
+        "line": 0
+      },
+      {
+        "name": "Record",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Record.java",
+        "line": 0
+      },
+      {
+        "name": "RecordStandardSchemeFactory",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Record.java",
+        "line": 0
+      },
+      {
+        "name": "RecordStandardScheme",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Record.java",
+        "line": 0
+      },
+      {
+        "name": "RecordTupleSchemeFactory",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Record.java",
+        "line": 0
+      },
+      {
+        "name": "RecordTupleScheme",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Record.java",
+        "line": 0
+      },
+      {
+        "name": "SetValue",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/SetValue.java",
+        "line": 0
+      },
+      {
+        "name": "SetValueStandardSchemeFactory",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/SetValue.java",
+        "line": 0
+      },
+      {
+        "name": "SetValueStandardScheme",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/SetValue.java",
+        "line": 0
+      },
+      {
+        "name": "SetValueTupleSchemeFactory",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/SetValue.java",
+        "line": 0
+      },
+      {
+        "name": "SetValueTupleScheme",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/SetValue.java",
+        "line": 0
+      },
+      {
+        "name": "StringList",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/StringList.java",
+        "line": 0
+      },
+      {
+        "name": "StringListStandardSchemeFactory",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/StringList.java",
+        "line": 0
+      },
+      {
+        "name": "StringListStandardScheme",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/StringList.java",
+        "line": 0
+      },
+      {
+        "name": "StringListTupleSchemeFactory",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/StringList.java",
+        "line": 0
+      },
+      {
+        "name": "StringListTupleScheme",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/StringList.java",
+        "line": 0
+      },
+      {
+        "name": "StringValue",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/StringValue.java",
+        "line": 0
+      },
+      {
+        "name": "StringValueStandardSchemeFactory",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/StringValue.java",
+        "line": 0
+      },
+      {
+        "name": "StringValueStandardScheme",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/StringValue.java",
+        "line": 0
+      },
+      {
+        "name": "StringValueTupleSchemeFactory",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/StringValue.java",
+        "line": 0
+      },
+      {
+        "name": "StringValueTupleScheme",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/StringValue.java",
+        "line": 0
+      }
+    ],
+    "interfaces": [],
+    "enums": [
+      {
+        "name": "_Fields",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicDouble.java",
+        "line": 0
+      },
+      {
+        "name": "_Fields",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicInt.java",
+        "line": 0
+      },
+      {
+        "name": "_Fields",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicString.java",
+        "line": 0
+      },
+      {
+        "name": "_Fields",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BoolValue.java",
+        "line": 0
+      },
+      {
+        "name": "Color",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Color.java",
+        "line": 0
+      },
+      {
+        "name": "value",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Color.java",
+        "line": 0
+      },
+      {
+        "name": "type",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Color.java",
+        "line": 0
+      },
+      {
+        "name": "_Fields",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Embedded.java",
+        "line": 0
+      },
+      {
+        "name": "_Fields",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/EnumValue.java",
+        "line": 0
+      },
+      {
+        "name": "_Fields",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Enumeration.java",
+        "line": 0
+      },
+      {
+        "name": "_Fields",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/HighArity.java",
+        "line": 0
+      },
+      {
+        "name": "_Fields",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/IntList.java",
+        "line": 0
+      },
+      {
+        "name": "_Fields",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/IntValue.java",
+        "line": 0
+      },
+      {
+        "name": "_Fields",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/MapValue.java",
+        "line": 0
+      },
+      {
+        "name": "_Fields",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/OneOf.java",
+        "line": 0
+      },
+      {
+        "name": "_Fields",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Record.java",
+        "line": 0
+      },
+      {
+        "name": "_Fields",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/SetValue.java",
+        "line": 0
+      },
+      {
+        "name": "_Fields",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/StringList.java",
+        "line": 0
+      },
+      {
+        "name": "_Fields",
+        "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/StringValue.java",
+        "line": 0
+      }
+    ],
+    "methods": [],
+    "imports": [],
+    "packages": [
+      "zio.schema.codec.generated"
+    ],
+    "annotations": [
+      "@Override",
+      "@SuppressWarnings",
+      "@generated",
+      "@jakarta",
+      "@org",
+      "@return",
+      "@see"
+    ],
+    "complexity_signals": [],
+    "test_coverage_signals": [],
+    "total_classes": 76,
+    "total_interfaces": 0,
+    "total_enums": 19,
+    "total_methods": 0,
+    "total_modules": 17
+  },
+  "imports": {},
+  "exports": {},
+  "dependencies": {},
+  "code_quality_signals": []
+}

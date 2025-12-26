@@ -1,0 +1,1364 @@
+{
+  "authority_ceiling_evaluation": {
+    "authority_confidence": {
+      "authority_confidence_level": "high",
+      "authority_confidence_score": 0.9,
+      "confidence_factors": {
+        "base_analysis_confidence": 0.8434911242603551,
+        "constraint_application": true,
+        "constraint_count": 1
+      },
+      "description": "Strong confidence in authority ceiling determination"
+    },
+    "authority_constraints": {
+      "constraint_count": 1,
+      "constraints": [
+        {
+          "authority_minimum": "technical_lead",
+          "constraint_type": "governance_based",
+          "description": "Moderate governance requires oversight",
+          "rationale": "Governance gaps need experienced oversight",
+          "severity": "medium"
+        }
+      ],
+      "highest_severity": "medium"
+    },
+    "authority_rationale": {
+      "authority_rationale": [
+        "Authority elevated to technical lead due to 1 constraining factor(s)",
+        "Governance Based: Moderate governance requires oversight",
+        "Decision scope limited to feature changes allowed with oversight required"
+      ],
+      "key_factors": [
+        "Moderate governance requires oversight"
+      ],
+      "rationale_summary": "Authority elevated to technical lead due to 1 constraining factor(s) Governance Based: Moderate governance requires oversight Decision scope limited to feature changes allowed with oversight required"
+    },
+    "evaluation_timestamp": "2025-01-01T00:00:00Z",
+    "evaluation_version": "1.0.0",
+    "final_authority_ceiling": {
+      "applied_constraints": [
+        {
+          "authority_minimum": "technical_lead",
+          "constraint_type": "governance_based",
+          "description": "Moderate governance requires oversight",
+          "rationale": "Governance gaps need experienced oversight",
+          "severity": "medium"
+        }
+      ],
+      "authority_level": 4,
+      "constraint_count": 1,
+      "decision_scope": "feature_changes_allowed",
+      "maximum_authority": "technical_lead",
+      "oversight_required": true
+    },
+    "organizational_factors": {
+      "factor_count": 1,
+      "highest_impact": "medium",
+      "organizational_factors": [
+        {
+          "authority_implication": "technical_lead",
+          "description": "Medium codebase requires technical leadership",
+          "factor_type": "scale",
+          "impact": "medium",
+          "rationale": "Medium codebases need experienced technical guidance"
+        }
+      ]
+    }
+  },
+  "decision_artifacts": {
+    "action_plan": {
+      "action_count": 4,
+      "immediate_actions": [
+        {
+          "category": "code_quality",
+          "description": "Address critical code duplication immediately",
+          "estimated_effort": "medium",
+          "rationale": "Critical code duplication indicates severe maintainability issues"
+        },
+        {
+          "category": "testing",
+          "description": "Implement comprehensive test suite",
+          "estimated_effort": "high",
+          "rationale": "High testing risk indicates insufficient quality assurance"
+        }
+      ],
+      "long_term_actions": [
+        {
+          "category": "safe_improvement",
+          "description": "No safe changes identified - proceed with extreme caution",
+          "estimated_effort": "low",
+          "rationale": "Safe change that can improve repository health"
+        }
+      ],
+      "prohibited_actions": [
+        "Address misleading signals before making changes",
+        "Avoid changes without extensive testing",
+        "Avoid dependency updates without thorough testing",
+        "Avoid modifying core business logic",
+        "Avoid modifying critical path files"
+      ],
+      "short_term_actions": [
+        {
+          "category": "compliance",
+          "description": "Address high-severity compliance issues",
+          "estimated_effort": "low",
+          "rationale": "High compliance risk indicates significant standards violations"
+        }
+      ]
+    },
+    "authority_ceiling": {
+      "decision_scope": "full_changes_allowed",
+      "maximum_authority": "developer",
+      "oversight_required": false,
+      "rationale": "Low risk allows developer-level decisions"
+    },
+    "confidence_assessment": {
+      "confidence_factors": {
+        "analysis_consistency": 0.680473372781065,
+        "data_completeness": 1.0,
+        "risk_assessment_confidence": 0.85
+      },
+      "confidence_level": "high",
+      "confidence_score": 0.8434911242603551,
+      "description": "Strong confidence in analysis results"
+    },
+    "decision_framework": {
+      "approval_gates": [
+        "peer_review",
+        "risk_assessment_review"
+      ],
+      "authority_required": "senior_technical_lead",
+      "decision_type": "conservative",
+      "rationale": "Critical issues detected - elevated decision framework required",
+      "timeframe": "rapid_deployment"
+    },
+    "decision_timestamp": "2025-01-01T00:00:00Z",
+    "decision_version": "1.0.0",
+    "next_steps": [
+      {
+        "owner": "technical_lead",
+        "priority": "immediate",
+        "rationale": "Conservative framework requires senior approval",
+        "step": "Schedule senior review meeting",
+        "timeframe": "within_24_hours"
+      },
+      {
+        "owner": "assigned_developer",
+        "priority": "immediate",
+        "rationale": "Critical issues require immediate attention",
+        "step": "Address 2 critical issue(s)",
+        "timeframe": "within_1_week"
+      },
+      {
+        "owner": "technical_lead",
+        "priority": "short_term",
+        "rationale": "High-priority items need planning and scheduling",
+        "step": "Plan 1 high-priority improvement(s)",
+        "timeframe": "within_2_weeks"
+      },
+      {
+        "owner": "analysis_owner",
+        "priority": "immediate",
+        "rationale": "Team needs to be aware of analysis results",
+        "step": "Document findings and share with team",
+        "timeframe": "within_48_hours"
+      }
+    ]
+  },
+  "determinism_verification": {
+    "canonical_data_summary": {
+      "data_components": 11,
+      "has_all_required_components": true,
+      "hash_input_size": 74956,
+      "total_files": 270
+    },
+    "consistency_check": {
+      "consistency_issues": [
+        {
+          "description": "Structure file counts total (411) doesn't match overall count (270)",
+          "issue": "structure_file_count_mismatch",
+          "severity": "medium"
+        },
+        {
+          "description": "Risk synthesis has 14 components, expected 8",
+          "issue": "risk_component_count_mismatch",
+          "severity": "low"
+        }
+      ],
+      "consistency_score": 0.75,
+      "issues_found": 2,
+      "overall_consistency": "medium"
+    },
+    "determinism_hash": "0046e86eabb430ad960a85b80974506c02cc7d97b5782118a00fadb3f71527ec",
+    "determinism_report": {
+      "analysis_hash": "0046e86eabb430ad960a85b80974506c02cc7d97b5782118a00fadb3f71527ec",
+      "confidence_level": "medium",
+      "consistency_score": 0.75,
+      "description": "Analysis pipeline produces mostly deterministic results with minor inconsistencies",
+      "determinism_status": "acceptable",
+      "hash_algorithm": "SHA-256",
+      "issues_found": 2,
+      "verification_method": "canonical_data_hashing"
+    },
+    "verification_timestamp": "2025-12-23T00:00:00Z",
+    "verification_version": "1.0.0"
+  },
+  "gaps": [],
+  "governance": {
+    "ci_cd_governance": {
+      "automation_scripts": [],
+      "build_automation": [
+        "package.json"
+      ],
+      "ci_config_files": [
+        ".github/workflows"
+      ],
+      "ci_platforms": [
+        "GitHub Actions"
+      ],
+      "has_ci_cd": true
+    },
+    "code_quality_governance": {
+      "code_quality_config_files": [],
+      "formatters": [],
+      "linters": [],
+      "pre_commit_hooks": false,
+      "static_analyzers": []
+    },
+    "compliance_artifacts": [
+      {
+        "artifact": "LICENSE",
+        "compliance_area": "open_source",
+        "found": true,
+        "type": "license"
+      },
+      {
+        "artifact": "DCO",
+        "compliance_area": "contribution",
+        "found": true,
+        "type": "developer_certificate"
+      },
+      {
+        "artifact": "CLA",
+        "compliance_area": "contribution",
+        "found": true,
+        "type": "contributor_license"
+      }
+    ],
+    "dependency_governance": {
+      "dependency_files": [
+        {
+          "file": "package.json",
+          "language": "Node.js"
+        }
+      ],
+      "dependency_scanning": true,
+      "has_dependency_management": true,
+      "has_lock_files": false,
+      "lock_files": []
+    },
+    "documentation_governance": {
+      "api_docs": true,
+      "changelog": false,
+      "code_of_conduct": false,
+      "contributing_guide": false,
+      "documentation_tools": [],
+      "license_file": true,
+      "readme_files": [
+        "/home/dee/workspace/algora/zio-schema/README.md",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-examples/README.md"
+      ]
+    },
+    "governance_gaps": [],
+    "governance_maturity_score": 0.6875,
+    "security_governance": {
+      "has_security_md": false,
+      "secret_scanning": false,
+      "security_policies": [],
+      "security_scanners": [
+        "dependabot"
+      ],
+      "vulnerability_management": []
+    }
+  },
+  "intent_posture": {
+    "code_patterns": {
+      "architecture_patterns": [],
+      "quality_patterns": [],
+      "security_patterns": []
+    },
+    "development_stage": {
+      "development_stage": "concept",
+      "stage_confidence": 1.0,
+      "stage_description": "Early concept or planning phase",
+      "stage_indicators": {
+        "concept": 1,
+        "development": 0,
+        "production": 1,
+        "stabilization": 1,
+        "testing": 0
+      }
+    },
+    "intent_confidence": 0.6859375,
+    "maturity_classification": {
+      "description": "Alpha-quality, functional but incomplete",
+      "maturity_factors": {
+        "code_structure": 1.0,
+        "documentation_completeness": 0.5,
+        "governance_maturity": 0.6875,
+        "maturity_recommendations": [],
+        "testing_maturity": 0.2
+      },
+      "maturity_level": "alpha",
+      "maturity_score": 0.56625
+    },
+    "primary_intent": {
+      "confidence_score": 1.0,
+      "intent_signals": {
+        "application": 0,
+        "educational": 1,
+        "framework": 0,
+        "infrastructure": 1,
+        "library": 0,
+        "research": 0,
+        "tool": 0
+      },
+      "primary_intent": "educational",
+      "secondary_intents": [
+        [
+          "infrastructure",
+          1
+        ],
+        [
+          "application",
+          0
+        ]
+      ]
+    },
+    "risk_posture": {
+      "overall_risk_level": "medium",
+      "risk_factors": {
+        "maintenance_risks": 2,
+        "operational_risks": 0,
+        "quality_risks": 3,
+        "security_risks": 2
+      },
+      "risk_mitigation_suggestions": [
+        "Add code quality tools (linters, formatters)",
+        "Add comprehensive documentation",
+        "Add security policy and disclosure guidelines",
+        "Establish contribution guidelines",
+        "Implement CI/CD pipelines",
+        "Implement automated security scanning",
+        "Implement code review processes",
+        "Increase test coverage to at least 70%",
+        "Use dependency scanning tools"
+      ],
+      "risk_score": 7
+    },
+    "security_posture": {
+      "overall_posture": "moderate",
+      "risk_level": "medium",
+      "security_controls": [
+        "automated_testing",
+        "dependabot",
+        "dependency_scanning"
+      ],
+      "security_practices_score": 0.4,
+      "security_recommendations": [],
+      "vulnerability_indicators": []
+    }
+  },
+  "metadata": {
+    "deterministic_hash": "placeholder-hash",
+    "run_timestamp": "2025-01-01T00:00:00Z",
+    "scanner_version": "1.1.0"
+  },
+  "misleading_signals": {
+    "misleading_signals": {
+      "code_quality_inconsistencies": [],
+      "documentation_discrepancies": [
+        {
+          "description": "Multiple README files may indicate confusion or duplication",
+          "evidence": "Found 2 README files: ['/home/dee/workspace/algora/zio-schema/README.md', '/home/dee/workspace/algora/zio-schema/zio-schema-examples/README.md']",
+          "severity": "low",
+          "type": "multiple_readmes"
+        }
+      ],
+      "governance_conflicts": [
+        {
+          "description": "CI/CD pipeline exists but no security scanning detected",
+          "evidence": "CI/CD present, security scanning absent",
+          "severity": "high",
+          "type": "ci_without_security"
+        }
+      ],
+      "intent_mismatches": [],
+      "maintenance_indicators": [],
+      "security_deceptions": [
+        {
+          "description": "Security practices score is very low",
+          "evidence": "Security score: 0.4/10",
+          "severity": "high",
+          "type": "low_security_score"
+        }
+      ]
+    },
+    "overall_misleading_risk": "medium",
+    "requires_caution": true,
+    "total_misleading_signals": 3
+  },
+  "repository": {
+    "name": "zio-schema",
+    "path": "/home/dee/workspace/algora/zio-schema"
+  },
+  "risk_synthesis": {
+    "component_risks": {
+      "advanced_code_risk": {
+        "description": "Advanced code risk: high (64 points from complexity and flow analysis)",
+        "risk_factors": [
+          "high_cyclomatic_complexity_/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicDouble.java",
+          "high_cognitive_complexity_/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicDouble.java",
+          "high_cyclomatic_complexity_/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicInt.java",
+          "high_cognitive_complexity_/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicInt.java",
+          "high_cyclomatic_complexity_/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicString.java",
+          "high_cognitive_complexity_/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicString.java",
+          "high_cyclomatic_complexity_/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BoolValue.java",
+          "high_cognitive_complexity_/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BoolValue.java",
+          "high_cyclomatic_complexity_/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Embedded.java",
+          "high_cognitive_complexity_/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Embedded.java",
+          "high_cyclomatic_complexity_/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/EnumValue.java",
+          "high_cognitive_complexity_/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/EnumValue.java",
+          "high_cyclomatic_complexity_/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Enumeration.java",
+          "high_cognitive_complexity_/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Enumeration.java",
+          "high_cyclomatic_complexity_/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/HighArity.java",
+          "high_cognitive_complexity_/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/HighArity.java",
+          "high_cyclomatic_complexity_/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/IntList.java",
+          "high_cognitive_complexity_/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/IntList.java",
+          "high_cyclomatic_complexity_/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/IntValue.java",
+          "high_cognitive_complexity_/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/IntValue.java",
+          "high_cyclomatic_complexity_/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/MapValue.java",
+          "high_cognitive_complexity_/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/MapValue.java",
+          "high_cyclomatic_complexity_/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/OneOf.java",
+          "high_cognitive_complexity_/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/OneOf.java",
+          "high_cyclomatic_complexity_/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Record.java",
+          "high_cognitive_complexity_/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Record.java",
+          "high_cyclomatic_complexity_/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/SetValue.java",
+          "high_cognitive_complexity_/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/SetValue.java",
+          "high_cyclomatic_complexity_/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/StringList.java",
+          "high_cognitive_complexity_/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/StringList.java",
+          "high_cyclomatic_complexity_/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/StringValue.java",
+          "high_cognitive_complexity_/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/StringValue.java"
+        ],
+        "risk_level": "high",
+        "risk_score": 64
+      },
+      "api_risk": {
+        "description": "Low API risk (0 points)",
+        "risk_factors": [],
+        "risk_level": "low",
+        "risk_score": 0
+      },
+      "change_risk": {
+        "description": "Change risk: medium (2 points)",
+        "risk_factors": [
+          "low_change_safety"
+        ],
+        "risk_level": "medium",
+        "risk_score": 2
+      },
+      "compliance_risk": {
+        "description": "Compliance risk: high (117 points)",
+        "risk_factors": [
+          "moderate_compliance_issues",
+          "critical_compliance_violations",
+          "high_severity_compliance_violations"
+        ],
+        "risk_level": "high",
+        "risk_score": 10
+      },
+      "comprehension_risk": {
+        "description": "Comprehension risk: low (2 points)",
+        "risk_factors": [
+          "inconsistent_architecture"
+        ],
+        "risk_level": "low",
+        "risk_score": 2
+      },
+      "dependency_risk": {
+        "description": "Low dependency risk (0 points)",
+        "risk_factors": [],
+        "risk_level": "low",
+        "risk_score": 0
+      },
+      "duplication_risk": {
+        "description": "Critical duplication risk (28 points)",
+        "risk_factors": [
+          "severe_duplication",
+          "high_duplicate_ratio",
+          "9_files_critical_duplication",
+          "5_files_high_duplication",
+          "large_clone_groups"
+        ],
+        "risk_level": "critical",
+        "risk_score": 28
+      },
+      "governance_risk": {
+        "description": "Governance risk: medium (2 points)",
+        "risk_factors": [
+          "missing_security_scanning"
+        ],
+        "risk_level": "medium",
+        "risk_score": 2
+      },
+      "intent_risk": {
+        "description": "Intent risk: medium (3 points)",
+        "risk_factors": [
+          "low_security_posture"
+        ],
+        "risk_level": "medium",
+        "risk_score": 3
+      },
+      "misleading_risk": {
+        "description": "Misleading risk: medium (2 points)",
+        "risk_factors": [
+          "medium_misleading_signals"
+        ],
+        "risk_level": "medium",
+        "risk_score": 2
+      },
+      "security_risk": {
+        "description": "Security risk: low (1.0 points)",
+        "risk_factors": [],
+        "risk_level": "low",
+        "risk_score": 1.0
+      },
+      "semantic_risk": {
+        "description": "Semantic risk: low (0 points)",
+        "risk_factors": [],
+        "risk_level": "low",
+        "risk_score": 0
+      },
+      "structural_risk": {
+        "description": "Structural risk: low (0 points)",
+        "risk_factors": [],
+        "risk_level": "low",
+        "risk_score": 0
+      },
+      "testing_risk": {
+        "description": "Testing risk: high (4 points)",
+        "risk_factors": [
+          "very_low_test_maturity"
+        ],
+        "risk_level": "high",
+        "risk_score": 4
+      }
+    },
+    "critical_issues": [
+      {
+        "immediate_action_required": true,
+        "impact": "Severe maintainability issues - immediate refactoring required",
+        "issue": "Critical code duplication detected",
+        "severity": "critical"
+      }
+    ],
+    "overall_risk_assessment": {
+      "average_risk_score": 1.7391304347826086,
+      "description": "Low risk - generally acceptable for most use cases",
+      "overall_risk_level": "low",
+      "risk_components_count": 14
+    },
+    "recommendations": [
+      {
+        "action": "Address critical code duplication immediately",
+        "category": "code_quality",
+        "priority": "critical",
+        "rationale": "Critical code duplication indicates severe maintainability issues"
+      },
+      {
+        "action": "Implement comprehensive test suite",
+        "category": "testing",
+        "priority": "critical",
+        "rationale": "High testing risk indicates insufficient quality assurance"
+      },
+      {
+        "action": "Address high-severity compliance issues",
+        "category": "compliance",
+        "priority": "high",
+        "rationale": "High compliance risk indicates significant standards violations"
+      }
+    ],
+    "risk_confidence": 0.85
+  },
+  "run_id": "placeholder-run-id",
+  "safe_change_surface": {
+    "change_confidence": 0.8,
+    "overall_change_safety": {
+      "average_score": 2.4,
+      "description": "Changes are risky, extensive testing required",
+      "overall_safety_level": "low",
+      "safety_factors_count": 5
+    },
+    "safe_changes": [
+      "No safe changes identified - proceed with extreme caution"
+    ],
+    "safety_factors": {
+      "complexity_safety": {
+        "complex_functions_count": 0,
+        "complexity_ratio": 0.0,
+        "description": "Low complexity codebase is generally safe to modify",
+        "safety_level": "high",
+        "simple_functions_count": 0
+      },
+      "critical_path_safety": {
+        "critical_files": [
+          ".gitignore",
+          "/home/dee/workspace/algora/zio-schema/.github/workflows/auto-approve.yml",
+          "/home/dee/workspace/algora/zio-schema/.github/workflows/ci.yml",
+          "/home/dee/workspace/algora/zio-schema/.github/workflows/release-drafter.yml",
+          "/home/dee/workspace/algora/zio-schema/.github/workflows/scala-steward.yml",
+          "/home/dee/workspace/algora/zio-schema/.github/workflows/site.yml",
+          "/home/dee/workspace/algora/zio-schema/tests/js/src/test/scala/zio/schema/PlatformSpecificGen.scala",
+          "/home/dee/workspace/algora/zio-schema/tests/jvm/src/test/scala/zio/schema/PlatformSpecificGen.scala",
+          "/home/dee/workspace/algora/zio-schema/tests/native/src/test/scala/zio/schema/PlatformSpecificGen.scala",
+          "/home/dee/workspace/algora/zio-schema/zio-schema-derivation/shared/src/main/scala-2/zio/schema/VersionSpecificDeriver.scala"
+        ],
+        "critical_files_count": 24,
+        "critical_ratio": 0.08888888888888889,
+        "description": "Few critical files, most changes are safe",
+        "safety_level": "high"
+      },
+      "dependency_safety": {
+        "description": "No dependency lock files increase change risk",
+        "external_dependencies": 0,
+        "has_lock_files": false,
+        "has_vulnerable_deps": false,
+        "internal_dependencies": 0,
+        "safety_level": "low"
+      },
+      "documentation_safety": {
+        "description": "No documentation makes changes very risky",
+        "doc_coverage_ratio": 1.5217391304347827,
+        "doc_files_count": 35,
+        "has_api_docs": false,
+        "has_readme": false,
+        "safety_level": "very_low"
+      },
+      "test_coverage_safety": {
+        "description": "Minimal test coverage makes changes highly risky",
+        "safety_level": "very_low",
+        "test_gaps_count": 1,
+        "testing_maturity": 0.2
+      }
+    },
+    "unsafe_changes": [
+      "Address misleading signals before making changes",
+      "Avoid changes without extensive testing",
+      "Avoid dependency updates without thorough testing",
+      "Avoid modifying core business logic",
+      "Avoid modifying critical path files"
+    ]
+  },
+  "semantic": {
+    "code_quality_signals": [],
+    "dependencies": {},
+    "exports": {},
+    "imports": {},
+    "java_analysis": {
+      "annotations": [
+        "@Override",
+        "@SuppressWarnings",
+        "@generated",
+        "@jakarta",
+        "@org",
+        "@return",
+        "@see"
+      ],
+      "classes": [
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicDouble.java",
+          "line": 0,
+          "name": "BasicDouble"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicDouble.java",
+          "line": 0,
+          "name": "BasicDoubleStandardSchemeFactory"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicDouble.java",
+          "line": 0,
+          "name": "BasicDoubleStandardScheme"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicDouble.java",
+          "line": 0,
+          "name": "BasicDoubleTupleSchemeFactory"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicDouble.java",
+          "line": 0,
+          "name": "BasicDoubleTupleScheme"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicInt.java",
+          "line": 0,
+          "name": "BasicInt"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicInt.java",
+          "line": 0,
+          "name": "BasicIntStandardSchemeFactory"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicInt.java",
+          "line": 0,
+          "name": "BasicIntStandardScheme"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicInt.java",
+          "line": 0,
+          "name": "BasicIntTupleSchemeFactory"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicInt.java",
+          "line": 0,
+          "name": "BasicIntTupleScheme"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicString.java",
+          "line": 0,
+          "name": "BasicString"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicString.java",
+          "line": 0,
+          "name": "BasicStringStandardSchemeFactory"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicString.java",
+          "line": 0,
+          "name": "BasicStringStandardScheme"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicString.java",
+          "line": 0,
+          "name": "BasicStringTupleSchemeFactory"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicString.java",
+          "line": 0,
+          "name": "BasicStringTupleScheme"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BoolValue.java",
+          "line": 0,
+          "name": "BoolValue"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BoolValue.java",
+          "line": 0,
+          "name": "BoolValueStandardSchemeFactory"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BoolValue.java",
+          "line": 0,
+          "name": "BoolValueStandardScheme"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BoolValue.java",
+          "line": 0,
+          "name": "BoolValueTupleSchemeFactory"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BoolValue.java",
+          "line": 0,
+          "name": "BoolValueTupleScheme"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Embedded.java",
+          "line": 0,
+          "name": "Embedded"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Embedded.java",
+          "line": 0,
+          "name": "EmbeddedStandardSchemeFactory"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Embedded.java",
+          "line": 0,
+          "name": "EmbeddedStandardScheme"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Embedded.java",
+          "line": 0,
+          "name": "EmbeddedTupleSchemeFactory"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Embedded.java",
+          "line": 0,
+          "name": "EmbeddedTupleScheme"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/EnumValue.java",
+          "line": 0,
+          "name": "EnumValue"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/EnumValue.java",
+          "line": 0,
+          "name": "EnumValueStandardSchemeFactory"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/EnumValue.java",
+          "line": 0,
+          "name": "EnumValueStandardScheme"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/EnumValue.java",
+          "line": 0,
+          "name": "EnumValueTupleSchemeFactory"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/EnumValue.java",
+          "line": 0,
+          "name": "EnumValueTupleScheme"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Enumeration.java",
+          "line": 0,
+          "name": "Enumeration"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Enumeration.java",
+          "line": 0,
+          "name": "EnumerationStandardSchemeFactory"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Enumeration.java",
+          "line": 0,
+          "name": "EnumerationStandardScheme"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Enumeration.java",
+          "line": 0,
+          "name": "EnumerationTupleSchemeFactory"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Enumeration.java",
+          "line": 0,
+          "name": "EnumerationTupleScheme"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/HighArity.java",
+          "line": 0,
+          "name": "HighArity"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/HighArity.java",
+          "line": 0,
+          "name": "HighArityStandardSchemeFactory"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/HighArity.java",
+          "line": 0,
+          "name": "HighArityStandardScheme"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/HighArity.java",
+          "line": 0,
+          "name": "HighArityTupleSchemeFactory"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/HighArity.java",
+          "line": 0,
+          "name": "HighArityTupleScheme"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/IntList.java",
+          "line": 0,
+          "name": "IntList"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/IntList.java",
+          "line": 0,
+          "name": "IntListStandardSchemeFactory"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/IntList.java",
+          "line": 0,
+          "name": "IntListStandardScheme"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/IntList.java",
+          "line": 0,
+          "name": "IntListTupleSchemeFactory"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/IntList.java",
+          "line": 0,
+          "name": "IntListTupleScheme"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/IntValue.java",
+          "line": 0,
+          "name": "IntValue"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/IntValue.java",
+          "line": 0,
+          "name": "IntValueStandardSchemeFactory"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/IntValue.java",
+          "line": 0,
+          "name": "IntValueStandardScheme"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/IntValue.java",
+          "line": 0,
+          "name": "IntValueTupleSchemeFactory"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/IntValue.java",
+          "line": 0,
+          "name": "IntValueTupleScheme"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/MapValue.java",
+          "line": 0,
+          "name": "MapValue"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/MapValue.java",
+          "line": 0,
+          "name": "MapValueStandardSchemeFactory"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/MapValue.java",
+          "line": 0,
+          "name": "MapValueStandardScheme"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/MapValue.java",
+          "line": 0,
+          "name": "MapValueTupleSchemeFactory"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/MapValue.java",
+          "line": 0,
+          "name": "MapValueTupleScheme"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/OneOf.java",
+          "line": 0,
+          "name": "OneOf"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Record.java",
+          "line": 0,
+          "name": "Record"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Record.java",
+          "line": 0,
+          "name": "RecordStandardSchemeFactory"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Record.java",
+          "line": 0,
+          "name": "RecordStandardScheme"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Record.java",
+          "line": 0,
+          "name": "RecordTupleSchemeFactory"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Record.java",
+          "line": 0,
+          "name": "RecordTupleScheme"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/SetValue.java",
+          "line": 0,
+          "name": "SetValue"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/SetValue.java",
+          "line": 0,
+          "name": "SetValueStandardSchemeFactory"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/SetValue.java",
+          "line": 0,
+          "name": "SetValueStandardScheme"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/SetValue.java",
+          "line": 0,
+          "name": "SetValueTupleSchemeFactory"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/SetValue.java",
+          "line": 0,
+          "name": "SetValueTupleScheme"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/StringList.java",
+          "line": 0,
+          "name": "StringList"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/StringList.java",
+          "line": 0,
+          "name": "StringListStandardSchemeFactory"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/StringList.java",
+          "line": 0,
+          "name": "StringListStandardScheme"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/StringList.java",
+          "line": 0,
+          "name": "StringListTupleSchemeFactory"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/StringList.java",
+          "line": 0,
+          "name": "StringListTupleScheme"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/StringValue.java",
+          "line": 0,
+          "name": "StringValue"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/StringValue.java",
+          "line": 0,
+          "name": "StringValueStandardSchemeFactory"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/StringValue.java",
+          "line": 0,
+          "name": "StringValueStandardScheme"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/StringValue.java",
+          "line": 0,
+          "name": "StringValueTupleSchemeFactory"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/StringValue.java",
+          "line": 0,
+          "name": "StringValueTupleScheme"
+        }
+      ],
+      "complexity_signals": [],
+      "enums": [
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicDouble.java",
+          "line": 0,
+          "name": "_Fields"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicInt.java",
+          "line": 0,
+          "name": "_Fields"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicString.java",
+          "line": 0,
+          "name": "_Fields"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BoolValue.java",
+          "line": 0,
+          "name": "_Fields"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Color.java",
+          "line": 0,
+          "name": "Color"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Color.java",
+          "line": 0,
+          "name": "value"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Color.java",
+          "line": 0,
+          "name": "type"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Embedded.java",
+          "line": 0,
+          "name": "_Fields"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/EnumValue.java",
+          "line": 0,
+          "name": "_Fields"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Enumeration.java",
+          "line": 0,
+          "name": "_Fields"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/HighArity.java",
+          "line": 0,
+          "name": "_Fields"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/IntList.java",
+          "line": 0,
+          "name": "_Fields"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/IntValue.java",
+          "line": 0,
+          "name": "_Fields"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/MapValue.java",
+          "line": 0,
+          "name": "_Fields"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/OneOf.java",
+          "line": 0,
+          "name": "_Fields"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Record.java",
+          "line": 0,
+          "name": "_Fields"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/SetValue.java",
+          "line": 0,
+          "name": "_Fields"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/StringList.java",
+          "line": 0,
+          "name": "_Fields"
+        },
+        {
+          "file": "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/StringValue.java",
+          "line": 0,
+          "name": "_Fields"
+        }
+      ],
+      "imports": [],
+      "interfaces": [],
+      "methods": [],
+      "modules": [
+        "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicDouble.java",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicInt.java",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicString.java",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BoolValue.java",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Color.java",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Embedded.java",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/EnumValue.java",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Enumeration.java",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/HighArity.java",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/IntList.java",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/IntValue.java",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/MapValue.java",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/OneOf.java",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Record.java",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/SetValue.java",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/StringList.java",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/StringValue.java"
+      ],
+      "packages": [
+        "zio.schema.codec.generated"
+      ],
+      "test_coverage_signals": [],
+      "total_classes": 76,
+      "total_enums": 19,
+      "total_interfaces": 0,
+      "total_methods": 0,
+      "total_modules": 17
+    },
+    "javascript_analysis": {
+      "classes": [],
+      "complexity_signals": [],
+      "exports": [],
+      "functions": [],
+      "imports": [],
+      "modules": [
+        "/home/dee/workspace/algora/zio-schema/docs/sidebars.js"
+      ],
+      "react_components": [],
+      "test_coverage_signals": [],
+      "total_classes": 0,
+      "total_functions": 0,
+      "total_modules": 1,
+      "total_react_components": 0
+    },
+    "python_analysis": {
+      "has_init_files": false,
+      "has_main_files": false,
+      "has_tests": false,
+      "python_files_count": 0
+    },
+    "typescript_analysis": {
+      "has_config": false,
+      "has_react_components": false,
+      "has_tests": false,
+      "typescript_files_count": 0
+    }
+  },
+  "structure": {
+    "build_systems": [],
+    "configuration": [
+      ".gitignore"
+    ],
+    "documentation": [
+      "README",
+      "docs/ directory",
+      "Markdown files"
+    ],
+    "file_counts": {
+      "code": 23,
+      "config": 10,
+      "docs": 35,
+      "test": 73,
+      "total": 270
+    },
+    "frameworks": [
+      "Node.js"
+    ],
+    "languages": {
+      "JSON": 3,
+      "Java": 17,
+      "JavaScript": 1,
+      "Markdown": 32,
+      "Unknown": 210,
+      "YAML": 7
+    },
+    "test_frameworks": []
+  },
+  "summary": {
+    "files_scanned": 270,
+    "gaps_count": 0,
+    "overall_score": 0.0,
+    "tests_discovered": 73
+  },
+  "tasks": {},
+  "test_signals": {
+    "test_coverage_signals": {
+      "coverage_tools": [],
+      "has_coverage_tools": false,
+      "test_file_percentage": 76.04166666666666,
+      "test_to_code_ratio": 3.1739130434782608,
+      "untested_modules": []
+    },
+    "test_files": {
+      "e2e_tests": [],
+      "integration_tests": [
+        "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicInt.java",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/IntList.java",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/IntValue.java"
+      ],
+      "other_tests": [
+        "/home/dee/workspace/algora/zio-schema/docs/derivations/zio-test-gen-derivation.md",
+        "/home/dee/workspace/algora/zio-schema/tests/js/src/test/scala/zio/schema/PlatformSpecificGen.scala",
+        "/home/dee/workspace/algora/zio-schema/tests/jvm/src/test/scala/zio/schema/PlatformSpecificGen.scala",
+        "/home/dee/workspace/algora/zio-schema/tests/native/src/test/scala/zio/schema/PlatformSpecificGen.scala",
+        "/home/dee/workspace/algora/zio-schema/tests/shared/src/test/scala/zio/schema/AccessorBuilderSpec.scala",
+        "/home/dee/workspace/algora/zio-schema/tests/shared/src/test/scala/zio/schema/DefaultValueSpec.scala",
+        "/home/dee/workspace/algora/zio-schema/tests/shared/src/test/scala/zio/schema/DynamicValueGen.scala",
+        "/home/dee/workspace/algora/zio-schema/tests/shared/src/test/scala/zio/schema/DynamicValueSpec.scala",
+        "/home/dee/workspace/algora/zio-schema/tests/shared/src/test/scala/zio/schema/JavaTimeGen.scala",
+        "/home/dee/workspace/algora/zio-schema/tests/shared/src/test/scala/zio/schema/MetaSchemaSpec.scala",
+        "/home/dee/workspace/algora/zio-schema/tests/shared/src/test/scala/zio/schema/MigrationSpec.scala",
+        "/home/dee/workspace/algora/zio-schema/tests/shared/src/test/scala/zio/schema/OrderingSpec.scala",
+        "/home/dee/workspace/algora/zio-schema/tests/shared/src/test/scala/zio/schema/PatchSpec.scala",
+        "/home/dee/workspace/algora/zio-schema/tests/shared/src/test/scala/zio/schema/SchemaGen.scala",
+        "/home/dee/workspace/algora/zio-schema/tests/shared/src/test/scala/zio/schema/SchemaMigrationSpec.scala",
+        "/home/dee/workspace/algora/zio-schema/tests/shared/src/test/scala/zio/schema/SchemaSpec.scala",
+        "/home/dee/workspace/algora/zio-schema/tests/shared/src/test/scala/zio/schema/StandardTypeGen.scala",
+        "/home/dee/workspace/algora/zio-schema/tests/shared/src/test/scala/zio/schema/TestAccessorBuilder.scala",
+        "/home/dee/workspace/algora/zio-schema/tests/shared/src/test/scala/zio/schema/TypeIdSpec.scala",
+        "/home/dee/workspace/algora/zio-schema/tests/shared/src/test/scala/zio/schema/ast/NodePathSpec.scala",
+        "/home/dee/workspace/algora/zio-schema/tests/shared/src/test/scala/zio/schema/types.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-avro/src/test/scala/zio/schema/codec/AvroCodecSpec.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-avro/src/test/scala/zio/schema/codec/AvroSchemaCodecSpec.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-bson/src/test/scala/zio/schema/codec/BsonConfig.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-bson/src/test/scala/zio/schema/codec/BsonSchemaCodecGenericSpec.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-bson/src/test/scala/zio/schema/codec/BsonSchemaCodecSpec.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-bson/src/test/scala/zio/schema/codec/MixedConfig.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-bson/src/test/scala/zio/schema/codec/SchemaConfig.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-derivation/shared/src/main/scala-2/zio/schema/VersionSpecificDeriver.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-derivation/shared/src/main/scala-3/zio/schema/VersionSpecificDeriver.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-derivation/shared/src/test/scala-2.12/zio/schema/VersionSpecificDeriveSchemaSpec.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-derivation/shared/src/test/scala-2.12/zio/schema/VersionSpecificDeriveSpec.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-derivation/shared/src/test/scala-2.13/zio/schema/VersionSpecificDeriveSchemaSpec.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-derivation/shared/src/test/scala-2.13/zio/schema/VersionSpecificDeriveSpec.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-derivation/shared/src/test/scala-3/zio/schema/VerifyFieldNameMacro.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-derivation/shared/src/test/scala-3/zio/schema/VersionSpecificDeriveSchemaSpec.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-derivation/shared/src/test/scala-3/zio/schema/VersionSpecificDeriveSpec.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-derivation/shared/src/test/scala/zio/schema/DeriveSchemaSpec.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-derivation/shared/src/test/scala/zio/schema/DeriveSpec.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-derivation/shared/src/test/scala/zio/schema/RecordSpec.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-derivation/shared/src/test/scala/zio/schema/SchemaValidationSpec.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-json/jvm/src/test/scala/zio/schema/codec/JsonCodecJVMSpec.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-json/shared/src/test/scala-3/zio/schema/codec/VersionSpecificJsonCodecSpec.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-json/shared/src/test/scala/zio/schema/codec/JsonCodecSpec.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-msg-pack/src/test/scala/zio/schema/codec/MessagePackCodecSpec.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-optics/shared/src/test/scala/zio/schema/optics/LensSpec.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-protobuf/shared/src/test/scala/zio/schema/codec/ProtobufCodecSpec.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/resources/testing-data.thrift",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/ThriftCodecSpec.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicDouble.java",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BasicString.java",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/BoolValue.java",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Color.java",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Embedded.java",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/EnumValue.java",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Enumeration.java",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/HighArity.java",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/MapValue.java",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/OneOf.java",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/Record.java",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/SetValue.java",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/StringList.java",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-thrift/src/test/scala/zio/schema/codec/generated/StringValue.java",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-zio-test/shared/src/main/scala/zio/schema/DeriveGen.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-zio-test/shared/src/test/scala/zio/schema/DeriveGenSpec.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema-zio-test/shared/src/test/scala/zio/schema/TestData.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema/js/src/main/scala/zio/schema/SchemaPlatformSpecific.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema/jvm/src/main/scala/zio/schema/SchemaPlatformSpecific.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema/native/src/main/scala/zio/schema/SchemaPlatformSpecific.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema/shared/src/main/scala-2/zio/schema/SchemaVersionSpecific.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema/shared/src/main/scala-3/zio/schema/SchemaVersionSpecific.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema/shared/src/test/scala-3/zio/schema/IArraySpec.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema/shared/src/test/scala/zio/schema/SchemaAssertions.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema/shared/src/test/scala/zio/schema/validation/PhoneNumberValidationSpec.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema/shared/src/test/scala/zio/schema/validation/RegexCompileSpec.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema/shared/src/test/scala/zio/schema/validation/TimeSpec.scala",
+        "/home/dee/workspace/algora/zio-schema/zio-schema/shared/src/test/scala/zio/schema/validation/ValidationSpec.scala"
+      ],
+      "total_test_files": 80,
+      "unit_tests": []
+    },
+    "test_frameworks": [],
+    "test_gaps": [
+      {
+        "description": "No dedicated test directory found",
+        "gap_type": "missing_test_directory",
+        "severity": "medium"
+      }
+    ],
+    "test_quality_signals": [],
+    "testing_maturity_score": 0.2
+  }
+}

@@ -105,7 +105,7 @@ class PRAutomationEngine:
             "commit_fragmentation": commit_plan,
             "filtered_solution": filtered_solution,
             "generated_at": datetime.now().isoformat(),
-            "confidence_score": _calculate_generation_confidence(maintainer_profile, governance)
+            "confidence_score": self._calculate_generation_confidence(maintainer_profile, governance)
         }
 
         return pr_content
@@ -209,6 +209,62 @@ class PRAutomationEngine:
 
         return description
 
+    def _generate_adr_notes(self, adr_analysis: Dict, bounty_data: Dict) -> str:
+        """Generate ADR-related notes for PR description."""
+        if not adr_analysis or not adr_analysis.get("adr_files"):
+            return ""
+
+        notes = []
+
+        # Add relevant architectural decisions
+        bounty_topic = f"{bounty_data.get('title', '')} {bounty_data.get('description', '')}".lower()
+        relevant_decisions = []
+
+        for adr_file in adr_analysis.get("adr_files", []):
+            for decision in adr_file.get("decisions", []):
+                decision_text = decision.get("content", "").lower()
+                # Check if decision is relevant to bounty topic
+                if any(keyword in decision_text for keyword in bounty_topic.split() if len(keyword) > 3):
+                    relevant_decisions.append(decision)
+
+        if relevant_decisions:
+            notes.append("This implementation follows established architectural patterns:")
+            for decision in relevant_decisions[:3]:  # Limit to top 3
+                notes.append(f"- **{decision.get('title', 'Decision')}**: {decision.get('rationale', '')[:100]}...")
+
+        # Add constraints and trade-offs
+        constraints = adr_analysis.get("architectural_constraints", [])
+        if constraints:
+            notes.append("\n**Key Constraints Considered:**")
+            for constraint in constraints[:3]:
+                notes.append(f"- {constraint}")
+
+        return "\n".join(notes) if notes else ""
+
+    def _generate_contextual_anchors(self, forensics_data: Dict, bounty_data: Dict,
+                                   repo_path: Optional[str]) -> str:
+        """Generate contextual anchor references for PR description."""
+        if not forensics_data or not repo_path:
+            return ""
+
+        anchors = []
+
+        # Find contextual anchors from forensics
+        bounty_topic = f"{bounty_data.get('title', '')} {bounty_data.get('description', '')}"
+        contextual_anchors = self.forensics_engine.find_contextual_anchors(
+            repo_path, bounty_topic, {}  # maintainer_profile can be empty for now
+        )
+
+        if contextual_anchors:
+            anchors.append("This implementation builds upon established patterns in the codebase:")
+            for anchor in contextual_anchors[:2]:  # Limit to top 2
+                if anchor["type"] == "pr_reference":
+                    anchors.append(f"- Follows the approach established in {anchor['reference']} regarding {anchor.get('title', '')[:50]}...")
+                elif anchor["type"] == "technical_decision":
+                    anchors.append(f"- Consistent with {anchor['reference']}: {anchor.get('content', '')[:100]}...")
+
+        return "\n".join(anchors) if anchors else ""
+
     def _generate_branch_name(self, bounty_data: Dict, pr_type: str) -> str:
         """Generate branch name following conventional patterns."""
         bounty_id = bounty_data.get("id", "unknown")
@@ -260,8 +316,9 @@ class PRAutomationEngine:
 
         return list(set(labels))  # Remove duplicates
 
-    def _generate_pr_checklist(self, governance: Dict, maintainer_profile: Dict) -> List[Dict]:
-        """Generate PR checklist based on governance and maintainer requirements."""
+    def _generate_pr_checklist(self, governance: Dict, maintainer_profile: Dict,
+                             adr_analysis: Optional[Dict] = None) -> List[Dict]:
+        """Generate PR checklist based on governance, maintainer requirements, and ADR analysis."""
         checklist = []
 
         # Code quality requirements
@@ -586,7 +643,13 @@ class CommitFragmenter:
     def __init__(self, max_commits: int = 4, delay_minutes: int = 10):
         self.max_commits = max_commits
         self.delay_minutes = delay_minutes
-        """Fragment solution code into multiple commits."""
+
+    def fragment_changes(self, solution_code: Dict, maintainer_profile: Dict) -> List[Dict]:
+        """Fragment solution code into multiple commits.
+
+        This method accepts the AI solution payload and the maintainer profile,
+        groups changes logically, and returns a list of commit dictionaries.
+        """
         files_to_modify = solution_code.get("files_to_modify", [])
         new_files = solution_code.get("new_files", [])
         code_changes = solution_code.get("code_changes", [])
@@ -665,7 +728,7 @@ class CommitFragmenter:
     def _generate_commit_message(self, group: Dict, maintainer_profile: Dict, commit_index: int) -> str:
         """Generate human-like commit message."""
         group_type = group["type"]
-        persona = maintainer_profile.get("detected_persona", {})
+        persona = maintainer_profile.get("detected_persona") or {}
 
         # Base messages by type
         base_messages = {
@@ -722,7 +785,7 @@ class SurgicalMinimalistFilter:
     def _find_minimal_implementation(self, ai_code: str, original_code: str,
                                    existing_codebase: Dict, maintainer_profile: Dict) -> Optional[str]:
         """Find a minimal implementation using existing utilities."""
-        persona = maintainer_profile.get("detected_persona", {})
+        persona = maintainer_profile.get("detected_persona") or {}
 
         # For Ziverge (Scala/ZIO): Prefer existing ZIO utilities
         if persona.get("persona") == "ziverge":
@@ -781,29 +844,6 @@ class SurgicalMinimalistFilter:
         """Optimize Rust code for zero-copy operations."""
         # Replace clone() with & references where possible
         return code.replace(".clone()", ".as_ref()")
-
-
-def _calculate_generation_confidence(maintainer_profile: Dict, governance: Dict) -> float:
-    """Calculate confidence score for PR generation based on available data."""
-    confidence = 0.5  # Base confidence
-
-    # Boost confidence based on maintainer profile completeness
-    if maintainer_profile.get("detected_persona"):
-        confidence += 0.2
-
-    if maintainer_profile.get("communication_style"):
-        confidence += 0.1
-
-    if maintainer_profile.get("review_patterns"):
-        confidence += 0.1
-
-    # Boost confidence based on governance analysis completeness
-    governance_keys = ["code_quality_governance", "security_governance",
-                      "ci_cd_governance", "documentation_governance"]
-    governance_completeness = sum(1 for key in governance_keys if governance.get(key))
-    confidence += (governance_completeness / len(governance_keys)) * 0.2
-
-    return min(confidence, 1.0)  # Cap at 1.0
 
 
     def _generate_adr_notes(self, adr_analysis: Dict, bounty_data: Dict) -> str:

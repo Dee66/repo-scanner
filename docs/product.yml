@@ -270,3 +270,82 @@ success_criteria:
   - blast_radius_explicit
   - authority_bounds_respected
   - trust_maintained_over_output_volume
+
+# Implementation alignment (auto-generated evidence summary)
+implementation_alignment:
+  repo_root: .
+  cli_entrypoints:
+    - name: scan
+      handler: src/cli.py:handle_scan_command
+      lines: L145-L219
+      sinks:
+        - scan_report.md
+        - verdict_report.md
+        - scan_report.json
+    - name: bounty
+      handler: src/cli.py:handle_bounty_command
+      lines: L220-L373
+      sinks:
+        - bounty_batch_results.json
+        - bounty_assessment.json
+        - bounty_solution.json
+        - pr_content.md
+    - name: validate
+      handler: src/cli.py:handle_validate_command
+      lines: L374-L428
+      sinks:
+        - bounty_accuracy_report.md
+        - bounty_accuracy_metrics.json
+
+  api_entrypoints:
+    - route: POST /scan
+      handler: src/api_server.py:start_scan
+      lines: L117-L142
+      background_task: src/api_server.py:process_scan_job L191-L301
+      sinks:
+        - /tmp/scanner-{job_id}/scan_report.md
+        - /tmp/scanner-{job_id}/verdict_report.md
+        - /tmp/scanner-{job_id}/scan_report.json
+    - route: GET /status/{job_id}
+      handler: src/api_server.py:get_job_status
+      lines: L144-L151
+    - route: GET /results/{job_id}/{filename}
+      handler: src/api_server.py:get_job_result
+      lines: L153-L175
+    - route: GET /health*
+      handler: src/api_server.py:health_check (and related)
+
+  core_modules:
+    - src/core/pipeline/analysis.py: executes standard and optimized pipelines
+    - src/services/bounty_service.py: Bounty orchestration and accuracy validator integration
+    - src/core/bounty/accuracy_validator.py: stores/validates `validation_data/bounty_validation_cases.json`
+
+  claims_detected:
+    - text: "99.999% SME accuracy"
+      location: src/services/bounty_service.py L1-L6
+      verification_required: true
+
+  validation_data:
+    path: validation_data/
+    exists: true
+    files_present:
+      - bounty_validation_cases.json
+      - sme_validations.json
+
+  adapter_status:
+    python_adapter: partial (stubs present; some NotImplementedError)
+    java_adapter: stubbed
+    rust_adapter: stubbed
+
+  known_gaps_and_risks:
+    - description: "Runtime licensing enforcement is not implemented (no gating for paid-tier features)."
+    - description: "SME-backed validation for 99.999% claims is placeholder; SME evidence file present but marked unverified."
+    - description: "Git URL scanning path raises NotImplementedError (network clone not implemented)"
+      location: src/api_server.py L212-L215
+    - description: "Language adapter stubs raise NotImplementedError and reduce analysis depth for those languages"
+
+  recommendations:
+    - populate validation_data with authoritative SME validations and broad backtesting cases
+    - implement runtime licensing enforcement if commercial launch is intended
+    - implement git clone flow or document explicit offline-only constraint for API
+    - complete adapter implementations or document unsupported languages clearly
