@@ -147,22 +147,33 @@ def detect_configuration(file_list: List[str]) -> List[str]:
 
 def get_file_counts(file_list: List[str]) -> Dict[str, int]:
     """Get counts of different file types."""
+    # Normalize and deduplicate input paths to avoid variations caused by
+    # traversal order or duplicate entries. Use a sorted list so iteration
+    # order is deterministic across runs.
+    normalized_files = sorted({os.path.normpath(f) for f in file_list})
+
     counts = {
-        'total': len(file_list),
+        'total': len(normalized_files),
         'code': 0,
         'test': 0,
         'config': 0,
         'docs': 0
     }
-    
-    for file_path in file_list:
-        if any(ext in file_path.lower() for ext in ['.py', '.js', '.ts', '.java', '.rs', '.go', '.cpp', '.c', '.rb', '.php']):
+
+    code_exts = {'.py', '.js', '.ts', '.java', '.rs', '.go', '.cpp', '.c', '.rb', '.php'}
+    config_exts = {'.yml', '.yaml', '.json', '.xml', '.toml', '.ini', '.cfg'}
+
+    for file_path in normalized_files:
+        lower = file_path.lower()
+        _, ext = os.path.splitext(lower)
+
+        if ext in code_exts:
             counts['code'] += 1
-        if 'test' in file_path.lower():
+        if 'test' in lower:
             counts['test'] += 1
-        if any(cf in file_path for cf in ['.yml', '.yaml', '.json', '.xml', '.toml', '.ini', '.cfg']):
+        if ext in config_exts:
             counts['config'] += 1
-        if any(doc in file_path.lower() for doc in ['readme', '.md', 'docs/']):
+        if 'readme' in lower or ext == '.md' or 'docs' in lower:
             counts['docs'] += 1
-    
+
     return counts

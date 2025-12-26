@@ -152,6 +152,10 @@ pytest --cov=src --cov-report=term --cov-report=xml -q
 - Phase A discovery notes and test coverage areas are captured in this repository's `docs/` and `tests/` directories.
 - Phase B hypotheses guided the Phase C debugging; see the file diffs and the changelog section below for specifics.
 
+## Developer architecture reference
+
+See the developer-grade architecture guide: [docs/README_ARCHITECTURE.md](docs/README_ARCHITECTURE.md) for a per-file index, API signatures, dataflow diagram, informal JSON schemas, reproducibility steps, and next steps.
+
 ---
 
 ## Changelog

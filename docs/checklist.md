@@ -241,3 +241,34 @@
 
 *This checklist enables systematic, iterative implementation of ShieldCraft Engine. Each task is designed to be implementable independently while building toward the complete system. Update progress as tasks are completed.*
 
+---
+
+## Supplemental fixes
+
+These supplemental checklist items capture the concrete remediation and hardening work we've planned and started implementing. Each item is written as a single, unambiguous task suitable for direct implementation and CI verification.
+
+ - [x] SFX-001: Add and formalize strict JSON schemas for all machine-readable outputs under `docs/schemas/`, including field names, types, `required` arrays, and explicit enum/value constraints where applicable.
+ - [x] SFX-002: Implement a schema loader and validator (`src/core/quality/schema_validator.py`) that is invoked by the pipeline and CI; validator must fail the run on missing required keys and return clear diagnostics for each missing field.
+ - [x] SFX-003: Integrate schema validation into the pipeline `analysis` stage so that `tmp_scan_output/scan_report.json` and other artifacts are validated automatically after generation.
+ - [x] SFX-004: Expand `src/core/pipeline/repository_discovery.py` canonical exclude list to cover generated, cached, and output directories (`.scanner_cache`, `tmp_scan_output`, `scan_output`, `reports`, `outputs`, `analysis`) and common compiled artifacts (`.pyc`, `.pyo`, `.class`, coverage files); add unit test to assert excluded paths.
+ - [x] SFX-005: Re-run the scanner end-to-end after exclude updates and record outputs to `tmp_scan_output/`; produce a machine-readable `scan_report.json` for validation and comparison with previous runs.
+ - [x] SFX-006: Validate `tmp_scan_output/scan_report.json` against `docs/schemas/scan_report.schema.json`; create a triage report listing every schema failure with file/path and JSON pointer to the failing value.
+ - [x] SFX-007: For each high-severity finding in reports, attach explicit evidence: minimal proof snippet (file path, line range, quoted lines) and deterministic provenance (git commit SHA and file byte offsets). Add unit tests verifying presence of evidence fields for severity >= HIGH.
+ - [x] SFX-008: Implement deterministic provenance fields in machine outputs: `repo_commit` (SHA), `source_path`, `byte_range` or `line_range`, and `evidence_snippet`. Ensure no use of non-deterministic timestamps in primary artifacts (respect `no_timestamps`).
+ - [x] SFX-009: Harden detectors to be evidence-first: update detector code so every claim is only emitted if linked to one or more evidence objects; add tests that simulate detector inputs and assert claims without evidence are not emitted.
+- [ ] SFX-010: Add stricter schema versions and compatibility tests: create a `docs/schemas/compatibility.md` and a test that fails if generated output does not conform to the current schema version.
+- [ ] SFX-011: Create a golden-repos dataset and calibration harness (`tests/golden/`) with 3-5 representative repositories; write calibration tests that compute detector precision/recall metrics and produce a failing CI check if precision for `HIGH` findings drops below a configured threshold.
+- [ ] SFX-012: Implement adversarial/unit/property tests for detectors that exercise edge cases (obfuscated comments, generated files, polyglot files); add these to `tests/` and ensure they run in CI within a bounded time budget.
+- [ ] SFX-013: Add CI gating: include a `ci/schema_validation.yml` job that runs schema validation and deterministic verification on PRs; the job must fail PR merges on schema violations or determinism mismatch.
+- [ ] SFX-014: Implement determinism verification harness: run the pipeline twice in isolation on the same input snapshot and assert bitwise-equal outputs (or canonicalized equality) for all machine-readable artifacts; add this harness to CI as a fast check (sampled or lightweight mode).
+- [ ] SFX-015: Add performance profiling and budgets: add a pipeline stage that measures runtime and memory per stage; add thresholds in `docs/quality/` and have the CI job warn or fail when budgets are exceeded.
+- [ ] SFX-016: Update documentation (`docs/README_ARCHITECTURE.md`, `docs/phase_C_diffs.md`) to include the supplemental fixes, expected artifacts, and the verification steps required for each fix.
+- [ ] SFX-017: Add an automated remediation-triage script (`tools/triage_schema_failures.py`) that parses validator output and emits actionable TODOs (file, detector, fix recommendation) so engineers can quickly patch detectors or schemas.
+- [ ] SFX-018: Add release checklist entries and version bumping: add a `RELEASE.md` step that requires schema validation and determinism verification to pass before cutting a release tag.
+
+---
+
+Add these items to the project TODO tracker and mark progress as you complete each task.
+
+**Progress Note (2025-12-26):** SFX-001 through SFX-009 implemented and unit-tested. SFX-009 (evidence-first enforcement) has targeted tests and the pipeline-level filter in `src/core/quality/output_contract.py`; full test suite passes locally (78 passed, 1 warning).
+

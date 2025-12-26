@@ -142,11 +142,16 @@ def _verify_internal_consistency(canonical_data: Dict) -> Dict:
     structure = canonical_data.get("structure", {})
     if structure:
         file_counts = structure.get("file_counts", {})
-        total_from_counts = sum(file_counts.values())
-        if total_from_counts != file_count:
+        # Sum only categorical counts (exclude the 'total' entry) to avoid
+        # double-counting the overall total which is also present in the map.
+        total_from_categories = sum(v for k, v in file_counts.items() if k != 'total')
+        # Prefer explicit 'total' if present, otherwise compare against summed categories
+        reported_total = file_counts.get('total', total_from_categories)
+
+        if total_from_categories != file_count or reported_total != file_count:
             consistency_issues.append({
                 "issue": "structure_file_count_mismatch",
-                "description": f"Structure file counts total ({total_from_counts}) doesn't match overall count ({file_count})",
+                "description": f"Structure file counts total ({total_from_categories}) doesn't match overall count ({file_count})",
                 "severity": "medium"
             })
             consistency_score -= 0.2

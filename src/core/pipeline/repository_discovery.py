@@ -114,6 +114,16 @@ def get_canonical_file_list(repository_root: str) -> list[str]:
         'vendor',
         'third_party',
         'deps',
+        '.scanner_cache',
+        'analysis',
+        'tmp_scan_output',
+        'scan_output',
+        'reports',
+        'outputs',
+        '.cache',
+        '.export',
+        'dist-info',
+        '__generated__',
     }
 
     try:
@@ -134,6 +144,14 @@ def get_canonical_file_list(repository_root: str) -> list[str]:
             dirnames[:] = filtered
 
             for filename in filenames:
+                # Skip compiled and temporary files
+                if filename.endswith(('.pyc', '.pyo', '.class', '.so')):
+                    continue
+                if filename in ('.coverage', 'coverage.xml'):
+                    continue
+                # Skip typical generated bundle artifacts
+                if filename.endswith(('.min.js', '.bundle.js', '.map')):
+                    continue
                 file_path = Path(dirpath) / filename
                 # Get absolute path for consistent file access
                 try:

@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Bounty Solution",
+  "type": "object",
+  "required": ["bounty_id", "pr_content"],
+  "properties": {
+    "bounty_id": {"type": "string"},
+    "pr_content": {
+      "type": "object",
+      "properties": {
+        "title": {"type": "string"},
+        "body": {"type": "string"},
+        "files": {"type": "array", "items": {"type": "object"}}
+      },
+      "required": ["title"]
+    },
+    "integration_plan": {"type": "object"},
+    "generated_at": {"type": "string"},
+    "confidence_score": {"type": "number", "minimum": 0, "maximum": 1}
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "decision_artifacts": {
+    "artifacts": [
+      {"id": "r3_h1", "severity": "HIGH", "title": "major"},
+      {"id": "r3_h2", "severity": "HIGH", "title": "major 2"},
+      {"id": "r3_fp1", "severity": "HIGH", "title": "false positive"}
+    ]
+  }
+}

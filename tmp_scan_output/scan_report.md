@@ -3,13 +3,13 @@
 ## Executive Summary
 
 Analysis completed for repository: /home/dee/workspace/AI/Repo-Scanner
-871 files analyzed
+938 files analyzed
 Analysis timestamp: Generated on demand
 
 ## System Characterization
 
 **Repository:** /home/dee/workspace/AI/Repo-Scanner
-**Files Analyzed:** 871
+**Files Analyzed:** 938
 
 ### Repository Structure
 
@@ -26,7 +26,7 @@ Analysis timestamp: Generated on demand
 
 ### Testing Signals
 
-- **Test Files:** 53
+- **Test Files:** 56
 - **Test Frameworks:** pytest, pytest
 - **Testing Maturity:** 0.5/10
 

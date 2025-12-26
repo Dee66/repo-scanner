@@ -1,0 +1,52 @@
+{
+  "repos": {
+    "repo1": {
+      "expected_high": [
+        "r1_h1",
+        "r1_h2"
+      ],
+      "predicted_high": [
+        "r1_fp1",
+        "r1_h1",
+        "r1_h2"
+      ],
+      "tp": 2,
+      "fp": 1,
+      "fn": 0
+    },
+    "repo2": {
+      "expected_high": [
+        "r2_h1"
+      ],
+      "predicted_high": [
+        "r2_h1"
+      ],
+      "tp": 1,
+      "fp": 0,
+      "fn": 0
+    },
+    "repo3": {
+      "expected_high": [
+        "r3_h1",
+        "r3_h2",
+        "r3_h3"
+      ],
+      "predicted_high": [
+        "r3_fp1",
+        "r3_h1",
+        "r3_h2"
+      ],
+      "tp": 2,
+      "fp": 1,
+      "fn": 1
+    }
+  },
+  "summary": {
+    "total_tp": 5,
+    "total_fp": 2,
+    "total_fn": 1,
+    "precision": 0.7142857142857143,
+    "recall": 0.8333333333333334,
+    "f1": 0.7692307692307692
+  }
+}

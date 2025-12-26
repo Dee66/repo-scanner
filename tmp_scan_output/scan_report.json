@@ -199,13 +199,13 @@
     "canonical_data_summary": {
       "data_components": 11,
       "has_all_required_components": true,
-      "hash_input_size": 207751,
-      "total_files": 871
+      "hash_input_size": 217432,
+      "total_files": 938
     },
     "consistency_check": {
       "consistency_issues": [
         {
-          "description": "Structure file counts total (1189) doesn't match overall count (871)",
+          "description": "Structure file counts total (1271) doesn't match overall count (938)",
           "issue": "structure_file_count_mismatch",
           "severity": "medium"
         },
@@ -219,9 +219,9 @@
       "issues_found": 2,
       "overall_consistency": "medium"
     },
-    "determinism_hash": "796bc451f98750947ce209f8a63613f06736b31b53923092865b09a4994f4e08",
+    "determinism_hash": "7d01af5e493b33a25a8ad0eec3e855df5857f0bf655d05b329cc2df09ce1ac1f",
     "determinism_report": {
-      "analysis_hash": "796bc451f98750947ce209f8a63613f06736b31b53923092865b09a4994f4e08",
+      "analysis_hash": "7d01af5e493b33a25a8ad0eec3e855df5857f0bf655d05b329cc2df09ce1ac1f",
       "confidence_level": "medium",
       "consistency_score": 0.75,
       "description": "Analysis pipeline produces mostly deterministic results with minor inconsistencies",
@@ -307,6 +307,7 @@
       "license_file": true,
       "readme_files": [
         "/home/dee/workspace/AI/Repo-Scanner/README.md",
+        "/home/dee/workspace/AI/Repo-Scanner/docs/README_ARCHITECTURE.md",
         "/home/dee/workspace/AI/Repo-Scanner/enhanced_scanner/README.md",
         "/home/dee/workspace/AI/Repo-Scanner/test_repositories/minimal_library/README.md",
         "/home/dee/workspace/AI/Repo-Scanner/test_repositories/python_web_app/README.md",
@@ -449,7 +450,7 @@
       "documentation_discrepancies": [
         {
           "description": "Multiple README files may indicate confusion or duplication",
-          "evidence": "Found 5 README files: ['/home/dee/workspace/AI/Repo-Scanner/README.md', '/home/dee/workspace/AI/Repo-Scanner/enhanced_scanner/README.md', '/home/dee/workspace/AI/Repo-Scanner/test_repositories/minimal_library/README.md', '/home/dee/workspace/AI/Repo-Scanner/test_repositories/python_web_app/README.md', '/home/dee/workspace/AI/Repo-Scanner/tests/fixtures/minimal_repo/README.md']",
+          "evidence": "Found 6 README files: ['/home/dee/workspace/AI/Repo-Scanner/README.md', '/home/dee/workspace/AI/Repo-Scanner/docs/README_ARCHITECTURE.md', '/home/dee/workspace/AI/Repo-Scanner/enhanced_scanner/README.md', '/home/dee/workspace/AI/Repo-Scanner/test_repositories/minimal_library/README.md', '/home/dee/workspace/AI/Repo-Scanner/test_repositories/python_web_app/README.md', '/home/dee/workspace/AI/Repo-Scanner/tests/fixtures/minimal_repo/README.md']",
           "severity": "low",
           "type": "multiple_readmes"
         }
@@ -484,7 +485,7 @@
   "risk_synthesis": {
     "component_risks": {
       "advanced_code_risk": {
-        "description": "Advanced code risk: high (355 points from complexity and flow analysis)",
+        "description": "Advanced code risk: high (357 points from complexity and flow analysis)",
         "risk_factors": [
           "high_cyclomatic_complexity_/home/dee/workspace/AI/Repo-Scanner/enhanced_scanner/baseline_assessment.py",
           "high_cognitive_complexity_/home/dee/workspace/AI/Repo-Scanner/enhanced_scanner/baseline_assessment.py",
@@ -492,6 +493,8 @@
           "high_cognitive_complexity_/home/dee/workspace/AI/Repo-Scanner/scripts/assess_operational_readiness.py",
           "high_cyclomatic_complexity_/home/dee/workspace/AI/Repo-Scanner/scripts/execute_production_deployment.py",
           "high_cognitive_complexity_/home/dee/workspace/AI/Repo-Scanner/scripts/execute_production_deployment.py",
+          "high_cyclomatic_complexity_/home/dee/workspace/AI/Repo-Scanner/scripts/generate_call_graph.py",
+          "high_cognitive_complexity_/home/dee/workspace/AI/Repo-Scanner/scripts/generate_call_graph.py",
           "high_cyclomatic_complexity_/home/dee/workspace/AI/Repo-Scanner/scripts/load_test.py",
           "moderate_cognitive_complexity_/home/dee/workspace/AI/Repo-Scanner/scripts/load_test.py",
           "high_cyclomatic_complexity_/home/dee/workspace/AI/Repo-Scanner/scripts/performance_benchmark.py",
@@ -520,8 +523,6 @@
           "high_cognitive_complexity_/home/dee/workspace/AI/Repo-Scanner/src/core/ai/training/lightweight_trainer.py",
           "high_cyclomatic_complexity_/home/dee/workspace/AI/Repo-Scanner/src/core/ai/training/model_trainer.py",
           "high_cognitive_complexity_/home/dee/workspace/AI/Repo-Scanner/src/core/ai/training/model_trainer.py",
-          "high_cyclomatic_complexity_/home/dee/workspace/AI/Repo-Scanner/src/core/analysis/compliance_analysis.py",
-          "high_cognitive_complexity_/home/dee/workspace/AI/Repo-Scanner/src/core/analysis/compliance_analysis.py",
           "high_cyclomatic_complexity_/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/accuracy_validator.py",
           "high_cognitive_complexity_/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/accuracy_validator.py",
           "high_cyclomatic_complexity_/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/adr_engine.py",
@@ -592,6 +593,8 @@
           "high_cognitive_complexity_/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/test_signal_analysis.py",
           "high_cyclomatic_complexity_/home/dee/workspace/AI/Repo-Scanner/src/core/quality/output_contract.py",
           "high_cognitive_complexity_/home/dee/workspace/AI/Repo-Scanner/src/core/quality/output_contract.py",
+          "high_cyclomatic_complexity_/home/dee/workspace/AI/Repo-Scanner/src/core/quality/schema_validator.py",
+          "high_cognitive_complexity_/home/dee/workspace/AI/Repo-Scanner/src/core/quality/schema_validator.py",
           "high_cyclomatic_complexity_/home/dee/workspace/AI/Repo-Scanner/src/core/risk/decision_artifacts.py",
           "moderate_cognitive_complexity_/home/dee/workspace/AI/Repo-Scanner/src/core/risk/decision_artifacts.py",
           "high_cyclomatic_complexity_/home/dee/workspace/AI/Repo-Scanner/src/core/validation/backtesting.py",
@@ -653,7 +656,6 @@
           "frequent_variable_redefinition_/home/dee/workspace/AI/Repo-Scanner/src/cli.py",
           "frequent_variable_redefinition_/home/dee/workspace/AI/Repo-Scanner/src/core/ai/models/llama_cpp_model.py",
           "frequent_variable_redefinition_/home/dee/workspace/AI/Repo-Scanner/src/core/ai/training/data_pipeline.py",
-          "frequent_variable_redefinition_/home/dee/workspace/AI/Repo-Scanner/src/core/analysis/compliance_analysis.py",
           "frequent_variable_redefinition_/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/accuracy_validator.py",
           "frequent_variable_redefinition_/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/api_integration_engine.py",
           "frequent_variable_redefinition_/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/api_integration_engine.py",
@@ -661,7 +663,6 @@
           "frequent_variable_redefinition_/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/api_integration_engine.py",
           "frequent_variable_redefinition_/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/api_integration_engine.py",
           "frequent_variable_redefinition_/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/historical_forensics.py",
-          "frequent_variable_redefinition_/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/pr_automation.py",
           "frequent_variable_redefinition_/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/pr_automation.py",
           "frequent_variable_redefinition_/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/pr_automation.py",
           "frequent_variable_redefinition_/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/profitability_triage.py",
@@ -716,7 +717,7 @@
           "advanced_insight_complexity_warning"
         ],
         "risk_level": "high",
-        "risk_score": 355
+        "risk_score": 357
       },
       "api_risk": {
         "description": "Low API risk (0 points)",
@@ -731,7 +732,7 @@
         "risk_score": 0
       },
       "compliance_risk": {
-        "description": "Compliance risk: high (247 points)",
+        "description": "Compliance risk: high (239 points)",
         "risk_factors": [
           "moderate_compliance_issues",
           "critical_compliance_violations",
@@ -792,12 +793,12 @@
         "risk_score": 2
       },
       "security_risk": {
-        "description": "Security risk: high (6.7 points)",
+        "description": "Security risk: high (6.8 points)",
         "risk_factors": [
           "high_security_vulnerabilities"
         ],
         "risk_level": "high",
-        "risk_score": 6.74
+        "risk_score": 6.760000000000001
       },
       "semantic_risk": {
         "description": "Semantic risk: low (0 points)",
@@ -909,7 +910,7 @@
           "/home/dee/workspace/AI/Repo-Scanner/src/core/principles/epistemic.py"
         ],
         "critical_files_count": 15,
-        "critical_ratio": 0.01722158438576349,
+        "critical_ratio": 0.015991471215351813,
         "description": "Few critical files, most changes are safe",
         "safety_level": "high"
       },
@@ -923,8 +924,8 @@
       },
       "documentation_safety": {
         "description": "No documentation makes changes very risky",
-        "doc_coverage_ratio": 0.26143790849673204,
-        "doc_files_count": 40,
+        "doc_coverage_ratio": 0.27848101265822783,
+        "doc_files_count": 44,
         "has_api_docs": false,
         "has_readme": false,
         "safety_level": "very_low"
@@ -1190,13 +1191,8 @@
         },
         {
           "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/pr_automation.py",
-          "line": 583,
+          "line": 640,
           "name": "CommitFragmenter"
-        },
-        {
-          "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/analysis/compliance_analysis.py",
-          "line": 15,
-          "name": "ComplianceAnalysis"
         },
         {
           "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/compliance_analysis.py",
@@ -1555,7 +1551,7 @@
         },
         {
           "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/pr_automation.py",
-          "line": 690,
+          "line": 753,
           "name": "SurgicalMinimalistFilter"
         },
         {
@@ -1752,12 +1748,6 @@
           "name": "_calculate_duplication_risk"
         },
         {
-          "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/pr_automation.py",
-          "is_method": false,
-          "line": 786,
-          "name": "_calculate_generation_confidence"
-        },
-        {
           "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/risk_synthesis.py",
           "is_method": false,
           "line": 338,
@@ -1902,6 +1892,18 @@
           "name": "_execute_standard_pipeline"
         },
         {
+          "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/schema_validator.py",
+          "is_method": false,
+          "line": 40,
+          "name": "_fallback_required_check"
+        },
+        {
+          "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/schema_validator.py",
+          "is_method": false,
+          "line": 34,
+          "name": "_format_json_pointer"
+        },
+        {
           "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/decision_artifact_generation.py",
           "is_method": false,
           "line": 115,
@@ -2028,6 +2030,12 @@
           "name": "_identify_critical_issues"
         },
         {
+          "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/schema_validator.py",
+          "is_method": false,
+          "line": 23,
+          "name": "_schema_dir"
+        },
+        {
           "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/determinism_verification.py",
           "is_method": false,
           "line": 237,
@@ -2038,6 +2046,12 @@
           "is_method": false,
           "line": 478,
           "name": "_synthesize_overall_risk"
+        },
+        {
+          "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/schema_validator.py",
+          "is_method": false,
+          "line": 79,
+          "name": "_validate_file"
         },
         {
           "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/determinism_verification.py",
@@ -2072,13 +2086,13 @@
         {
           "file": "/home/dee/workspace/AI/Repo-Scanner/src/services/bounty_service.py",
           "is_method": false,
-          "line": 409,
+          "line": 414,
           "name": "analyze_bounty_batch"
         },
         {
           "file": "/home/dee/workspace/AI/Repo-Scanner/src/services/bounty_service.py",
           "is_method": false,
-          "line": 402,
+          "line": 407,
           "name": "analyze_bounty_opportunity"
         },
         {
@@ -2110,6 +2124,12 @@
           "is_method": false,
           "line": 365,
           "name": "analyze_dependencies"
+        },
+        {
+          "file": "/home/dee/workspace/AI/Repo-Scanner/scripts/generate_call_graph.py",
+          "is_method": false,
+          "line": 55,
+          "name": "analyze_file"
         },
         {
           "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/governance_signal_analysis.py",
@@ -2594,7 +2614,7 @@
         {
           "file": "/home/dee/workspace/AI/Repo-Scanner/src/services/bounty_service.py",
           "is_method": false,
-          "line": 416,
+          "line": 421,
           "name": "generate_bounty_solution"
         },
         {
@@ -2630,13 +2650,13 @@
         {
           "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/pr_automation.py",
           "is_method": false,
-          "line": 573,
+          "line": 630,
           "name": "generate_pr_for_bounty"
         },
         {
           "file": "/home/dee/workspace/AI/Repo-Scanner/src/cli.py",
           "is_method": false,
-          "line": 445,
+          "line": 459,
           "name": "generate_pr_markdown"
         },
         {
@@ -2668,6 +2688,12 @@
           "is_method": false,
           "line": 223,
           "name": "get_cached_model_loader"
+        },
+        {
+          "file": "/home/dee/workspace/AI/Repo-Scanner/scripts/generate_call_graph.py",
+          "is_method": false,
+          "line": 38,
+          "name": "get_call_name"
         },
         {
           "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/repository_discovery.py",
@@ -2732,13 +2758,13 @@
         {
           "file": "/home/dee/workspace/AI/Repo-Scanner/src/cli.py",
           "is_method": false,
-          "line": 220,
+          "line": 226,
           "name": "handle_bounty_command"
         },
         {
           "file": "/home/dee/workspace/AI/Repo-Scanner/src/cli.py",
           "is_method": false,
-          "line": 145,
+          "line": 146,
           "name": "handle_scan_command"
         },
         {
@@ -2750,7 +2776,7 @@
         {
           "file": "/home/dee/workspace/AI/Repo-Scanner/src/cli.py",
           "is_method": false,
-          "line": 374,
+          "line": 388,
           "name": "handle_validate_command"
         },
         {
@@ -2826,6 +2852,12 @@
           "name": "lazy_import"
         },
         {
+          "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/schema_validator.py",
+          "is_method": false,
+          "line": 28,
+          "name": "load_schema"
+        },
+        {
           "file": "/home/dee/workspace/AI/Repo-Scanner/test_repositories/python_web_app/app.py",
           "is_method": false,
           "line": 16,
@@ -2850,6 +2882,12 @@
           "name": "main"
         },
         {
+          "file": "/home/dee/workspace/AI/Repo-Scanner/scripts/generate_call_graph.py",
+          "is_method": false,
+          "line": 133,
+          "name": "main"
+        },
+        {
           "file": "/home/dee/workspace/AI/Repo-Scanner/scripts/load_test.py",
           "is_method": false,
           "line": 95,
@@ -2870,7 +2908,7 @@
         {
           "file": "/home/dee/workspace/AI/Repo-Scanner/src/cli.py",
           "is_method": false,
-          "line": 14,
+          "line": 15,
           "name": "main"
         },
         {
@@ -2930,7 +2968,7 @@
         {
           "file": "/home/dee/workspace/AI/Repo-Scanner/src/cli.py",
           "is_method": false,
-          "line": 429,
+          "line": 443,
           "name": "parse_json_input"
         },
         {
@@ -2958,6 +2996,12 @@
           "name": "setup_ai_registry"
         },
         {
+          "file": "/home/dee/workspace/AI/Repo-Scanner/scripts/generate_call_graph.py",
+          "is_method": false,
+          "line": 27,
+          "name": "should_skip"
+        },
+        {
           "file": "/home/dee/workspace/AI/Repo-Scanner/test_repositories/python_web_app/app.py",
           "is_method": false,
           "line": 12,
@@ -2974,6 +3018,12 @@
           "is_method": false,
           "line": 18,
           "name": "synthesize_risks_and_gaps"
+        },
+        {
+          "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_output_schemas.py",
+          "is_method": false,
+          "line": 15,
+          "name": "test_bounty_assessment_schema_noop"
         },
         {
           "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_scanner_cli.py",
@@ -3028,6 +3078,12 @@
           "is_method": false,
           "line": 53,
           "name": "test_cli_valid_repository"
+        },
+        {
+          "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_pr_automation_unit.py",
+          "is_method": false,
+          "line": 25,
+          "name": "test_commit_fragmenter_fragment_changes_structure"
         },
         {
           "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_scanner_cli.py",
@@ -3088,6 +3144,12 @@
           "is_method": false,
           "line": 37,
           "name": "test_discover_repository_root_non_git"
+        },
+        {
+          "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_repository_discovery_excludes.py",
+          "is_method": false,
+          "line": 7,
+          "name": "test_excludes_skip_generated_dirs_and_files"
         },
         {
           "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_pipeline.py",
@@ -3240,10 +3302,22 @@
           "name": "test_repository_discovery_non_git"
         },
         {
+          "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_output_schemas.py",
+          "is_method": false,
+          "line": 8,
+          "name": "test_scan_report_schema"
+        },
+        {
           "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_scanner_cli.py",
           "is_method": false,
           "line": 223,
           "name": "test_scanner_cli_invocation"
+        },
+        {
+          "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_pr_automation_unit.py",
+          "is_method": false,
+          "line": 5,
+          "name": "test_surgical_minimalist_filter_handles_none_persona_and_returns_structure"
         },
         {
           "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/training/model_trainer.py",
@@ -3258,10 +3332,28 @@
           "name": "triage_bounty_profitability"
         },
         {
+          "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/schema_validator.py",
+          "is_method": false,
+          "line": 62,
+          "name": "validate_against_schema"
+        },
+        {
           "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/accuracy_validator.py",
           "is_method": false,
           "line": 356,
           "name": "validate_bounty_accuracy"
+        },
+        {
+          "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/schema_validator.py",
+          "is_method": false,
+          "line": 91,
+          "name": "validate_bounty_assessment"
+        },
+        {
+          "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/schema_validator.py",
+          "is_method": false,
+          "line": 95,
+          "name": "validate_bounty_solution"
         },
         {
           "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/constraints/operating.py",
@@ -3280,6 +3372,12 @@
           "is_method": false,
           "line": 256,
           "name": "validate_pr_humanity"
+        },
+        {
+          "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/schema_validator.py",
+          "is_method": false,
+          "line": 87,
+          "name": "validate_scan_report"
         },
         {
           "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/determinism_verification.py",
@@ -3313,7 +3411,6 @@
         "argparse",
         "ast",
         "asyncio",
-        "base.AnalysisComponent",
         "collections.Counter",
         "collections.defaultdict",
         "collections.deque",
@@ -3321,6 +3418,7 @@
         "concurrent.futures.ThreadPoolExecutor",
         "concurrent.futures.as_completed",
         "contextlib.contextmanager",
+        "csv",
         "dataclasses.asdict",
         "dataclasses.dataclass",
         "dataclasses.field",
@@ -3350,6 +3448,8 @@
         "inference_pipeline.InferenceResult",
         "inference_pipeline.ModelMetadata",
         "json",
+        "jsonschema",
+        "jsonschema.Draft7Validator",
         "llama_cpp.Llama",
         "logging",
         "maintainer_profile_engine.MaintainerProfileEngine",
@@ -3386,7 +3486,9 @@
         "src.core.bounty.bounty_performance_optimizer.ParallelBountyAnalyzer",
         "src.core.bounty.maintainer_profile_engine.MaintainerProfileEngine",
         "src.core.bounty.maintainer_profile_engine.generate_maintainer_profile",
+        "src.core.bounty.pr_automation.CommitFragmenter",
         "src.core.bounty.pr_automation.PRAutomationEngine",
+        "src.core.bounty.pr_automation.SurgicalMinimalistFilter",
         "src.core.bounty.pr_automation.generate_pr_for_bounty",
         "src.core.bounty.profitability_triage.ProfitabilityTriageEngine",
         "src.core.bounty.profitability_triage.triage_bounty_profitability",
@@ -3425,6 +3527,7 @@
         "src.core.quality.output_contract.generate_executive_verdict",
         "src.core.quality.output_contract.generate_machine_output",
         "src.core.quality.output_contract.generate_primary_report",
+        "src.core.quality.schema_validator",
         "src.core.validation.backtesting.BacktestResult",
         "src.core.validation.backtesting.DifferentialLogicOracle",
         "src.core.validation.backtesting.HistoricalPR",
@@ -3473,6 +3576,7 @@
         "/home/dee/workspace/AI/Repo-Scanner/enhanced_scanner/baseline_assessment.py",
         "/home/dee/workspace/AI/Repo-Scanner/scripts/assess_operational_readiness.py",
         "/home/dee/workspace/AI/Repo-Scanner/scripts/execute_production_deployment.py",
+        "/home/dee/workspace/AI/Repo-Scanner/scripts/generate_call_graph.py",
         "/home/dee/workspace/AI/Repo-Scanner/scripts/load_test.py",
         "/home/dee/workspace/AI/Repo-Scanner/scripts/performance_benchmark.py",
         "/home/dee/workspace/AI/Repo-Scanner/scripts/validate_deployment.py",
@@ -3490,7 +3594,6 @@
         "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/training/data_pipeline.py",
         "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/training/lightweight_trainer.py",
         "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/training/model_trainer.py",
-        "/home/dee/workspace/AI/Repo-Scanner/src/core/analysis/compliance_analysis.py",
         "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/accuracy_validator.py",
         "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/adr_engine.py",
         "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/api_integration_engine.py",
@@ -3532,6 +3635,7 @@
         "/home/dee/workspace/AI/Repo-Scanner/src/core/principles/trust.py",
         "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/assurance.py",
         "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/output_contract.py",
+        "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/schema_validator.py",
         "/home/dee/workspace/AI/Repo-Scanner/src/core/risk/confidence_model.py",
         "/home/dee/workspace/AI/Repo-Scanner/src/core/risk/decision_artifacts.py",
         "/home/dee/workspace/AI/Repo-Scanner/src/core/risk/synthesis.py",
@@ -3568,15 +3672,18 @@
         "/home/dee/workspace/AI/Repo-Scanner/tests/test_determinism.py",
         "/home/dee/workspace/AI/Repo-Scanner/tests/test_integration_5nines.py",
         "/home/dee/workspace/AI/Repo-Scanner/tests/test_output_contract.py",
+        "/home/dee/workspace/AI/Repo-Scanner/tests/test_output_schemas.py",
         "/home/dee/workspace/AI/Repo-Scanner/tests/test_performance.py",
         "/home/dee/workspace/AI/Repo-Scanner/tests/test_pipeline.py",
+        "/home/dee/workspace/AI/Repo-Scanner/tests/test_pr_automation_unit.py",
         "/home/dee/workspace/AI/Repo-Scanner/tests/test_repository_discovery.py",
+        "/home/dee/workspace/AI/Repo-Scanner/tests/test_repository_discovery_excludes.py",
         "/home/dee/workspace/AI/Repo-Scanner/tests/test_scanner_cli.py"
       ],
       "test_coverage_signals": [],
-      "total_classes": 120,
-      "total_functions": 277,
-      "total_modules": 102
+      "total_classes": 119,
+      "total_functions": 294,
+      "total_modules": 106
     },
     "typescript_analysis": {
       "has_config": false,
@@ -3596,11 +3703,11 @@
       "Markdown files"
     ],
     "file_counts": {
-      "code": 153,
-      "config": 74,
-      "docs": 40,
-      "test": 51,
-      "total": 871
+      "code": 158,
+      "config": 75,
+      "docs": 44,
+      "test": 56,
+      "total": 938
     },
     "frameworks": [
       "Python (requirements.txt)",
@@ -3610,14 +3717,14 @@
       "Maven (Java)"
     ],
     "languages": {
-      "JSON": 46,
+      "JSON": 47,
       "Java": 1,
       "JavaScript": 3,
-      "Markdown": 38,
-      "Python": 102,
+      "Markdown": 39,
+      "Python": 106,
       "Shell": 3,
       "Text": 12,
-      "Unknown": 641,
+      "Unknown": 702,
       "XML": 3,
       "YAML": 22
     },
@@ -3626,22 +3733,23 @@
     ]
   },
   "summary": {
-    "files_scanned": 871,
+    "files_scanned": 938,
     "gaps_count": 0,
     "overall_score": 0.0,
-    "tests_discovered": 51
+    "tests_discovered": 56
   },
   "tasks": {},
   "test_signals": {
     "test_coverage_signals": {
       "coverage_tools": [],
       "has_coverage_tools": false,
-      "test_file_percentage": 25.0,
-      "test_to_code_ratio": 0.3333333333333333,
+      "test_file_percentage": 26.168224299065418,
+      "test_to_code_ratio": 0.35443037974683544,
       "untested_modules": [
         "/home/dee/workspace/AI/Repo-Scanner/enhanced_scanner/baseline_assessment.py",
         "/home/dee/workspace/AI/Repo-Scanner/scripts/assess_operational_readiness.py",
         "/home/dee/workspace/AI/Repo-Scanner/scripts/execute_production_deployment.py",
+        "/home/dee/workspace/AI/Repo-Scanner/scripts/generate_call_graph.py",
         "/home/dee/workspace/AI/Repo-Scanner/scripts/load_test.py",
         "/home/dee/workspace/AI/Repo-Scanner/scripts/performance_benchmark.py",
         "/home/dee/workspace/AI/Repo-Scanner/scripts/validate_deployment.py",
@@ -3659,7 +3767,6 @@
         "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/training/data_pipeline.py",
         "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/training/lightweight_trainer.py",
         "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/training/model_trainer.py",
-        "/home/dee/workspace/AI/Repo-Scanner/src/core/analysis/compliance_analysis.py",
         "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/accuracy_validator.py",
         "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/adr_engine.py",
         "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/api_integration_engine.py",
@@ -3699,6 +3806,7 @@
         "/home/dee/workspace/AI/Repo-Scanner/src/core/principles/epistemic.py",
         "/home/dee/workspace/AI/Repo-Scanner/src/core/principles/trust.py",
         "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/assurance.py",
+        "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/schema_validator.py",
         "/home/dee/workspace/AI/Repo-Scanner/src/core/risk/confidence_model.py",
         "/home/dee/workspace/AI/Repo-Scanner/src/core/risk/decision_artifacts.py",
         "/home/dee/workspace/AI/Repo-Scanner/src/core/risk/synthesis.py",
@@ -3735,9 +3843,12 @@
         "/home/dee/workspace/AI/Repo-Scanner/tests/test_determinism.py",
         "/home/dee/workspace/AI/Repo-Scanner/tests/test_integration_5nines.py",
         "/home/dee/workspace/AI/Repo-Scanner/tests/test_output_contract.py",
+        "/home/dee/workspace/AI/Repo-Scanner/tests/test_output_schemas.py",
         "/home/dee/workspace/AI/Repo-Scanner/tests/test_performance.py",
         "/home/dee/workspace/AI/Repo-Scanner/tests/test_pipeline.py",
+        "/home/dee/workspace/AI/Repo-Scanner/tests/test_pr_automation_unit.py",
         "/home/dee/workspace/AI/Repo-Scanner/tests/test_repository_discovery.py",
+        "/home/dee/workspace/AI/Repo-Scanner/tests/test_repository_discovery_excludes.py",
         "/home/dee/workspace/AI/Repo-Scanner/tests/test_scanner_cli.py"
       ]
     },
@@ -3756,7 +3867,7 @@
         "/home/dee/workspace/AI/Repo-Scanner/tests/fixtures/minimal_repo/README.md",
         "/home/dee/workspace/AI/Repo-Scanner/tests/fixtures/minimal_repo/sample.py"
       ],
-      "total_test_files": 53,
+      "total_test_files": 56,
       "unit_tests": [
         "/home/dee/workspace/AI/Repo-Scanner/docs/TEST_PLAN.md",
         "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/test_signal_analysis.py",
@@ -3797,9 +3908,12 @@
         "/home/dee/workspace/AI/Repo-Scanner/tests/test_determinism.py",
         "/home/dee/workspace/AI/Repo-Scanner/tests/test_integration_5nines.py",
         "/home/dee/workspace/AI/Repo-Scanner/tests/test_output_contract.py",
+        "/home/dee/workspace/AI/Repo-Scanner/tests/test_output_schemas.py",
         "/home/dee/workspace/AI/Repo-Scanner/tests/test_performance.py",
         "/home/dee/workspace/AI/Repo-Scanner/tests/test_pipeline.py",
+        "/home/dee/workspace/AI/Repo-Scanner/tests/test_pr_automation_unit.py",
         "/home/dee/workspace/AI/Repo-Scanner/tests/test_repository_discovery.py",
+        "/home/dee/workspace/AI/Repo-Scanner/tests/test_repository_discovery_excludes.py",
         "/home/dee/workspace/AI/Repo-Scanner/tests/test_scanner_cli.py"
       ]
     },
@@ -3822,14 +3936,14 @@
         "severity": "medium"
       },
       {
-        "description": "100 modules appear untested",
+        "description": "104 modules appear untested",
         "gap_type": "untested_modules",
         "severity": "high"
       }
     ],
     "test_quality_signals": [
       {
-        "count": 57,
+        "count": 62,
         "quality": "positive",
         "signal": "test_functions_found"
       },

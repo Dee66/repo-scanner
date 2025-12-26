@@ -1,0 +1,12 @@
+{
+  "baseline": "run_1",
+  "runs": [
+    "run_1",
+    "run_2",
+    "run_3"
+  ],
+  "diffs": {
+    "run_2": 102,
+    "run_3": 102
+  }
+}
