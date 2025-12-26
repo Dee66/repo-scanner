@@ -1,0 +1,9 @@
+{
+  "decision_artifacts": {
+    "artifacts": [
+      {"id": "r1_h1", "severity": "HIGH", "title": "issue 1"},
+      {"id": "r1_h2", "severity": "HIGH", "title": "issue 2"},
+      {"id": "r1_l1", "severity": "LOW", "title": "minor"}
+    ]
+  }
+}

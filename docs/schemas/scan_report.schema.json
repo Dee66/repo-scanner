@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Scan Report",
+  "type": "object",
+  "required": ["decision_artifacts", "governance", "determinism_verification"],
+  "properties": {
+    "decision_artifacts": {
+      "type": "object",
+      "properties": {
+        "artifacts": {
+          "type": "array",
+          "items": {"$ref": "#/definitions/decisionArtifact"}
+        }
+      }
+    },
+    "governance": {
+      "type": "object",
+      "properties": {
+        "policy_version": {"type": "string"},
+        "scanner_version": {"type": "string"},
+        "schema_version": {"type": "string"}
+      }
+    },
+    "determinism_verification": {
+      "type": "object",
+      "properties": {
+        "repeated_runs": {"type": "integer"},
+        "hash_algorithm": {"type": "string", "enum": ["sha256"]},
+        "consistent": {"type": "boolean"}
+      }
+    }
+  },
+  "definitions": {
+    "evidence": {
+      "type": "object",
+      "properties": {
+        "repo_commit": {"type": "string"},
+        "source_path": {"type": "string"},
+        "line_range": {
+          "type": "array",
+          "items": {"type": "integer"},
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "snippet": {"type": "string"}
+      },
+      "required": ["repo_commit", "source_path"]
+    },
+    "decisionArtifact": {
+      "type": "object",
+      "properties": {
+        "id": {"type": "string"},
+        "type": {"type": "string", "enum": ["finding", "refusal", "recommendation", "assessment"]},
+        "severity": {"type": "string", "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"]},
+        "title": {"type": "string"},
+        "description": {"type": "string"},
+        "evidence": {"type": "array", "items": {"$ref": "#/definitions/evidence"}}
+      },
+      "required": ["id", "type", "title"]
+    }
+  }
+}

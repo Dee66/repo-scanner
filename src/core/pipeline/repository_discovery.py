@@ -94,17 +94,71 @@ def get_canonical_file_list(repository_root: str) -> list[str]:
     
     root_path = Path(repository_root)
     files = []
-    
+    # Directories to always skip
+    _EXCLUDE_DIRS = {
+        'node_modules',
+        '__pycache__',
+        'build',
+        'dist',
+        'venv',
+        '.venv',
+        '.env',
+        '.pytest_cache',
+        'target',
+        'out',
+        '.idea',
+        '.vscode',
+        '.egg-info',
+        '.mypy_cache',
+        'site-packages',
+        'vendor',
+        'third_party',
+        'deps',
+        '.scanner_cache',
+        'analysis',
+        'tmp_scan_output',
+        'scan_output',
+        'reports',
+        'outputs',
+        '.cache',
+        '.export',
+        'dist-info',
+        '__generated__',
+    }
+
     try:
         # Use os.walk for better performance than rglob
         for dirpath, dirnames, filenames in os.walk(root_path):
-            # Skip common directories that shouldn't be analyzed (but keep .git for tests)
-            dirnames[:] = [d for d in dirnames if d not in {'node_modules', '__pycache__', 'build', 'dist'}]
-            
+            # Filter dirnames in-place to control traversal. Keep '.git' only.
+            filtered = []
+            for d in dirnames:
+                if d == '.git':
+                    filtered.append(d)
+                    continue
+                # Skip any dot-folder except .git
+                if d.startswith('.'):
+                    continue
+                if d in _EXCLUDE_DIRS:
+                    continue
+                filtered.append(d)
+            dirnames[:] = filtered
+
             for filename in filenames:
+                # Skip compiled and temporary files
+                if filename.endswith(('.pyc', '.pyo', '.class', '.so')):
+                    continue
+                if filename in ('.coverage', 'coverage.xml'):
+                    continue
+                # Skip typical generated bundle artifacts
+                if filename.endswith(('.min.js', '.bundle.js', '.map')):
+                    continue
                 file_path = Path(dirpath) / filename
                 # Get absolute path for consistent file access
-                files.append(str(file_path.resolve()))
+                try:
+                    files.append(str(file_path.resolve()))
+                except (OSError, RuntimeError):
+                    # Skip problematic files
+                    continue
     except (OSError, ValueError):
         pass
     

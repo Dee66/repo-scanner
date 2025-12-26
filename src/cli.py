@@ -8,6 +8,7 @@ from pathlib import Path
 from src.core.exceptions import ScannerError, RepositoryDiscoveryError, AnalysisError, OutputGenerationError, ValidationError
 from src.core.pipeline.analysis import execute_pipeline
 from src.core.quality.output_contract import generate_primary_report, generate_machine_output, generate_executive_verdict
+from src.core.quality import schema_validator
 from src.services.bounty_service import BountyService
 
 
@@ -210,6 +211,11 @@ def handle_scan_command(args):
             with open(json_path, 'w') as f:
                 json.dump(json_data, f, indent=2, sort_keys=True)
             print(f"Machine-readable output written to {json_path}")
+            # Validate machine output against schema; raise ValidationError on failure
+            try:
+                schema_validator.validate_scan_report(str(json_path))
+            except Exception as e:
+                raise ValidationError(f"Schema validation failed for scan_report.json: {e}", {"path": str(json_path), "error": str(e)}) from e
 
     except Exception as e:
         raise OutputGenerationError(f"Output generation failed: {e}", {"error": str(e)}) from e
@@ -351,6 +357,10 @@ def handle_bounty_command(args):
             with open(assessment_path, 'w') as f:
                 json.dump(bounty_assessments[0], f, indent=2, sort_keys=True)
             print(f"Bounty assessment written to {assessment_path}")
+            try:
+                schema_validator.validate_bounty_assessment(str(assessment_path))
+            except Exception as e:
+                raise ValidationError(f"Schema validation failed for bounty_assessment.json: {e}", {"path": str(assessment_path), "error": str(e)}) from e
 
             # Write bounty solution if generated
             if bounty_solution:
@@ -358,6 +368,10 @@ def handle_bounty_command(args):
                 with open(solution_path, 'w') as f:
                     json.dump(bounty_solution, f, indent=2, sort_keys=True)
                 print(f"Bounty solution written to {solution_path}")
+                try:
+                    schema_validator.validate_bounty_solution(str(solution_path))
+                except Exception as e:
+                    raise ValidationError(f"Schema validation failed for bounty_solution.json: {e}", {"path": str(solution_path), "error": str(e)}) from e
 
                 # Write PR content separately for easy access
                 pr_path = output_dir / "pr_content.md"

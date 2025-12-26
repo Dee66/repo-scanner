@@ -1,0 +1,13 @@
+Incremental semantic not implemented, running full analysis
+Machine-readable output written to outputs_determinism/run_1/scan_report.json
+Scan completed successfully
+Incremental semantic not implemented, running full analysis
+Machine-readable output written to outputs_determinism/run_2/scan_report.json
+Scan completed successfully
+Incremental semantic not implemented, running full analysis
+Machine-readable output written to outputs_determinism/run_3/scan_report.json
+Scan completed successfully
+Run 1: generating output in outputs_determinism/run_1
+Run 2: generating output in outputs_determinism/run_2
+Run 3: generating output in outputs_determinism/run_3
+Wrote determinism report to tmp_scan_output/determinism_report.json and tmp_scan_output/determinism_report.md

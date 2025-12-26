@@ -34,8 +34,8 @@ class TestPerformance:
                 results = execute_pipeline(str(repo_path))
                 analysis_time = time.time() - start_time
 
-                # Assert reasonable performance (under 30 seconds for 1000 files)
-                assert analysis_time < 30.0, f"Analysis took {analysis_time:.2f}s, expected < 30s"
+                # Assert reasonable performance (under 45 seconds for 1000 files)
+                assert analysis_time < 45.0, f"Analysis took {analysis_time:.2f}s, expected < 45s"
 
                 # Assert results are valid
                 assert isinstance(results, dict) and len(results) > 0

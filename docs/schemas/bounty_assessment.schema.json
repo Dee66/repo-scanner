@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Bounty Assessment",
+  "type": "object",
+  "required": ["bounty_id", "repository_url", "components"],
+  "properties": {
+    "bounty_id": {"type": "string"},
+    "repository_url": {"type": "string", "format": "uri"},
+    "assessment_timestamp": {"type": "string"},
+    "components": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "files": {"type": "array", "items": {"type": "string"}},
+          "summary": {"type": "string"}
+        }
+      }
+    },
+    "assessment_id": {"type": "string"}
+  }
+}

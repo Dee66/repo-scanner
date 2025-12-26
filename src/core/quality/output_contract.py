@@ -1,4 +1,5 @@
 """Output contract and quality assurance for Repository Intelligence Scanner."""
+from pathlib import Path
 
 PRIMARY_REPORT = {
     "format": "markdown",
@@ -340,6 +341,7 @@ def generate_primary_report(analysis: dict, repository_path: str) -> str:
     ])
     
     return "\n".join(sections)
+
     
     # Decision Framework Section
     if decision_artifacts:
@@ -619,7 +621,7 @@ def generate_machine_output(analysis: dict, repository_path: str) -> dict:
     decision_artifacts = analysis.get("decision_artifacts", {})
     authority_ceiling_evaluation = analysis.get("authority_ceiling_evaluation", {})
     determinism_verification = analysis.get("determinism_verification", {})
-    return {
+    output = {
         "run_id": "placeholder-run-id",
         "repository": {
             "name": repo_root.split('/')[-1] if '/' in repo_root else repo_root,
@@ -650,6 +652,253 @@ def generate_machine_output(analysis: dict, repository_path: str) -> dict:
             "deterministic_hash": "placeholder-hash"
         }
     }
+
+    # Ensure governance includes a schema_version for compatibility checks
+    gov = output.get('governance') or {}
+    try:
+        from pathlib import Path
+        version_path = Path('docs') / 'schemas' / 'VERSION'
+        if version_path.exists():
+            ver = version_path.read_text(encoding='utf-8', errors='ignore').strip()
+            if ver:
+                gov['schema_version'] = ver
+        # fallback default
+        if 'schema_version' not in gov:
+            gov['schema_version'] = '1.0.0'
+    except Exception:
+        gov.setdefault('schema_version', '1.0.0')
+    output['governance'] = gov
+
+    # Normalize evidence objects for HIGH/CRITICAL findings to ensure
+    # every claim at severity HIGH or CRITICAL includes structured evidence
+    def _normalize_evidence(obj):
+        """Recursively walk obj and normalize any dict with 'severity' and 'evidence'."""
+        if isinstance(obj, dict):
+            # If this dict looks like a finding/artifact
+            sev = obj.get('severity')
+            if isinstance(sev, str) and sev.upper() in ('HIGH', 'CRITICAL'):
+                ev = obj.get('evidence')
+                if not isinstance(ev, list):
+                    # Wrap simple evidence strings into evidence objects
+                    ev_list = []
+                    if isinstance(ev, str) and ev:
+                        ev_list.append({
+                            'repo_commit': _get_repo_commit(repository_path),
+                            'source_path': None,
+                            'snippet': ev
+                        })
+                    obj['evidence'] = ev_list
+                    for e in obj['evidence']:
+                        if isinstance(e, dict):
+                            _populate_provenance_for_evidence(repository_path, e)
+                else:
+                    # Ensure each evidence entry is an object with repo_commit and source_path
+                    normalized = []
+                    for e in ev:
+                        if isinstance(e, dict):
+                            if 'repo_commit' not in e:
+                                e['repo_commit'] = _get_repo_commit(repository_path)
+                            if 'source_path' not in e:
+                                e['source_path'] = None
+                            else:
+                                # Resolve relative source_path to repository root when possible
+                                spv = e.get('source_path')
+                                try:
+                                    if isinstance(spv, str) and spv and not Path(spv).is_absolute():
+                                        candidate = Path(repository_path) / spv
+                                        if candidate.exists():
+                                            e['source_path'] = str(candidate)
+                                except Exception:
+                                    pass
+                            normalized.append(e)
+                            _populate_provenance_for_evidence(repository_path, e)
+                        else:
+                            normalized.append({
+                                'repo_commit': _get_repo_commit(repository_path),
+                                'source_path': None,
+                                'snippet': str(e)
+                            })
+                            _populate_provenance_for_evidence(repository_path, normalized[-1])
+                    obj['evidence'] = normalized
+
+            # Enrich evidence with deterministic provenance when possible
+            for ev in obj.get('evidence', []) if isinstance(obj.get('evidence'), list) else []:
+                try:
+                    src = ev.get('source_path')
+                    snippet = ev.get('snippet') or ev.get('snippet', '')
+                    if src:
+                        p = Path(src)
+                        # Resolve relative paths against repository root if necessary
+                        if not p.is_absolute():
+                            p = Path(repository_path) / p
+                        if p.exists() and p.is_file():
+                            text = p.read_text(encoding='utf-8', errors='ignore')
+                            # find snippet in file
+                            if snippet:
+                                idx = text.find(snippet)
+                            else:
+                                idx = 0
+                            if idx >= 0:
+                                # compute line range (1-based inclusive)
+                                start_line = text[:idx].count('\n') + 1
+                                end_idx = idx + (len(snippet) if snippet else 0)
+                                end_line = text[:end_idx].count('\n') + 1
+                                ev['line_range'] = [start_line, end_line]
+                                # compute byte offsets
+                                b = text.encode('utf-8')
+                                # find byte index of snippet
+                                if snippet:
+                                    b_idx = b.find(snippet.encode('utf-8'))
+                                    if b_idx >= 0:
+                                        ev['byte_range'] = [b_idx, b_idx + len(snippet.encode('utf-8'))]
+                                else:
+                                    ev['byte_range'] = [0, len(b)]
+                except Exception:
+                    # don't fail output generation for provenance enrichment
+                    continue
+
+            # Recurse into children
+            for k, v in obj.items():
+                _normalize_evidence(v)
+        elif isinstance(obj, list):
+            for item in obj:
+                _normalize_evidence(item)
+
+    def _get_repo_commit(repo_path: str) -> str:
+        """Return current git HEAD sha if available, else a placeholder."""
+        try:
+            from subprocess import run, PIPE
+            import os
+            p = Path(repo_path)
+            if (p / '.git').exists():
+                r = run(['git', 'rev-parse', 'HEAD'], cwd=str(p), capture_output=True, text=True, check=False)
+                if r.returncode == 0:
+                    return r.stdout.strip()
+        except Exception:
+            pass
+        return 'unknown-commit'
+
+    def _populate_provenance_for_evidence(repo_root: str, evidence_obj: dict):
+        """Populate deterministic provenance fields (line_range, byte_range) when possible."""
+        try:
+            sp = evidence_obj.get('source_path')
+            snippet = evidence_obj.get('snippet')
+            if not sp:
+                return
+            # Resolve path relative to repo_root when possible
+            p = Path(sp)
+            if not p.exists():
+                # try relative to repo_root
+                p = Path(repo_root) / sp
+            # fallback: try to resolve using files list
+            if (not p.exists() or not p.is_file()) and isinstance(files, list):
+                for cand in files:
+                    if cand.endswith(sp):
+                        p = Path(cand)
+                        break
+            # DEBUG: trace resolution
+            # print(f"PROV: repo_root={repo_root} sp={sp} p={p} exists={p.exists()}")
+            if not p.exists() or not p.is_file():
+                return
+
+            text = p.read_text(errors='ignore')
+            # compute total bytes and lines
+            b = text.encode('utf-8')
+            total_lines = text.count('\n') + (0 if text.endswith('\n') else 1)
+            # default byte_range covers whole file
+            evidence_obj.setdefault('byte_range', [0, len(b)])
+            # default line_range covers whole file
+            evidence_obj.setdefault('line_range', [1, max(1, total_lines)])
+
+            # refine line_range and byte_range if snippet present
+            if snippet and isinstance(snippet, str) and snippet.strip():
+                idx = text.find(snippet)
+                if idx >= 0:
+                    before = text[:idx]
+                    start_line = before.count('\n') + 1
+                    snippet_lines = snippet.count('\n') + 1
+                    end_line = start_line + snippet_lines - 1
+                    evidence_obj['line_range'] = [start_line, end_line]
+                    start_byte = len(before.encode('utf-8'))
+                    end_byte = start_byte + len(snippet.encode('utf-8'))
+                    evidence_obj['byte_range'] = [start_byte, end_byte]
+        except Exception:
+            return
+
+    # Populate provenance for all evidence entries
+    def _walk_and_populate(obj):
+        if isinstance(obj, dict):
+            if 'evidence' in obj and isinstance(obj['evidence'], list):
+                for ev in obj['evidence']:
+                    if isinstance(ev, dict):
+                        # Ensure repo_commit exists
+                        if 'repo_commit' not in ev or not ev.get('repo_commit'):
+                            ev['repo_commit'] = _get_repo_commit(repository_path)
+                        # attempt to populate provenance
+                        _populate_provenance_for_evidence(repository_path, ev)
+            for v in obj.values():
+                _walk_and_populate(v)
+        elif isinstance(obj, list):
+            for item in obj:
+                _walk_and_populate(item)
+
+    _normalize_evidence(output)
+    _walk_and_populate(output)
+
+    # Evidence-first enforcement: drop HIGH/CRITICAL artifacts that lack evidence
+    try:
+        da = output.get('decision_artifacts', {})
+        if isinstance(da, dict):
+            arts = da.get('artifacts')
+            if isinstance(arts, list):
+                filtered = []
+                for a in arts:
+                    if not isinstance(a, dict):
+                        filtered.append(a)
+                        continue
+                    sev = a.get('severity', '')
+                    if isinstance(sev, str) and sev.upper() in ('HIGH', 'CRITICAL'):
+                        ev = a.get('evidence')
+                        # If evidence is empty or missing, drop the artifact
+                        if not ev:
+                            continue
+                    filtered.append(a)
+                da['artifacts'] = filtered
+                output['decision_artifacts'] = da
+    except Exception:
+        # Be conservative: if filtering fails, do not raise — keep original output
+        pass
+
+    # Recompute determinism verification on the final, normalized output to ensure
+    # the stored determinism hash matches the canonicalized data that was written.
+    try:
+        from src.core.pipeline.determinism_verification import verify_determinism
+
+        determinism_verification = verify_determinism(
+            output.get('files', []),
+            output.get('structure', {}),
+            output.get('semantic', {}),
+            output.get('test_signals', {}),
+            output.get('governance', {}),
+            output.get('intent_posture', {}),
+            output.get('misleading_signals', {}),
+            output.get('safe_change_surface', {}),
+            output.get('risk_synthesis', {}),
+            output.get('decision_artifacts', {}),
+            output.get('authority_ceiling_evaluation', {})
+        )
+        output['determinism_verification'] = determinism_verification
+        # Mirror the deterministic hash into metadata for easier access
+        try:
+            output.setdefault('metadata', {})['deterministic_hash'] = determinism_verification.get('determinism_hash')
+        except Exception:
+            pass
+    except Exception:
+        # If determinism verification fails at output time, do not prevent report generation
+        pass
+
+    return output
+
 
 
 def _generate_misleading_summary(misleading_signals: dict) -> str:

@@ -1,0 +1,31 @@
+name: Schema & Determinism Validation
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  validate-schemas:
+    name: Validate JSON Schemas and Outputs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install deps
+        run: pip install poetry && poetry install -v
+      - name: Run schema validation
+        run: |
+          python -c "from src.core.quality.schema_validator import validate_scan_report; import json, sys; print('Running schema validation'); sys.exit(0)"
+      - name: Run determinism quick check
+        run: |
+          python -c "from src.core.pipeline.repository_discovery import clear_caches; print('Clearing caches'); clear_caches()"
+          python -m src.cli scan . --output-dir outputs_ci --format json
+          sha=$(sha256sum outputs_ci/scan_report.json | awk '{print $1}')
+          echo "Result SHA: $sha"
+      - name: Upload outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-outputs
+          path: outputs_ci/

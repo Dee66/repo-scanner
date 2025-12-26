@@ -1,0 +1,20 @@
+{
+  "cases": [
+    {
+      "bounty_id": "bounty-example-001",
+      "repository_url": "file:///tmp/example-repo",
+      "bounty_data": {
+        "id": "bounty-example-001",
+        "title": "Fix example bug",
+        "description": "A minimal example bounty used for validation"
+      },
+      "predicted_profitability": 0.82,
+      "predicted_merge_confidence": 0.91,
+      "actual_outcome": true,
+      "actual_merge_time": 2,
+      "validation_timestamp": "2025-12-26T00:00:00Z",
+      "confidence_score": 0.95
+    }
+  ],
+  "last_updated": "2025-12-26T00:00:00Z"
+}
