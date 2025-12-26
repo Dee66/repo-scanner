@@ -206,36 +206,62 @@ def _execute_standard_pipeline(repository_path: str, repo_root: str, file_list: 
                              start_time: float, initial_memory: Dict[str, Any]) -> dict:
     """Execute the standard analysis pipeline for smaller repositories."""
     performance_optimizer = get_performance_optimizer()
+    performance_stage_stats: Dict[str, Dict[str, float]] = {}
+
+    def _run_stage(name: str, func, *a, **k):
+        """Run a pipeline stage and record time + memory usage."""
+        t0 = time.time()
+        mem0 = performance_optimizer.get_memory_usage().get('rss_mb', 0.0)
+        try:
+            res = func(*a, **k)
+        except Exception:
+            # still record timing on failure
+            t1 = time.time()
+            mem1 = performance_optimizer.get_memory_usage().get('rss_mb', 0.0)
+            performance_stage_stats[name] = {
+                'time_seconds': t1 - t0,
+                'memory_rss_mb_start': mem0,
+                'memory_rss_mb_end': mem1
+            }
+            raise
+        t1 = time.time()
+        mem1 = performance_optimizer.get_memory_usage().get('rss_mb', 0.0)
+        performance_stage_stats[name] = {
+            'time_seconds': t1 - t0,
+            'memory_rss_mb_start': mem0,
+            'memory_rss_mb_end': mem1
+        }
+        return res
 
     # Structural modeling (must be first)
-    structure = analyze_repository_structure(file_list)
+    structure = _run_stage('structural_modeling', analyze_repository_structure, file_list)
 
     # Static semantic analysis (must be second)
-    semantic = analyze_semantic_structure(file_list, structure)
+    semantic = _run_stage('static_semantic_analysis', analyze_semantic_structure, file_list, structure)
 
     # Advanced code analysis (depends on semantic)
-    advanced_code_analysis = analyze_advanced_code(file_list, semantic)
+    advanced_code_analysis = _run_stage('advanced_code_analysis', analyze_advanced_code, file_list, semantic)
 
     # Code comprehension analysis (depends on semantic)
-    code_comprehension = analyze_code_comprehension(Path(repo_root), semantic)
+    code_comprehension = _run_stage('code_comprehension', analyze_code_comprehension, Path(repo_root), semantic)
 
     # Security vulnerability analysis (depends on semantic)
-    security_analysis = analyze_security_vulnerabilities(file_list, semantic)
+    security_analysis = _run_stage('security_vulnerability_analysis', analyze_security_vulnerabilities, file_list, semantic)
 
     # Compliance analysis (depends on semantic)
-    compliance_analysis = analyze_compliance(file_list, semantic)
+    compliance_analysis = _run_stage('compliance_analysis', analyze_compliance, file_list, semantic)
 
     # Dependency analysis (depends on semantic)
-    dependency_analysis = analyze_dependencies(file_list, semantic)
+    dependency_analysis = _run_stage('dependency_analysis', analyze_dependencies, file_list, semantic)
 
     # Code duplication analysis (depends on semantic)
-    code_duplication_analysis = analyze_code_duplication(file_list, semantic)
+    code_duplication_analysis = _run_stage('code_duplication_analysis', analyze_code_duplication, file_list, semantic)
 
     # API analysis (depends on semantic)
-    api_analysis = analyze_api_definitions(file_list, semantic)
+    api_analysis = _run_stage('api_analysis', analyze_api_definitions, file_list, semantic)
 
     # Test signal analysis (run first as others depend on it)
-    test_signals = analyze_test_signals(file_list, structure, semantic)
+    test_signals = _run_stage('test_signal_analysis', analyze_test_signals, file_list, structure, semantic)
 
     # Parallel execution for independent analysis stages
     thread_pool = OptimizedThreadPool(max_workers=4)
@@ -256,12 +282,12 @@ def _execute_standard_pipeline(repository_path: str, repo_root: str, file_list: 
         logger.info(f"Thread pool stats: {thread_pool_stats}")
 
     # Sequential execution for dependent stages
-    misleading_signals = analyze_misleading_signals(file_list, structure, semantic, test_signals, governance, intent_posture)
-    safe_change_surface = analyze_safe_change_surface(file_list, structure, semantic, test_signals, governance, intent_posture, misleading_signals)
-    risk_synthesis = synthesize_risks(file_list, structure, semantic, test_signals, governance, intent_posture, misleading_signals, safe_change_surface, security_analysis, code_comprehension, compliance_analysis, dependency_analysis, code_duplication_analysis, api_analysis, advanced_code_analysis)
-    decision_artifacts = generate_decision_artifacts(file_list, structure, semantic, test_signals, governance, intent_posture, misleading_signals, safe_change_surface, risk_synthesis)
-    authority_ceiling_evaluation = evaluate_authority_ceiling(file_list, structure, semantic, test_signals, governance, intent_posture, misleading_signals, safe_change_surface, risk_synthesis, decision_artifacts)
-    determinism_verification = verify_determinism(file_list, structure, semantic, test_signals, governance, intent_posture, misleading_signals, safe_change_surface, risk_synthesis, decision_artifacts, authority_ceiling_evaluation)
+    misleading_signals = _run_stage('misleading_signal_detection', analyze_misleading_signals, file_list, structure, semantic, test_signals, governance, intent_posture)
+    safe_change_surface = _run_stage('safe_change_surface_modeling', analyze_safe_change_surface, file_list, structure, semantic, test_signals, governance, intent_posture, misleading_signals)
+    risk_synthesis = _run_stage('risk_and_gap_synthesis', synthesize_risks, file_list, structure, semantic, test_signals, governance, intent_posture, misleading_signals, safe_change_surface, security_analysis, code_comprehension, compliance_analysis, dependency_analysis, code_duplication_analysis, api_analysis, advanced_code_analysis)
+    decision_artifacts = _run_stage('decision_artifact_generation', generate_decision_artifacts, file_list, structure, semantic, test_signals, governance, intent_posture, misleading_signals, safe_change_surface, risk_synthesis)
+    authority_ceiling_evaluation = _run_stage('authority_ceiling_evaluation', evaluate_authority_ceiling, file_list, structure, semantic, test_signals, governance, intent_posture, misleading_signals, safe_change_surface, risk_synthesis, decision_artifacts)
+    determinism_verification = _run_stage('determinism_verification', verify_determinism, file_list, structure, semantic, test_signals, governance, intent_posture, misleading_signals, safe_change_surface, risk_synthesis, decision_artifacts, authority_ceiling_evaluation)
 
     execution_time = time.time() - start_time
 
@@ -297,7 +323,8 @@ def _execute_standard_pipeline(repository_path: str, repo_root: str, file_list: 
             "initial_memory_mb": initial_memory['rss_mb'],
             "final_memory_mb": final_memory['rss_mb'],
             "memory_delta_mb": memory_delta,
-            "thread_pool_stats": thread_pool_stats
+            "thread_pool_stats": thread_pool_stats,
+            "stages": performance_stage_stats
         },
         "status": "standard_pipeline_complete"
     }

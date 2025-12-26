@@ -199,13 +199,13 @@
     "canonical_data_summary": {
       "data_components": 11,
       "has_all_required_components": true,
-      "hash_input_size": 141549,
+      "hash_input_size": 142544,
       "total_files": 0
     },
     "consistency_check": {
       "consistency_issues": [
         {
-          "description": "Structure file counts total (324) doesn't match overall count (0)",
+          "description": "Structure file counts total (335) doesn't match overall count (0)",
           "issue": "structure_file_count_mismatch",
           "severity": "medium"
         },
@@ -219,9 +219,9 @@
       "issues_found": 2,
       "overall_consistency": "medium"
     },
-    "determinism_hash": "846fe4b73b82c96233b528c12ad83d5010d39daf02e76ccd41a371c5a047f997",
+    "determinism_hash": "a322323db21fdca132e5ec80e7679d9b4a1781ef5ba07a39dd35601ef8907096",
     "determinism_report": {
-      "analysis_hash": "846fe4b73b82c96233b528c12ad83d5010d39daf02e76ccd41a371c5a047f997",
+      "analysis_hash": "a322323db21fdca132e5ec80e7679d9b4a1781ef5ba07a39dd35601ef8907096",
       "confidence_level": "medium",
       "consistency_score": 0.75,
       "description": "Analysis pipeline produces mostly deterministic results with minor inconsistencies",
@@ -301,7 +301,7 @@
     },
     "documentation_governance": {
       "api_docs": true,
-      "changelog": false,
+      "changelog": true,
       "code_of_conduct": false,
       "contributing_guide": false,
       "documentation_tools": [],
@@ -331,7 +331,7 @@
         "severity": "high"
       }
     ],
-    "governance_maturity_score": 0.5625,
+    "governance_maturity_score": 0.59375,
     "schema_version": "1.0.0",
     "security_governance": {
       "has_security_md": false,
@@ -370,18 +370,18 @@
         "testing": 2
       }
     },
-    "intent_confidence": 0.8203125,
+    "intent_confidence": 0.82421875,
     "maturity_classification": {
       "description": "Beta-quality, mostly stable",
       "maturity_factors": {
         "code_structure": 1.0,
-        "documentation_completeness": 0.5,
-        "governance_maturity": 0.5625,
+        "documentation_completeness": 0.65,
+        "governance_maturity": 0.59375,
         "maturity_recommendations": [],
         "testing_maturity": 0.6
       },
       "maturity_level": "beta",
-      "maturity_score": 0.64875
+      "maturity_score": 0.688125
     },
     "primary_intent": {
       "confidence_score": 1.0,
@@ -441,7 +441,7 @@
     }
   },
   "metadata": {
-    "deterministic_hash": "846fe4b73b82c96233b528c12ad83d5010d39daf02e76ccd41a371c5a047f997",
+    "deterministic_hash": "a322323db21fdca132e5ec80e7679d9b4a1781ef5ba07a39dd35601ef8907096",
     "run_timestamp": "2025-01-01T00:00:00Z",
     "scanner_version": "1.1.0"
   },
@@ -471,7 +471,7 @@
           "description": "Security practices score is very low",
           "evidence": [
             {
-              "repo_commit": "d28a7abc6322fadd0bd51dc8474ac6b9c39737bd",
+              "repo_commit": "432cf2bb9cfaa0c6a82ffba7453ffac1377d4e10",
               "snippet": "Security score: 0.4/10",
               "source_path": null
             }
@@ -492,7 +492,7 @@
   "risk_synthesis": {
     "component_risks": {
       "advanced_code_risk": {
-        "description": "Advanced code risk: high (381 points from complexity and flow analysis)",
+        "description": "Advanced code risk: high (385 points from complexity and flow analysis)",
         "risk_factors": [
           "high_cyclomatic_complexity_/home/dee/workspace/AI/Repo-Scanner/enhanced_scanner/baseline_assessment.py",
           "high_cognitive_complexity_/home/dee/workspace/AI/Repo-Scanner/enhanced_scanner/baseline_assessment.py",
@@ -645,6 +645,8 @@
           "moderate_cognitive_complexity_/home/dee/workspace/AI/Repo-Scanner/tools/generate_calibration_report.py",
           "moderate_cyclomatic_complexity_/home/dee/workspace/AI/Repo-Scanner/tools/generate_verification_summary.py",
           "moderate_cognitive_complexity_/home/dee/workspace/AI/Repo-Scanner/tools/generate_verification_summary.py",
+          "high_cyclomatic_complexity_/home/dee/workspace/AI/Repo-Scanner/tools/triage_schema_failures.py",
+          "high_cognitive_complexity_/home/dee/workspace/AI/Repo-Scanner/tools/triage_schema_failures.py",
           "complex_control_flow_/home/dee/workspace/AI/Repo-Scanner/src/cli.py",
           "moderate_control_flow_/home/dee/workspace/AI/Repo-Scanner/src/core/ai/training/bootstrap_trainer.py",
           "moderate_control_flow_/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/api_analysis.py",
@@ -741,7 +743,7 @@
           "advanced_insight_complexity_warning"
         ],
         "risk_level": "high",
-        "risk_score": 381
+        "risk_score": 385
       },
       "api_risk": {
         "description": "Low API risk (0 points)",
@@ -756,7 +758,7 @@
         "risk_score": 0
       },
       "compliance_risk": {
-        "description": "Compliance risk: high (251 points)",
+        "description": "Compliance risk: high (259 points)",
         "risk_factors": [
           "moderate_compliance_issues",
           "critical_compliance_violations",
@@ -934,7 +936,7 @@
           "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/security_analysis/__init__.py"
         ],
         "critical_files_count": 17,
-        "critical_ratio": 0.017653167185877467,
+        "critical_ratio": 0.015370705244122965,
         "description": "Few critical files, most changes are safe",
         "safety_level": "high"
       },
@@ -948,8 +950,8 @@
       },
       "documentation_safety": {
         "description": "No documentation makes changes very risky",
-        "doc_coverage_ratio": 0.3790322580645161,
-        "doc_files_count": 47,
+        "doc_coverage_ratio": 0.416,
+        "doc_files_count": 52,
         "has_api_docs": false,
         "has_readme": false,
         "safety_level": "very_low"
@@ -3008,6 +3010,12 @@
           "name": "main"
         },
         {
+          "file": "/home/dee/workspace/AI/Repo-Scanner/tools/triage_schema_failures.py",
+          "is_method": false,
+          "line": 68,
+          "name": "main"
+        },
+        {
           "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/safety/safe_change_surface.py",
           "is_method": false,
           "line": 22,
@@ -3054,6 +3062,18 @@
           "is_method": false,
           "line": 443,
           "name": "parse_json_input"
+        },
+        {
+          "file": "/home/dee/workspace/AI/Repo-Scanner/tools/triage_schema_failures.py",
+          "is_method": false,
+          "line": 21,
+          "name": "parse_validator_message"
+        },
+        {
+          "file": "/home/dee/workspace/AI/Repo-Scanner/tools/triage_schema_failures.py",
+          "is_method": false,
+          "line": 47,
+          "name": "recommend_fix"
         },
         {
           "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/validation/effectiveness_validator.py",
@@ -3476,6 +3496,12 @@
           "name": "triage_bounty_profitability"
         },
         {
+          "file": "/home/dee/workspace/AI/Repo-Scanner/tools/triage_schema_failures.py",
+          "is_method": false,
+          "line": 59,
+          "name": "triage_from_text"
+        },
+        {
           "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/schema_validator.py",
           "is_method": false,
           "line": 62,
@@ -3508,7 +3534,7 @@
         {
           "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/analysis.py",
           "is_method": false,
-          "line": 305,
+          "line": 332,
           "name": "validate_parallelism_guarantees"
         },
         {
@@ -3837,12 +3863,13 @@
         "/home/dee/workspace/AI/Repo-Scanner/tools/extract_paths_diff.py",
         "/home/dee/workspace/AI/Repo-Scanner/tools/find_json_differences.py",
         "/home/dee/workspace/AI/Repo-Scanner/tools/generate_calibration_report.py",
-        "/home/dee/workspace/AI/Repo-Scanner/tools/generate_verification_summary.py"
+        "/home/dee/workspace/AI/Repo-Scanner/tools/generate_verification_summary.py",
+        "/home/dee/workspace/AI/Repo-Scanner/tools/triage_schema_failures.py"
       ],
       "test_coverage_signals": [],
       "total_classes": 119,
-      "total_functions": 314,
-      "total_modules": 120
+      "total_functions": 318,
+      "total_modules": 121
     },
     "typescript_analysis": {
       "has_config": false,
@@ -3862,11 +3889,11 @@
       "Markdown files"
     ],
     "file_counts": {
-      "code": 124,
-      "config": 84,
-      "docs": 47,
-      "test": 69,
-      "total": 963
+      "code": 125,
+      "config": 85,
+      "docs": 52,
+      "test": 73,
+      "total": 1106
     },
     "frameworks": [
       "Python (requirements.txt)",
@@ -3879,12 +3906,12 @@
       "JSON": 56,
       "Java": 1,
       "JavaScript": 3,
-      "Markdown": 39,
-      "Python": 120,
+      "Markdown": 42,
+      "Python": 121,
       "Shell": 4,
-      "Text": 12,
-      "Unknown": 703,
-      "XML": 3,
+      "Text": 14,
+      "Unknown": 839,
+      "XML": 4,
       "YAML": 22
     },
     "test_frameworks": [
@@ -3892,18 +3919,18 @@
     ]
   },
   "summary": {
-    "files_scanned": 963,
+    "files_scanned": 1106,
     "gaps_count": 0,
     "overall_score": 0.0,
-    "tests_discovered": 69
+    "tests_discovered": 73
   },
   "tasks": {},
   "test_signals": {
     "test_coverage_signals": {
       "coverage_tools": [],
       "has_coverage_tools": false,
-      "test_file_percentage": 35.751295336787564,
-      "test_to_code_ratio": 0.5564516129032258,
+      "test_file_percentage": 36.868686868686865,
+      "test_to_code_ratio": 0.584,
       "untested_modules": [
         "/home/dee/workspace/AI/Repo-Scanner/enhanced_scanner/baseline_assessment.py",
         "/home/dee/workspace/AI/Repo-Scanner/scripts/assess_operational_readiness.py",
@@ -4022,7 +4049,8 @@
         "/home/dee/workspace/AI/Repo-Scanner/tools/extract_paths_diff.py",
         "/home/dee/workspace/AI/Repo-Scanner/tools/find_json_differences.py",
         "/home/dee/workspace/AI/Repo-Scanner/tools/generate_calibration_report.py",
-        "/home/dee/workspace/AI/Repo-Scanner/tools/generate_verification_summary.py"
+        "/home/dee/workspace/AI/Repo-Scanner/tools/generate_verification_summary.py",
+        "/home/dee/workspace/AI/Repo-Scanner/tools/triage_schema_failures.py"
       ]
     },
     "test_files": {
@@ -4046,7 +4074,7 @@
         "/home/dee/workspace/AI/Repo-Scanner/tests/golden/predicted_repo2.json",
         "/home/dee/workspace/AI/Repo-Scanner/tests/golden/predicted_repo3.json"
       ],
-      "total_test_files": 69,
+      "total_test_files": 71,
       "unit_tests": [
         "/home/dee/workspace/AI/Repo-Scanner/docs/TEST_PLAN.md",
         "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/test_signal_analysis.py",
@@ -4100,7 +4128,9 @@
         "/home/dee/workspace/AI/Repo-Scanner/tests/test_repository_discovery.py",
         "/home/dee/workspace/AI/Repo-Scanner/tests/test_repository_discovery_excludes.py",
         "/home/dee/workspace/AI/Repo-Scanner/tests/test_scanner_cli.py",
-        "/home/dee/workspace/AI/Repo-Scanner/tests/test_schema_version_compatibility.py"
+        "/home/dee/workspace/AI/Repo-Scanner/tests/test_schema_version_compatibility.py",
+        "/home/dee/workspace/AI/Repo-Scanner/tmp/pytest_output.txt",
+        "/home/dee/workspace/AI/Repo-Scanner/tmp/pytest_results.xml"
       ]
     },
     "test_frameworks": [
@@ -4122,7 +4152,7 @@
         "severity": "medium"
       },
       {
-        "description": "118 modules appear untested",
+        "description": "119 modules appear untested",
         "evidence": [],
         "gap_type": "untested_modules",
         "severity": "high"

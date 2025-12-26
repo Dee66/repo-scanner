@@ -1,0 +1,2911 @@
+{
+  "python_analysis": {
+    "modules": [
+      "/home/dee/workspace/AI/Repo-Scanner/enhanced_scanner/baseline_assessment.py",
+      "/home/dee/workspace/AI/Repo-Scanner/scripts/assess_operational_readiness.py",
+      "/home/dee/workspace/AI/Repo-Scanner/scripts/execute_production_deployment.py",
+      "/home/dee/workspace/AI/Repo-Scanner/scripts/generate_call_graph.py",
+      "/home/dee/workspace/AI/Repo-Scanner/scripts/load_test.py",
+      "/home/dee/workspace/AI/Repo-Scanner/scripts/performance_benchmark.py",
+      "/home/dee/workspace/AI/Repo-Scanner/scripts/validate_deployment.py",
+      "/home/dee/workspace/AI/Repo-Scanner/scripts/validate_deployment_comprehensive.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/adapters/java_adapter.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/adapters/python_adapter.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/adapters/rust_adapter.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/api_server.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/cli.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/inference_pipeline.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/models/llama_cpp_model.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/models/transformers_model.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/setup_registry.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/training/bootstrap_trainer.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/training/data_pipeline.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/training/lightweight_trainer.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/training/model_trainer.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/accuracy_validator.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/adr_engine.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/api_integration_engine.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/bounty_performance_optimizer.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/historical_forensics.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/humanizer_validator.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/maintainer_profile_engine.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/pr_automation.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/profitability_triage.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/reputation_monitor.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/style_analyzer.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/constraints/operating.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/exceptions.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/monitoring.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/performance_optimizer.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/advanced_code_analysis.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/analysis.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/api_analysis.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/authority_ceiling_evaluation.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/code_comprehension/__init__.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/code_duplication_analysis.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/compliance_analysis.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/decision_artifact_generation.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/dependency_analysis.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/determinism_verification.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/governance_signal_analysis.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/intent_posture_classification.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/misleading_signal_detection.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/optimized_analysis.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/repository_discovery.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/risk_synthesis.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/safe_change_surface_modeling.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/security_analysis/__init__.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/static_semantic_analysis.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/structural_modeling.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/test_signal_analysis.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/principles/behavioral.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/principles/epistemic.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/principles/trust.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/assurance.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/output_contract.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/schema_validator.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/risk/confidence_model.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/risk/decision_artifacts.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/risk/synthesis.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/safety/authority_ceiling.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/safety/intent_classification.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/safety/refusal_artifact.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/safety/safe_change_surface.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/system_config.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/system_identity.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/system_purpose.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/validation/__init__.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/validation/backtesting.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/validation/build_sandbox.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/validation/claims_validator.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/validation/effectiveness_validator.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/validation/style_audit.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/core/validation/transparency_audit.py",
+      "/home/dee/workspace/AI/Repo-Scanner/src/services/bounty_service.py",
+      "/home/dee/workspace/AI/Repo-Scanner/test_batch_processing.py",
+      "/home/dee/workspace/AI/Repo-Scanner/test_repositories/legacy_codebase/old_code.py",
+      "/home/dee/workspace/AI/Repo-Scanner/test_repositories/minimal_library/mylib.py",
+      "/home/dee/workspace/AI/Repo-Scanner/test_repositories/minimal_library/setup.py",
+      "/home/dee/workspace/AI/Repo-Scanner/test_repositories/mixed_enterprise/backend/app.py",
+      "/home/dee/workspace/AI/Repo-Scanner/test_repositories/performance_critical/fast_code.py",
+      "/home/dee/workspace/AI/Repo-Scanner/test_repositories/python_web_app/app.py",
+      "/home/dee/workspace/AI/Repo-Scanner/test_repositories/python_web_app/test_repositories/javascript_react/test_repositories/legacy_codebase/old_code.py",
+      "/home/dee/workspace/AI/Repo-Scanner/test_repositories/python_web_app/test_repositories/javascript_react/test_repositories/legacy_codebase/test_repositories/performance_critical/fast_code.py",
+      "/home/dee/workspace/AI/Repo-Scanner/test_repositories/python_web_app/test_repositories/javascript_react/test_repositories/legacy_codebase/test_repositories/security_focused/insecure.py",
+      "/home/dee/workspace/AI/Repo-Scanner/test_repositories/python_web_app/test_repositories/javascript_react/test_repositories/minimal_library/setup.py",
+      "/home/dee/workspace/AI/Repo-Scanner/test_repositories/security_focused/insecure.py",
+      "/home/dee/workspace/AI/Repo-Scanner/tests/fixtures/minimal_repo/sample.py",
+      "/home/dee/workspace/AI/Repo-Scanner/tests/test_adversarial_property.py",
+      "/home/dee/workspace/AI/Repo-Scanner/tests/test_bounty_integration.py",
+      "/home/dee/workspace/AI/Repo-Scanner/tests/test_calibration_golden_repos.py",
+      "/home/dee/workspace/AI/Repo-Scanner/tests/test_cross_platform.py",
+      "/home/dee/workspace/AI/Repo-Scanner/tests/test_detectors_evidence_first.py",
+      "/home/dee/workspace/AI/Repo-Scanner/tests/test_determinism.py",
+      "/home/dee/workspace/AI/Repo-Scanner/tests/test_deterministic_provenance.py",
+      "/home/dee/workspace/AI/Repo-Scanner/tests/test_evidence_normalization.py",
+      "/home/dee/workspace/AI/Repo-Scanner/tests/test_integration_5nines.py",
+      "/home/dee/workspace/AI/Repo-Scanner/tests/test_output_contract.py",
+      "/home/dee/workspace/AI/Repo-Scanner/tests/test_output_schemas.py",
+      "/home/dee/workspace/AI/Repo-Scanner/tests/test_performance.py",
+      "/home/dee/workspace/AI/Repo-Scanner/tests/test_pipeline.py",
+      "/home/dee/workspace/AI/Repo-Scanner/tests/test_pr_automation_unit.py",
+      "/home/dee/workspace/AI/Repo-Scanner/tests/test_provenance_fields.py",
+      "/home/dee/workspace/AI/Repo-Scanner/tests/test_repository_discovery.py",
+      "/home/dee/workspace/AI/Repo-Scanner/tests/test_repository_discovery_excludes.py",
+      "/home/dee/workspace/AI/Repo-Scanner/tests/test_scanner_cli.py",
+      "/home/dee/workspace/AI/Repo-Scanner/tests/test_schema_version_compatibility.py",
+      "/home/dee/workspace/AI/Repo-Scanner/tools/determinism_diff.py",
+      "/home/dee/workspace/AI/Repo-Scanner/tools/determinism_harness.py",
+      "/home/dee/workspace/AI/Repo-Scanner/tools/extract_file_language_diff.py",
+      "/home/dee/workspace/AI/Repo-Scanner/tools/extract_paths_diff.py",
+      "/home/dee/workspace/AI/Repo-Scanner/tools/find_json_differences.py",
+      "/home/dee/workspace/AI/Repo-Scanner/tools/generate_calibration_report.py",
+      "/home/dee/workspace/AI/Repo-Scanner/tools/generate_verification_summary.py",
+      "/home/dee/workspace/AI/Repo-Scanner/tools/triage_schema_failures.py"
+    ],
+    "classes": [
+      {
+        "name": "ADREngine",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/adr_engine.py",
+        "line": 16
+      },
+      {
+        "name": "AIModelRegistry",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/inference_pipeline.py",
+        "line": 48
+      },
+      {
+        "name": "APIAnalyzer",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/api_analysis.py",
+        "line": 21
+      },
+      {
+        "name": "APIIntegrationEngine",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/api_integration_engine.py",
+        "line": 13
+      },
+      {
+        "name": "AccuracyMetrics",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/accuracy_validator.py",
+        "line": 30
+      },
+      {
+        "name": "AdvancedCodeAnalyzer",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/advanced_code_analysis.py",
+        "line": 41
+      },
+      {
+        "name": "Alert",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/monitoring.py",
+        "line": 425
+      },
+      {
+        "name": "AlertManager",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/monitoring.py",
+        "line": 438
+      },
+      {
+        "name": "AnalysisBatch",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/optimized_analysis.py",
+        "line": 28
+      },
+      {
+        "name": "AnalysisCache",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/optimized_analysis.py",
+        "line": 36
+      },
+      {
+        "name": "AnalysisError",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/exceptions.py",
+        "line": 20
+      },
+      {
+        "name": "BacktestMetrics",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/validation/backtesting.py",
+        "line": 54
+      },
+      {
+        "name": "BacktestResult",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/validation/backtesting.py",
+        "line": 44
+      },
+      {
+        "name": "BaseAIModel",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/inference_pipeline.py",
+        "line": 116
+      },
+      {
+        "name": "BenchmarkResult",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/scripts/performance_benchmark.py",
+        "line": 23
+      },
+      {
+        "name": "BootstrapTrainer",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/training/bootstrap_trainer.py",
+        "line": 24
+      },
+      {
+        "name": "BountyAccuracyValidator",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/accuracy_validator.py",
+        "line": 43
+      },
+      {
+        "name": "BountyAnalysisBatch",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/bounty_performance_optimizer.py",
+        "line": 29
+      },
+      {
+        "name": "BountyCache",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/bounty_performance_optimizer.py",
+        "line": 38
+      },
+      {
+        "name": "BountyService",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/services/bounty_service.py",
+        "line": 22
+      },
+      {
+        "name": "BountyValidationCase",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/accuracy_validator.py",
+        "line": 16
+      },
+      {
+        "name": "BuildLockIntegritySandbox",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/validation/build_sandbox.py",
+        "line": 60
+      },
+      {
+        "name": "BuildResult",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/validation/build_sandbox.py",
+        "line": 30
+      },
+      {
+        "name": "CachedModelLoader",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/performance_optimizer.py",
+        "line": 141
+      },
+      {
+        "name": "ClaimValidationResult",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/validation/claims_validator.py",
+        "line": 18
+      },
+      {
+        "name": "ClaimsValidator",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/validation/claims_validator.py",
+        "line": 27
+      },
+      {
+        "name": "CodeComprehensionAnalyzer",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/code_comprehension/__init__.py",
+        "line": 42
+      },
+      {
+        "name": "CodeDataset",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/training/model_trainer.py",
+        "line": 52
+      },
+      {
+        "name": "CodeDuplicationAnalyzer",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/code_duplication_analysis.py",
+        "line": 19
+      },
+      {
+        "name": "CodeSample",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/training/data_pipeline.py",
+        "line": 22
+      },
+      {
+        "name": "CodeUnderstanding",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/code_comprehension/__init__.py",
+        "line": 23
+      },
+      {
+        "name": "CommitFragmenter",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/pr_automation.py",
+        "line": 640
+      },
+      {
+        "name": "ComplianceAnalyzer",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/compliance_analysis.py",
+        "line": 34
+      },
+      {
+        "name": "ComplianceRule",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/compliance_analysis.py",
+        "line": 16
+      },
+      {
+        "name": "ComprehensionResult",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/code_comprehension/__init__.py",
+        "line": 34
+      },
+      {
+        "name": "ConfigurationError",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/exceptions.py",
+        "line": 35
+      },
+      {
+        "name": "ContextualGraftingAudit",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/validation/style_audit.py",
+        "line": 51
+      },
+      {
+        "name": "ControlFlowNode",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/advanced_code_analysis.py",
+        "line": 19
+      },
+      {
+        "name": "DataFlowVariable",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/advanced_code_analysis.py",
+        "line": 34
+      },
+      {
+        "name": "Dataset",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/training/lightweight_trainer.py",
+        "line": 27
+      },
+      {
+        "name": "DependencyAnalyzer",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/dependency_analysis.py",
+        "line": 20
+      },
+      {
+        "name": "DeploymentExecutor",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/scripts/execute_production_deployment.py",
+        "line": 40
+      },
+      {
+        "name": "DeploymentValidator",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/scripts/validate_deployment.py",
+        "line": 28
+      },
+      {
+        "name": "DeploymentValidator",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/scripts/validate_deployment_comprehensive.py",
+        "line": 32
+      },
+      {
+        "name": "DifferentialLogicOracle",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/validation/backtesting.py",
+        "line": 64
+      },
+      {
+        "name": "DisclosureViolation",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/validation/transparency_audit.py",
+        "line": 17
+      },
+      {
+        "name": "EffectivenessAssessor",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/enhanced_scanner/baseline_assessment.py",
+        "line": 17
+      },
+      {
+        "name": "EffectivenessMetrics",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/validation/effectiveness_validator.py",
+        "line": 40
+      },
+      {
+        "name": "EffectivenessValidator",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/validation/effectiveness_validator.py",
+        "line": 53
+      },
+      {
+        "name": "EfficientCache",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/test_repositories/performance_critical/fast_code.py",
+        "line": 20
+      },
+      {
+        "name": "EfficientCache",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/test_repositories/python_web_app/test_repositories/javascript_react/test_repositories/legacy_codebase/test_repositories/performance_critical/fast_code.py",
+        "line": 20
+      },
+      {
+        "name": "EthicalTransparencyAudit",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/validation/transparency_audit.py",
+        "line": 35
+      },
+      {
+        "name": "FileAccessError",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/exceptions.py",
+        "line": 40
+      },
+      {
+        "name": "FileCache",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/analysis.py",
+        "line": 36
+      },
+      {
+        "name": "GitError",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/exceptions.py",
+        "line": 49
+      },
+      {
+        "name": "GraftingAuditResult",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/validation/style_audit.py",
+        "line": 43
+      },
+      {
+        "name": "HealthChecker",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/monitoring.py",
+        "line": 221
+      },
+      {
+        "name": "HistoricalForensicsEngine",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/historical_forensics.py",
+        "line": 18
+      },
+      {
+        "name": "HistoricalPR",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/validation/backtesting.py",
+        "line": 28
+      },
+      {
+        "name": "HumanizerValidator",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/humanizer_validator.py",
+        "line": 34
+      },
+      {
+        "name": "IncrementalAnalyzer",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/optimized_analysis.py",
+        "line": 145
+      },
+      {
+        "name": "InferencePipeline",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/inference_pipeline.py",
+        "line": 152
+      },
+      {
+        "name": "InferenceResult",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/inference_pipeline.py",
+        "line": 38
+      },
+      {
+        "name": "JavaAdapter",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/adapters/java_adapter.py",
+        "line": 4
+      },
+      {
+        "name": "JobStatus",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/api_server.py",
+        "line": 64
+      },
+      {
+        "name": "LightweightCodeDataset",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/training/lightweight_trainer.py",
+        "line": 32
+      },
+      {
+        "name": "LightweightTrainer",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/training/lightweight_trainer.py",
+        "line": 123
+      },
+      {
+        "name": "LlamaCppModel",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/models/llama_cpp_model.py",
+        "line": 23
+      },
+      {
+        "name": "LoadTestConfig",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/scripts/performance_benchmark.py",
+        "line": 40
+      },
+      {
+        "name": "LoadTester",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/scripts/load_test.py",
+        "line": 16
+      },
+      {
+        "name": "MaintainerProfileEngine",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/maintainer_profile_engine.py",
+        "line": 14
+      },
+      {
+        "name": "MemoryMonitor",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/performance_optimizer.py",
+        "line": 82
+      },
+      {
+        "name": "MetricPoint",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/monitoring.py",
+        "line": 16
+      },
+      {
+        "name": "MetricSeries",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/monitoring.py",
+        "line": 23
+      },
+      {
+        "name": "MetricsCollector",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/monitoring.py",
+        "line": 30
+      },
+      {
+        "name": "ModelMetadata",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/inference_pipeline.py",
+        "line": 26
+      },
+      {
+        "name": "ModelTrainer",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/training/model_trainer.py",
+        "line": 155
+      },
+      {
+        "name": "OperationalReadinessAssessor",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/scripts/assess_operational_readiness.py",
+        "line": 16
+      },
+      {
+        "name": "OptimizedAnalysisPipeline",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/optimized_analysis.py",
+        "line": 230
+      },
+      {
+        "name": "OptimizedThreadPool",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/performance_optimizer.py",
+        "line": 97
+      },
+      {
+        "name": "OutputGenerationError",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/exceptions.py",
+        "line": 25
+      },
+      {
+        "name": "PRAutomationEngine",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/pr_automation.py",
+        "line": 16
+      },
+      {
+        "name": "ParallelBountyAnalyzer",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/bounty_performance_optimizer.py",
+        "line": 78
+      },
+      {
+        "name": "PatternBasedModel",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/training/lightweight_trainer.py",
+        "line": 219
+      },
+      {
+        "name": "PerformanceBenchmarker",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/scripts/performance_benchmark.py",
+        "line": 52
+      },
+      {
+        "name": "PerformanceMonitor",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/monitoring.py",
+        "line": 350
+      },
+      {
+        "name": "PerformanceOptimizer",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/performance_optimizer.py",
+        "line": 24
+      },
+      {
+        "name": "PerplexityScore",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/humanizer_validator.py",
+        "line": 20
+      },
+      {
+        "name": "ProfitabilityTriageEngine",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/profitability_triage.py",
+        "line": 11
+      },
+      {
+        "name": "PythonAdapter",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/adapters/python_adapter.py",
+        "line": 4
+      },
+      {
+        "name": "RepositoryDiscoveryError",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/exceptions.py",
+        "line": 15
+      },
+      {
+        "name": "ReputationMonitor",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/reputation_monitor.py",
+        "line": 21
+      },
+      {
+        "name": "RustAdapter",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/adapters/rust_adapter.py",
+        "line": 4
+      },
+      {
+        "name": "SandboxResult",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/validation/build_sandbox.py",
+        "line": 51
+      },
+      {
+        "name": "ScanRequest",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/api_server.py",
+        "line": 47
+      },
+      {
+        "name": "ScanResponse",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/api_server.py",
+        "line": 56
+      },
+      {
+        "name": "ScannerError",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/exceptions.py",
+        "line": 6
+      },
+      {
+        "name": "SecurityAnalyzer",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/security_analysis/__init__.py",
+        "line": 21
+      },
+      {
+        "name": "SecurityFinding",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/security_analysis/__init__.py",
+        "line": 10
+      },
+      {
+        "name": "StreamingFileProcessor",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/optimized_analysis.py",
+        "line": 75
+      },
+      {
+        "name": "StyleAnalyzer",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/style_analyzer.py",
+        "line": 19
+      },
+      {
+        "name": "StyleProfile",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/validation/style_audit.py",
+        "line": 31
+      },
+      {
+        "name": "StyleViolation",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/validation/style_audit.py",
+        "line": 20
+      },
+      {
+        "name": "SurgicalMinimalistFilter",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/pr_automation.py",
+        "line": 753
+      },
+      {
+        "name": "TestBountyIntegration",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_bounty_integration.py",
+        "line": 11
+      },
+      {
+        "name": "TestCrossPlatform",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_cross_platform.py",
+        "line": 19
+      },
+      {
+        "name": "TestFiveNinesValidation",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_integration_5nines.py",
+        "line": 24
+      },
+      {
+        "name": "TestPerformance",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_performance.py",
+        "line": 20
+      },
+      {
+        "name": "TestResult",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/validation/build_sandbox.py",
+        "line": 40
+      },
+      {
+        "name": "ToneAnalysis",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/humanizer_validator.py",
+        "line": 27
+      },
+      {
+        "name": "TrainingConfig",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/training/model_trainer.py",
+        "line": 36
+      },
+      {
+        "name": "TrainingDataPipeline",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/training/data_pipeline.py",
+        "line": 44
+      },
+      {
+        "name": "TrainingDataset",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/training/data_pipeline.py",
+        "line": 35
+      },
+      {
+        "name": "TransformersModel",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/models/transformers_model.py",
+        "line": 28
+      },
+      {
+        "name": "TransparencyAuditResult",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/validation/transparency_audit.py",
+        "line": 27
+      },
+      {
+        "name": "ValidationCheck",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/scripts/validate_deployment_comprehensive.py",
+        "line": 22
+      },
+      {
+        "name": "ValidationError",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/exceptions.py",
+        "line": 30
+      },
+      {
+        "name": "ValidationResult",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/scripts/validate_deployment.py",
+        "line": 20
+      },
+      {
+        "name": "ValidationResult",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/validation/effectiveness_validator.py",
+        "line": 26
+      }
+    ],
+    "functions": [
+      {
+        "name": "_analyze_complexity_safety",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/safe_change_surface_modeling.py",
+        "line": 83,
+        "is_method": false
+      },
+      {
+        "name": "_analyze_critical_path_safety",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/safe_change_surface_modeling.py",
+        "line": 162,
+        "is_method": false
+      },
+      {
+        "name": "_analyze_dependency_safety",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/safe_change_surface_modeling.py",
+        "line": 123,
+        "is_method": false
+      },
+      {
+        "name": "_analyze_documentation_safety",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/safe_change_surface_modeling.py",
+        "line": 205,
+        "is_method": false
+      },
+      {
+        "name": "_analyze_test_coverage_safety",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/safe_change_surface_modeling.py",
+        "line": 57,
+        "is_method": false
+      },
+      {
+        "name": "_assess_analysis_consistency",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/decision_artifact_generation.py",
+        "line": 311,
+        "is_method": false
+      },
+      {
+        "name": "_assess_authority_confidence",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/authority_ceiling_evaluation.py",
+        "line": 300,
+        "is_method": false
+      },
+      {
+        "name": "_assess_data_completeness",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/decision_artifact_generation.py",
+        "line": 302,
+        "is_method": false
+      },
+      {
+        "name": "_assess_maintainer_compatibility",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/decision_artifact_generation.py",
+        "line": 400,
+        "is_method": false
+      },
+      {
+        "name": "_assess_organizational_factors",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/authority_ceiling_evaluation.py",
+        "line": 135,
+        "is_method": false
+      },
+      {
+        "name": "_calculate_advanced_code_risk",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/risk_synthesis.py",
+        "line": 1049,
+        "is_method": false
+      },
+      {
+        "name": "_calculate_api_risk",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/risk_synthesis.py",
+        "line": 963,
+        "is_method": false
+      },
+      {
+        "name": "_calculate_change_confidence",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/safe_change_surface_modeling.py",
+        "line": 336,
+        "is_method": false
+      },
+      {
+        "name": "_calculate_change_risk",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/risk_synthesis.py",
+        "line": 447,
+        "is_method": false
+      },
+      {
+        "name": "_calculate_compliance_risk",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/risk_synthesis.py",
+        "line": 741,
+        "is_method": false
+      },
+      {
+        "name": "_calculate_comprehension_risk",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/risk_synthesis.py",
+        "line": 239,
+        "is_method": false
+      },
+      {
+        "name": "_calculate_dependency_risk",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/risk_synthesis.py",
+        "line": 807,
+        "is_method": false
+      },
+      {
+        "name": "_calculate_deterministic_hash",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/determinism_verification.py",
+        "line": 115,
+        "is_method": false
+      },
+      {
+        "name": "_calculate_duplication_risk",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/risk_synthesis.py",
+        "line": 884,
+        "is_method": false
+      },
+      {
+        "name": "_calculate_governance_risk",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/risk_synthesis.py",
+        "line": 338,
+        "is_method": false
+      },
+      {
+        "name": "_calculate_intent_risk",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/risk_synthesis.py",
+        "line": 378,
+        "is_method": false
+      },
+      {
+        "name": "_calculate_merge_confidence",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/decision_artifact_generation.py",
+        "line": 436,
+        "is_method": false
+      },
+      {
+        "name": "_calculate_misleading_risk",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/risk_synthesis.py",
+        "line": 412,
+        "is_method": false
+      },
+      {
+        "name": "_calculate_overall_safety",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/safe_change_surface_modeling.py",
+        "line": 244,
+        "is_method": false
+      },
+      {
+        "name": "_calculate_profitability_score",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/decision_artifact_generation.py",
+        "line": 371,
+        "is_method": false
+      },
+      {
+        "name": "_calculate_risk_confidence",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/risk_synthesis.py",
+        "line": 1141,
+        "is_method": false
+      },
+      {
+        "name": "_calculate_security_risk",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/risk_synthesis.py",
+        "line": 195,
+        "is_method": false
+      },
+      {
+        "name": "_calculate_semantic_risk",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/risk_synthesis.py",
+        "line": 153,
+        "is_method": false
+      },
+      {
+        "name": "_calculate_structural_risk",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/risk_synthesis.py",
+        "line": 110,
+        "is_method": false
+      },
+      {
+        "name": "_calculate_testing_risk",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/risk_synthesis.py",
+        "line": 303,
+        "is_method": false
+      },
+      {
+        "name": "_canonicalize_dict",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/determinism_verification.py",
+        "line": 92,
+        "is_method": false
+      },
+      {
+        "name": "_detect_code_quality_inconsistencies",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/misleading_signal_detection.py",
+        "line": 66,
+        "is_method": false
+      },
+      {
+        "name": "_detect_documentation_discrepancies",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/misleading_signal_detection.py",
+        "line": 110,
+        "is_method": false
+      },
+      {
+        "name": "_detect_governance_conflicts",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/misleading_signal_detection.py",
+        "line": 141,
+        "is_method": false
+      },
+      {
+        "name": "_detect_intent_mismatches",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/misleading_signal_detection.py",
+        "line": 166,
+        "is_method": false
+      },
+      {
+        "name": "_detect_maintenance_indicators",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/misleading_signal_detection.py",
+        "line": 194,
+        "is_method": false
+      },
+      {
+        "name": "_detect_security_deceptions",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/misleading_signal_detection.py",
+        "line": 220,
+        "is_method": false
+      },
+      {
+        "name": "_determine_authority_ceiling",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/decision_artifact_generation.py",
+        "line": 163,
+        "is_method": false
+      },
+      {
+        "name": "_determine_final_authority_ceiling",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/authority_ceiling_evaluation.py",
+        "line": 199,
+        "is_method": false
+      },
+      {
+        "name": "_estimate_effort",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/decision_artifact_generation.py",
+        "line": 280,
+        "is_method": false
+      },
+      {
+        "name": "_estimate_repository_complexity",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/analysis.py",
+        "line": 157,
+        "is_method": false
+      },
+      {
+        "name": "_evaluate_authority_constraints",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/authority_ceiling_evaluation.py",
+        "line": 62,
+        "is_method": false
+      },
+      {
+        "name": "_execute_standard_pipeline",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/analysis.py",
+        "line": 205,
+        "is_method": false
+      },
+      {
+        "name": "_fallback_required_check",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/schema_validator.py",
+        "line": 40,
+        "is_method": false
+      },
+      {
+        "name": "_format_json_pointer",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/schema_validator.py",
+        "line": 34,
+        "is_method": false
+      },
+      {
+        "name": "_generate_action_plan",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/decision_artifact_generation.py",
+        "line": 115,
+        "is_method": false
+      },
+      {
+        "name": "_generate_authority_ceiling_summary",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/output_contract.py",
+        "line": 1097,
+        "is_method": false
+      },
+      {
+        "name": "_generate_authority_rationale",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/authority_ceiling_evaluation.py",
+        "line": 263,
+        "is_method": false
+      },
+      {
+        "name": "_generate_bounty_artifacts",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/decision_artifact_generation.py",
+        "line": 331,
+        "is_method": false
+      },
+      {
+        "name": "_generate_bounty_recommendations",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/decision_artifact_generation.py",
+        "line": 453,
+        "is_method": false
+      },
+      {
+        "name": "_generate_canonical_analysis_data",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/determinism_verification.py",
+        "line": 64,
+        "is_method": false
+      },
+      {
+        "name": "_generate_confidence_assessment",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/decision_artifact_generation.py",
+        "line": 197,
+        "is_method": false
+      },
+      {
+        "name": "_generate_decision_artifacts_summary",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/output_contract.py",
+        "line": 1023,
+        "is_method": false
+      },
+      {
+        "name": "_generate_decision_framework",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/decision_artifact_generation.py",
+        "line": 71,
+        "is_method": false
+      },
+      {
+        "name": "_generate_determinism_report",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/determinism_verification.py",
+        "line": 210,
+        "is_method": false
+      },
+      {
+        "name": "_generate_evidence_highlights",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/output_contract.py",
+        "line": 132,
+        "is_method": false
+      },
+      {
+        "name": "_generate_misleading_summary",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/output_contract.py",
+        "line": 904,
+        "is_method": false
+      },
+      {
+        "name": "_generate_next_steps",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/decision_artifact_generation.py",
+        "line": 231,
+        "is_method": false
+      },
+      {
+        "name": "_generate_risk_recommendations",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/risk_synthesis.py",
+        "line": 539,
+        "is_method": false
+      },
+      {
+        "name": "_generate_risk_synthesis_summary",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/output_contract.py",
+        "line": 967,
+        "is_method": false
+      },
+      {
+        "name": "_generate_safe_changes",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/safe_change_surface_modeling.py",
+        "line": 280,
+        "is_method": false
+      },
+      {
+        "name": "_generate_safe_changes_summary",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/output_contract.py",
+        "line": 931,
+        "is_method": false
+      },
+      {
+        "name": "_generate_system_characterization",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/output_contract.py",
+        "line": 35,
+        "is_method": false
+      },
+      {
+        "name": "_generate_unsafe_changes",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/safe_change_surface_modeling.py",
+        "line": 310,
+        "is_method": false
+      },
+      {
+        "name": "_generate_what_not_to_fix_summary",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/output_contract.py",
+        "line": 951,
+        "is_method": false
+      },
+      {
+        "name": "_high_ids",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_calibration_golden_repos.py",
+        "line": 10,
+        "is_method": false
+      },
+      {
+        "name": "_identify_critical_issues",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/risk_synthesis.py",
+        "line": 671,
+        "is_method": false
+      },
+      {
+        "name": "_load",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_calibration_golden_repos.py",
+        "line": 6,
+        "is_method": false
+      },
+      {
+        "name": "_schema_dir",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/schema_validator.py",
+        "line": 23,
+        "is_method": false
+      },
+      {
+        "name": "_summarize_canonical_data",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/determinism_verification.py",
+        "line": 242,
+        "is_method": false
+      },
+      {
+        "name": "_synthesize_overall_risk",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/risk_synthesis.py",
+        "line": 478,
+        "is_method": false
+      },
+      {
+        "name": "_validate_file",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/schema_validator.py",
+        "line": 79,
+        "is_method": false
+      },
+      {
+        "name": "_verify_internal_consistency",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/determinism_verification.py",
+        "line": 125,
+        "is_method": false
+      },
+      {
+        "name": "add",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/test_repositories/minimal_library/mylib.py",
+        "line": 5,
+        "is_method": false
+      },
+      {
+        "name": "analyze_advanced_code",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/advanced_code_analysis.py",
+        "line": 511,
+        "is_method": false
+      },
+      {
+        "name": "analyze_api_definitions",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/api_analysis.py",
+        "line": 509,
+        "is_method": false
+      },
+      {
+        "name": "analyze_api_integration_points",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/api_integration_engine.py",
+        "line": 614,
+        "is_method": false
+      },
+      {
+        "name": "analyze_bounty_batch",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/services/bounty_service.py",
+        "line": 414,
+        "is_method": false
+      },
+      {
+        "name": "analyze_bounty_opportunity",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/services/bounty_service.py",
+        "line": 407,
+        "is_method": false
+      },
+      {
+        "name": "analyze_code_comprehension",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/code_comprehension/__init__.py",
+        "line": 618,
+        "is_method": false
+      },
+      {
+        "name": "analyze_code_duplication",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/code_duplication_analysis.py",
+        "line": 392,
+        "is_method": false
+      },
+      {
+        "name": "analyze_code_patterns",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/intent_posture_classification.py",
+        "line": 379,
+        "is_method": false
+      },
+      {
+        "name": "analyze_compliance",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/compliance_analysis.py",
+        "line": 494,
+        "is_method": false
+      },
+      {
+        "name": "analyze_dependencies",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/dependency_analysis.py",
+        "line": 365,
+        "is_method": false
+      },
+      {
+        "name": "analyze_file",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/scripts/generate_call_graph.py",
+        "line": 55,
+        "is_method": false
+      },
+      {
+        "name": "analyze_governance_signals",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/governance_signal_analysis.py",
+        "line": 8,
+        "is_method": false
+      },
+      {
+        "name": "analyze_java_codebase",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/static_semantic_analysis.py",
+        "line": 249,
+        "is_method": false
+      },
+      {
+        "name": "analyze_java_file",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/static_semantic_analysis.py",
+        "line": 355,
+        "is_method": false
+      },
+      {
+        "name": "analyze_java_files",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/static_semantic_analysis.py",
+        "line": 164,
+        "is_method": false
+      },
+      {
+        "name": "analyze_javascript_codebase",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/static_semantic_analysis.py",
+        "line": 175,
+        "is_method": false
+      },
+      {
+        "name": "analyze_javascript_file",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/static_semantic_analysis.py",
+        "line": 295,
+        "is_method": false
+      },
+      {
+        "name": "analyze_javascript_files",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/static_semantic_analysis.py",
+        "line": 142,
+        "is_method": false
+      },
+      {
+        "name": "analyze_misleading_signals",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/misleading_signal_detection.py",
+        "line": 6,
+        "is_method": false
+      },
+      {
+        "name": "analyze_python_codebase",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/static_semantic_analysis.py",
+        "line": 54,
+        "is_method": false
+      },
+      {
+        "name": "analyze_python_file",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/static_semantic_analysis.py",
+        "line": 95,
+        "is_method": false
+      },
+      {
+        "name": "analyze_python_files",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/static_semantic_analysis.py",
+        "line": 43,
+        "is_method": false
+      },
+      {
+        "name": "analyze_repository_structure",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/structural_modeling.py",
+        "line": 8,
+        "is_method": false
+      },
+      {
+        "name": "analyze_safe_change_surface",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/safe_change_surface_modeling.py",
+        "line": 6,
+        "is_method": false
+      },
+      {
+        "name": "analyze_security_vulnerabilities",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/security_analysis/__init__.py",
+        "line": 341,
+        "is_method": false
+      },
+      {
+        "name": "analyze_semantic_structure",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/static_semantic_analysis.py",
+        "line": 10,
+        "is_method": false
+      },
+      {
+        "name": "analyze_test_signals",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/test_signal_analysis.py",
+        "line": 8,
+        "is_method": false
+      },
+      {
+        "name": "analyze_typescript_codebase",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/static_semantic_analysis.py",
+        "line": 216,
+        "is_method": false
+      },
+      {
+        "name": "analyze_typescript_files",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/static_semantic_analysis.py",
+        "line": 153,
+        "is_method": false
+      },
+      {
+        "name": "another_function",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/test_repositories/legacy_codebase/old_code.py",
+        "line": 13,
+        "is_method": false
+      },
+      {
+        "name": "another_function",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/test_repositories/python_web_app/test_repositories/javascript_react/test_repositories/legacy_codebase/old_code.py",
+        "line": 13,
+        "is_method": false
+      },
+      {
+        "name": "apply_conservative_bias",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/principles/trust.py",
+        "line": 18,
+        "is_method": false
+      },
+      {
+        "name": "assess_ci_cd_governance",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/governance_signal_analysis.py",
+        "line": 106,
+        "is_method": false
+      },
+      {
+        "name": "assess_code_quality_governance",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/governance_signal_analysis.py",
+        "line": 24,
+        "is_method": false
+      },
+      {
+        "name": "assess_dependency_governance",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/governance_signal_analysis.py",
+        "line": 190,
+        "is_method": false
+      },
+      {
+        "name": "assess_documentation_governance",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/governance_signal_analysis.py",
+        "line": 148,
+        "is_method": false
+      },
+      {
+        "name": "assess_documentation_readiness",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/scripts/assess_operational_readiness.py",
+        "line": 265,
+        "is_method": false
+      },
+      {
+        "name": "assess_infrastructure_readiness",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/scripts/assess_operational_readiness.py",
+        "line": 168,
+        "is_method": false
+      },
+      {
+        "name": "assess_monitoring_readiness",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/scripts/assess_operational_readiness.py",
+        "line": 242,
+        "is_method": false
+      },
+      {
+        "name": "assess_risk_posture",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/intent_posture_classification.py",
+        "line": 259,
+        "is_method": false
+      },
+      {
+        "name": "assess_security_governance",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/governance_signal_analysis.py",
+        "line": 67,
+        "is_method": false
+      },
+      {
+        "name": "assess_security_posture",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/intent_posture_classification.py",
+        "line": 99,
+        "is_method": false
+      },
+      {
+        "name": "assess_security_readiness",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/scripts/assess_operational_readiness.py",
+        "line": 209,
+        "is_method": false
+      },
+      {
+        "name": "assess_test_coverage",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/test_signal_analysis.py",
+        "line": 125,
+        "is_method": false
+      },
+      {
+        "name": "assess_validation_readiness",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/scripts/assess_operational_readiness.py",
+        "line": 289,
+        "is_method": false
+      },
+      {
+        "name": "calculate_governance_maturity",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/governance_signal_analysis.py",
+        "line": 264,
+        "is_method": false
+      },
+      {
+        "name": "calculate_intent_confidence",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/intent_posture_classification.py",
+        "line": 416,
+        "is_method": false
+      },
+      {
+        "name": "calculate_testing_maturity",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/test_signal_analysis.py",
+        "line": 205,
+        "is_method": false
+      },
+      {
+        "name": "canonicalize",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tools/determinism_diff.py",
+        "line": 12,
+        "is_method": false
+      },
+      {
+        "name": "check_never_force_action",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/principles/behavioral.py",
+        "line": 24,
+        "is_method": false
+      },
+      {
+        "name": "check_never_guess_intent",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/principles/behavioral.py",
+        "line": 11,
+        "is_method": false
+      },
+      {
+        "name": "check_never_mask_unknowns",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/principles/behavioral.py",
+        "line": 20,
+        "is_method": false
+      },
+      {
+        "name": "check_never_optimize_for_output_volume",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/principles/behavioral.py",
+        "line": 16,
+        "is_method": false
+      },
+      {
+        "name": "check_never_require_manual_intervention",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/principles/behavioral.py",
+        "line": 28,
+        "is_method": false
+      },
+      {
+        "name": "check_success_criteria",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/assurance.py",
+        "line": 34,
+        "is_method": false
+      },
+      {
+        "name": "check_vibe_fail",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/humanizer_validator.py",
+        "line": 266,
+        "is_method": false
+      },
+      {
+        "name": "check_vibe_fail",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/humanizer_validator.py",
+        "line": 270,
+        "is_method": false
+      },
+      {
+        "name": "classify_intent_posture",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/intent_posture_classification.py",
+        "line": 6,
+        "is_method": false
+      },
+      {
+        "name": "classify_intent_posture",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/safety/intent_classification.py",
+        "line": 22,
+        "is_method": false
+      },
+      {
+        "name": "classify_maturity_level",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/intent_posture_classification.py",
+        "line": 184,
+        "is_method": false
+      },
+      {
+        "name": "classify_primary_intent",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/intent_posture_classification.py",
+        "line": 34,
+        "is_method": false
+      },
+      {
+        "name": "clear_caches",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/repository_discovery.py",
+        "line": 81,
+        "is_method": false
+      },
+      {
+        "name": "collect_paths",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tools/extract_paths_diff.py",
+        "line": 11,
+        "is_method": false
+      },
+      {
+        "name": "command_injection",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/test_repositories/python_web_app/test_repositories/javascript_react/test_repositories/legacy_codebase/test_repositories/security_focused/insecure.py",
+        "line": 10,
+        "is_method": false
+      },
+      {
+        "name": "command_injection",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/test_repositories/security_focused/insecure.py",
+        "line": 10,
+        "is_method": false
+      },
+      {
+        "name": "create_fallback_models",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/training/lightweight_trainer.py",
+        "line": 302,
+        "is_method": false
+      },
+      {
+        "name": "create_refusal_artifact",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/safety/refusal_artifact.py",
+        "line": 19,
+        "is_method": false
+      },
+      {
+        "name": "create_sample_analysis_results",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/test_batch_processing.py",
+        "line": 49,
+        "is_method": false
+      },
+      {
+        "name": "create_sample_bounty_data",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/test_batch_processing.py",
+        "line": 20,
+        "is_method": false
+      },
+      {
+        "name": "create_test_repo",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_determinism.py",
+        "line": 12,
+        "is_method": false
+      },
+      {
+        "name": "dangerous_function",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/test_repositories/python_web_app/test_repositories/javascript_react/test_repositories/legacy_codebase/test_repositories/security_focused/insecure.py",
+        "line": 5,
+        "is_method": false
+      },
+      {
+        "name": "dangerous_function",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/test_repositories/security_focused/insecure.py",
+        "line": 5,
+        "is_method": false
+      },
+      {
+        "name": "detect_build_systems",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/structural_modeling.py",
+        "line": 83,
+        "is_method": false
+      },
+      {
+        "name": "detect_configuration",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/structural_modeling.py",
+        "line": 136,
+        "is_method": false
+      },
+      {
+        "name": "detect_documentation",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/structural_modeling.py",
+        "line": 122,
+        "is_method": false
+      },
+      {
+        "name": "detect_frameworks",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/structural_modeling.py",
+        "line": 54,
+        "is_method": false
+      },
+      {
+        "name": "detect_languages",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/structural_modeling.py",
+        "line": 22,
+        "is_method": false
+      },
+      {
+        "name": "detect_test_frameworks",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/structural_modeling.py",
+        "line": 99,
+        "is_method": false
+      },
+      {
+        "name": "detect_test_frameworks_detailed",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/test_signal_analysis.py",
+        "line": 72,
+        "is_method": false
+      },
+      {
+        "name": "determine_development_stage",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/intent_posture_classification.py",
+        "line": 317,
+        "is_method": false
+      },
+      {
+        "name": "discover_repository_root",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/repository_discovery.py",
+        "line": 13,
+        "is_method": false
+      },
+      {
+        "name": "emit_refusal_artifact",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/safety/authority_ceiling.py",
+        "line": 27,
+        "is_method": false
+      },
+      {
+        "name": "enforce_authority_limits",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/principles/trust.py",
+        "line": 22,
+        "is_method": false
+      },
+      {
+        "name": "enforce_determinism",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/principles/trust.py",
+        "line": 10,
+        "is_method": false
+      },
+      {
+        "name": "enforce_determinism_guarantees",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/constraints/operating.py",
+        "line": 44,
+        "is_method": false
+      },
+      {
+        "name": "enforce_quality_bar",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/assurance.py",
+        "line": 30,
+        "is_method": false
+      },
+      {
+        "name": "enforce_reproducibility",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/principles/trust.py",
+        "line": 14,
+        "is_method": false
+      },
+      {
+        "name": "evaluate_authority_ceiling",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/authority_ceiling_evaluation.py",
+        "line": 6,
+        "is_method": false
+      },
+      {
+        "name": "evaluate_authority_ceiling",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/safety/authority_ceiling.py",
+        "line": 22,
+        "is_method": false
+      },
+      {
+        "name": "evaluate_confidence",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/risk/confidence_model.py",
+        "line": 15,
+        "is_method": false
+      },
+      {
+        "name": "evaluate_test_quality",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/test_signal_analysis.py",
+        "line": 164,
+        "is_method": false
+      },
+      {
+        "name": "execute_optimized_pipeline",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/optimized_analysis.py",
+        "line": 588,
+        "is_method": false
+      },
+      {
+        "name": "execute_pipeline",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/analysis.py",
+        "line": 91,
+        "is_method": false
+      },
+      {
+        "name": "gather_paths",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tools/find_json_differences.py",
+        "line": 12,
+        "is_method": false
+      },
+      {
+        "name": "generate_bounty_solution",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/services/bounty_service.py",
+        "line": 421,
+        "is_method": false
+      },
+      {
+        "name": "generate_decision_artifacts",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/decision_artifact_generation.py",
+        "line": 6,
+        "is_method": false
+      },
+      {
+        "name": "generate_decision_artifacts",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/risk/decision_artifacts.py",
+        "line": 14,
+        "is_method": false
+      },
+      {
+        "name": "generate_executive_verdict",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/output_contract.py",
+        "line": 1146,
+        "is_method": false
+      },
+      {
+        "name": "generate_machine_output",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/output_contract.py",
+        "line": 608,
+        "is_method": false
+      },
+      {
+        "name": "generate_maintainer_profile",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/maintainer_profile_engine.py",
+        "line": 578,
+        "is_method": false
+      },
+      {
+        "name": "generate_pr_for_bounty",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/pr_automation.py",
+        "line": 630,
+        "is_method": false
+      },
+      {
+        "name": "generate_pr_markdown",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/cli.py",
+        "line": 459,
+        "is_method": false
+      },
+      {
+        "name": "generate_primary_report",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/output_contract.py",
+        "line": 191,
+        "is_method": false
+      },
+      {
+        "name": "generate_risk_mitigations",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/intent_posture_classification.py",
+        "line": 450,
+        "is_method": false
+      },
+      {
+        "name": "get_ai_pipeline",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/inference_pipeline.py",
+        "line": 292,
+        "is_method": false
+      },
+      {
+        "name": "get_alert_manager",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/monitoring.py",
+        "line": 593,
+        "is_method": false
+      },
+      {
+        "name": "get_cached_model_loader",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/performance_optimizer.py",
+        "line": 223,
+        "is_method": false
+      },
+      {
+        "name": "get_call_name",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/scripts/generate_call_graph.py",
+        "line": 38,
+        "is_method": false
+      },
+      {
+        "name": "get_canonical_file_list",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/repository_discovery.py",
+        "line": 87,
+        "is_method": false
+      },
+      {
+        "name": "get_dir_hash",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_determinism.py",
+        "line": 40,
+        "is_method": false
+      },
+      {
+        "name": "get_file_counts",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/structural_modeling.py",
+        "line": 148,
+        "is_method": false
+      },
+      {
+        "name": "get_file_hash",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_determinism.py",
+        "line": 34,
+        "is_method": false
+      },
+      {
+        "name": "get_health_checker",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/monitoring.py",
+        "line": 585,
+        "is_method": false
+      },
+      {
+        "name": "get_memory_usage",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/performance_optimizer.py",
+        "line": 235,
+        "is_method": false
+      },
+      {
+        "name": "get_metrics_collector",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/monitoring.py",
+        "line": 581,
+        "is_method": false
+      },
+      {
+        "name": "get_pattern_model",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/training/lightweight_trainer.py",
+        "line": 295,
+        "is_method": false
+      },
+      {
+        "name": "get_performance_monitor",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/monitoring.py",
+        "line": 589,
+        "is_method": false
+      },
+      {
+        "name": "get_performance_optimizer",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/performance_optimizer.py",
+        "line": 216,
+        "is_method": false
+      },
+      {
+        "name": "handle_bounty_command",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/cli.py",
+        "line": 226,
+        "is_method": false
+      },
+      {
+        "name": "handle_scan_command",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/cli.py",
+        "line": 146,
+        "is_method": false
+      },
+      {
+        "name": "handle_unexpected_conditions",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/constraints/operating.py",
+        "line": 48,
+        "is_method": false
+      },
+      {
+        "name": "handle_validate_command",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/cli.py",
+        "line": 388,
+        "is_method": false
+      },
+      {
+        "name": "hello",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/test_repositories/minimal_library/mylib.py",
+        "line": 2,
+        "is_method": false
+      },
+      {
+        "name": "hello",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/test_repositories/mixed_enterprise/backend/app.py",
+        "line": 6,
+        "is_method": false
+      },
+      {
+        "name": "hello",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/test_repositories/python_web_app/app.py",
+        "line": 8,
+        "is_method": false
+      },
+      {
+        "name": "hello",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/fixtures/minimal_repo/sample.py",
+        "line": 4,
+        "is_method": false
+      },
+      {
+        "name": "high_ids",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tools/generate_calibration_report.py",
+        "line": 32,
+        "is_method": false
+      },
+      {
+        "name": "humanize_pr_description",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/humanizer_validator.py",
+        "line": 261,
+        "is_method": false
+      },
+      {
+        "name": "identify_compliance_artifacts",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/governance_signal_analysis.py",
+        "line": 238,
+        "is_method": false
+      },
+      {
+        "name": "identify_governance_gaps",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/governance_signal_analysis.py",
+        "line": 310,
+        "is_method": false
+      },
+      {
+        "name": "identify_test_files",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/test_signal_analysis.py",
+        "line": 22,
+        "is_method": false
+      },
+      {
+        "name": "identify_test_gaps",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/test_signal_analysis.py",
+        "line": 241,
+        "is_method": false
+      },
+      {
+        "name": "is_test_file",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/test_signal_analysis.py",
+        "line": 48,
+        "is_method": false
+      },
+      {
+        "name": "justify_confidence",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/risk/confidence_model.py",
+        "line": 20,
+        "is_method": false
+      },
+      {
+        "name": "lazy_import",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/performance_optimizer.py",
+        "line": 231,
+        "is_method": false
+      },
+      {
+        "name": "load_and_canon",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tools/determinism_diff.py",
+        "line": 30,
+        "is_method": false
+      },
+      {
+        "name": "load_json",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tools/find_json_differences.py",
+        "line": 8,
+        "is_method": false
+      },
+      {
+        "name": "load_lang_map",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tools/extract_file_language_diff.py",
+        "line": 10,
+        "is_method": false
+      },
+      {
+        "name": "load_schema",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/schema_validator.py",
+        "line": 28,
+        "is_method": false
+      },
+      {
+        "name": "login",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/test_repositories/python_web_app/app.py",
+        "line": 16,
+        "is_method": false
+      },
+      {
+        "name": "main",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/enhanced_scanner/baseline_assessment.py",
+        "line": 286,
+        "is_method": false
+      },
+      {
+        "name": "main",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/scripts/assess_operational_readiness.py",
+        "line": 312,
+        "is_method": false
+      },
+      {
+        "name": "main",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/scripts/execute_production_deployment.py",
+        "line": 462,
+        "is_method": false
+      },
+      {
+        "name": "main",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/scripts/generate_call_graph.py",
+        "line": 133,
+        "is_method": false
+      },
+      {
+        "name": "main",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/scripts/load_test.py",
+        "line": 95,
+        "is_method": false
+      },
+      {
+        "name": "main",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/scripts/validate_deployment.py",
+        "line": 209,
+        "is_method": false
+      },
+      {
+        "name": "main",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/scripts/validate_deployment_comprehensive.py",
+        "line": 782,
+        "is_method": false
+      },
+      {
+        "name": "main",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/cli.py",
+        "line": 15,
+        "is_method": false
+      },
+      {
+        "name": "main",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/training/bootstrap_trainer.py",
+        "line": 305,
+        "is_method": false
+      },
+      {
+        "name": "main",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/test_batch_processing.py",
+        "line": 80,
+        "is_method": false
+      },
+      {
+        "name": "main",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tools/determinism_diff.py",
+        "line": 35,
+        "is_method": false
+      },
+      {
+        "name": "main",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tools/triage_schema_failures.py",
+        "line": 68,
+        "is_method": false
+      },
+      {
+        "name": "model_safe_change_surface",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/safety/safe_change_surface.py",
+        "line": 22,
+        "is_method": false
+      },
+      {
+        "name": "old_function",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/test_repositories/legacy_codebase/old_code.py",
+        "line": 3,
+        "is_method": false
+      },
+      {
+        "name": "old_function",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/test_repositories/python_web_app/test_repositories/javascript_react/test_repositories/legacy_codebase/old_code.py",
+        "line": 3,
+        "is_method": false
+      },
+      {
+        "name": "optimize_algorithm",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/test_repositories/performance_critical/fast_code.py",
+        "line": 14,
+        "is_method": false
+      },
+      {
+        "name": "optimize_algorithm",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/test_repositories/python_web_app/test_repositories/javascript_react/test_repositories/legacy_codebase/test_repositories/performance_critical/fast_code.py",
+        "line": 14,
+        "is_method": false
+      },
+      {
+        "name": "optimize_memory",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/performance_optimizer.py",
+        "line": 239,
+        "is_method": false
+      },
+      {
+        "name": "output_dir",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_scanner_cli.py",
+        "line": 34,
+        "is_method": false
+      },
+      {
+        "name": "parse_json_input",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/cli.py",
+        "line": 443,
+        "is_method": false
+      },
+      {
+        "name": "parse_validator_message",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tools/triage_schema_failures.py",
+        "line": 21,
+        "is_method": false
+      },
+      {
+        "name": "recommend_fix",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tools/triage_schema_failures.py",
+        "line": 47,
+        "is_method": false
+      },
+      {
+        "name": "run_effectiveness_validation",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/validation/effectiveness_validator.py",
+        "line": 740,
+        "is_method": false
+      },
+      {
+        "name": "run_pytest",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tools/generate_verification_summary.py",
+        "line": 14,
+        "is_method": false
+      },
+      {
+        "name": "run_scanner",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_scanner_cli.py",
+        "line": 41,
+        "is_method": false
+      },
+      {
+        "name": "run_scanner_deterministic",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_determinism.py",
+        "line": 52,
+        "is_method": false
+      },
+      {
+        "name": "setup_ai_registry",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/setup_registry.py",
+        "line": 13,
+        "is_method": false
+      },
+      {
+        "name": "should_skip",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/scripts/generate_call_graph.py",
+        "line": 27,
+        "is_method": false
+      },
+      {
+        "name": "show_user_profile",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/test_repositories/python_web_app/app.py",
+        "line": 12,
+        "is_method": false
+      },
+      {
+        "name": "synthesize_risks",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/risk_synthesis.py",
+        "line": 6,
+        "is_method": false
+      },
+      {
+        "name": "synthesize_risks_and_gaps",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/risk/synthesis.py",
+        "line": 18,
+        "is_method": false
+      },
+      {
+        "name": "test_bounty_assessment_schema_noop",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_output_schemas.py",
+        "line": 15,
+        "is_method": false
+      },
+      {
+        "name": "test_cli_file_as_repo",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_scanner_cli.py",
+        "line": 74,
+        "is_method": false
+      },
+      {
+        "name": "test_cli_invalid_repository",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_scanner_cli.py",
+        "line": 65,
+        "is_method": false
+      },
+      {
+        "name": "test_cli_json_only",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_scanner_cli.py",
+        "line": 98,
+        "is_method": false
+      },
+      {
+        "name": "test_cli_markdown_only",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_scanner_cli.py",
+        "line": 89,
+        "is_method": false
+      },
+      {
+        "name": "test_cli_report_type_both",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_scanner_cli.py",
+        "line": 262,
+        "is_method": false
+      },
+      {
+        "name": "test_cli_report_type_comprehensive",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_scanner_cli.py",
+        "line": 229,
+        "is_method": false
+      },
+      {
+        "name": "test_cli_report_type_default",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_scanner_cli.py",
+        "line": 277,
+        "is_method": false
+      },
+      {
+        "name": "test_cli_report_type_verdict",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_scanner_cli.py",
+        "line": 243,
+        "is_method": false
+      },
+      {
+        "name": "test_cli_valid_repository",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_scanner_cli.py",
+        "line": 53,
+        "is_method": false
+      },
+      {
+        "name": "test_commit_fragmenter_fragment_changes_structure",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_pr_automation_unit.py",
+        "line": 25,
+        "is_method": false
+      },
+      {
+        "name": "test_determinism",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_scanner_cli.py",
+        "line": 160,
+        "is_method": false
+      },
+      {
+        "name": "test_determinism_different_output_dirs",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_determinism.py",
+        "line": 85,
+        "is_method": false
+      },
+      {
+        "name": "test_determinism_file_ordering",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_determinism.py",
+        "line": 174,
+        "is_method": false
+      },
+      {
+        "name": "test_determinism_json_canonical_sorting",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_determinism.py",
+        "line": 126,
+        "is_method": false
+      },
+      {
+        "name": "test_determinism_multiple_runs",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_determinism.py",
+        "line": 66,
+        "is_method": false
+      },
+      {
+        "name": "test_determinism_no_timestamps",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_determinism.py",
+        "line": 149,
+        "is_method": false
+      },
+      {
+        "name": "test_determinism_repository_content",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_determinism.py",
+        "line": 102,
+        "is_method": false
+      },
+      {
+        "name": "test_discover_repository_root_git",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_repository_discovery.py",
+        "line": 12,
+        "is_method": false
+      },
+      {
+        "name": "test_discover_repository_root_invalid_path",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_repository_discovery.py",
+        "line": 104,
+        "is_method": false
+      },
+      {
+        "name": "test_discover_repository_root_non_git",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_repository_discovery.py",
+        "line": 37,
+        "is_method": false
+      },
+      {
+        "name": "test_evidence_normalization_wrapping",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_evidence_normalization.py",
+        "line": 4,
+        "is_method": false
+      },
+      {
+        "name": "test_excludes_skip_generated_dirs_and_files",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_repository_discovery_excludes.py",
+        "line": 7,
+        "is_method": false
+      },
+      {
+        "name": "test_execute_pipeline_basic",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_pipeline.py",
+        "line": 9,
+        "is_method": false
+      },
+      {
+        "name": "test_execute_pipeline_empty_repo",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_pipeline.py",
+        "line": 56,
+        "is_method": false
+      },
+      {
+        "name": "test_execute_pipeline_file_sorting",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_pipeline.py",
+        "line": 90,
+        "is_method": false
+      },
+      {
+        "name": "test_execute_pipeline_git_repo",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_pipeline.py",
+        "line": 30,
+        "is_method": false
+      },
+      {
+        "name": "test_execute_pipeline_nested_structure",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_pipeline.py",
+        "line": 68,
+        "is_method": false
+      },
+      {
+        "name": "test_execute_pipeline_subdirectory_start",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_pipeline.py",
+        "line": 107,
+        "is_method": false
+      },
+      {
+        "name": "test_generate_executive_verdict_fail",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_output_contract.py",
+        "line": 168,
+        "is_method": false
+      },
+      {
+        "name": "test_generate_executive_verdict_insufficient_evidence",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_output_contract.py",
+        "line": 202,
+        "is_method": false
+      },
+      {
+        "name": "test_generate_executive_verdict_pass",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_output_contract.py",
+        "line": 135,
+        "is_method": false
+      },
+      {
+        "name": "test_generate_executive_verdict_word_limit",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_output_contract.py",
+        "line": 225,
+        "is_method": false
+      },
+      {
+        "name": "test_generate_machine_output_basic",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_output_contract.py",
+        "line": 51,
+        "is_method": false
+      },
+      {
+        "name": "test_generate_machine_output_fallback",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_output_contract.py",
+        "line": 84,
+        "is_method": false
+      },
+      {
+        "name": "test_generate_primary_report_basic",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_output_contract.py",
+        "line": 8,
+        "is_method": false
+      },
+      {
+        "name": "test_generate_primary_report_fallback",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_output_contract.py",
+        "line": 40,
+        "is_method": false
+      },
+      {
+        "name": "test_generated_artifact_high_without_evidence_is_dropped",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_adversarial_property.py",
+        "line": 7,
+        "is_method": false
+      },
+      {
+        "name": "test_get_canonical_file_list",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_repository_discovery.py",
+        "line": 49,
+        "is_method": false
+      },
+      {
+        "name": "test_get_canonical_file_list_empty",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_repository_discovery.py",
+        "line": 75,
+        "is_method": false
+      },
+      {
+        "name": "test_get_canonical_file_list_invalid_path",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_repository_discovery.py",
+        "line": 113,
+        "is_method": false
+      },
+      {
+        "name": "test_get_canonical_file_list_nested",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_repository_discovery.py",
+        "line": 84,
+        "is_method": false
+      },
+      {
+        "name": "test_golden_repos_precision_threshold",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_calibration_golden_repos.py",
+        "line": 15,
+        "is_method": false
+      },
+      {
+        "name": "test_high_findings_without_evidence_are_dropped",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_detectors_evidence_first.py",
+        "line": 4,
+        "is_method": false
+      },
+      {
+        "name": "test_machine_output_json_serializable",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_output_contract.py",
+        "line": 96,
+        "is_method": false
+      },
+      {
+        "name": "test_machine_output_schema_compliance",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_output_contract.py",
+        "line": 112,
+        "is_method": false
+      },
+      {
+        "name": "test_obfuscated_comment_evidence_populates_provenance",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_adversarial_property.py",
+        "line": 37,
+        "is_method": false
+      },
+      {
+        "name": "test_output_json_schema",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_scanner_cli.py",
+        "line": 130,
+        "is_method": false
+      },
+      {
+        "name": "test_output_markdown_structure",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_scanner_cli.py",
+        "line": 107,
+        "is_method": false
+      },
+      {
+        "name": "test_polyglot_file_without_evidence_is_dropped",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_adversarial_property.py",
+        "line": 84,
+        "is_method": false
+      },
+      {
+        "name": "test_provenance_population",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_provenance_fields.py",
+        "line": 5,
+        "is_method": false
+      },
+      {
+        "name": "test_provenance_population_for_existing_source",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_deterministic_provenance.py",
+        "line": 5,
+        "is_method": false
+      },
+      {
+        "name": "test_repo",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_scanner_cli.py",
+        "line": 15,
+        "is_method": false
+      },
+      {
+        "name": "test_repository_discovery_git_repo",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_scanner_cli.py",
+        "line": 186,
+        "is_method": false
+      },
+      {
+        "name": "test_repository_discovery_non_git",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_scanner_cli.py",
+        "line": 205,
+        "is_method": false
+      },
+      {
+        "name": "test_scan_report_includes_schema_version_if_defined",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_schema_version_compatibility.py",
+        "line": 7,
+        "is_method": false
+      },
+      {
+        "name": "test_scan_report_schema",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_output_schemas.py",
+        "line": 8,
+        "is_method": false
+      },
+      {
+        "name": "test_scanner_cli_invocation",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_scanner_cli.py",
+        "line": 223,
+        "is_method": false
+      },
+      {
+        "name": "test_surgical_minimalist_filter_handles_none_persona_and_returns_structure",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tests/test_pr_automation_unit.py",
+        "line": 5,
+        "is_method": false
+      },
+      {
+        "name": "train_bootstrap_models",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/ai/training/model_trainer.py",
+        "line": 382,
+        "is_method": false
+      },
+      {
+        "name": "triage_bounty_profitability",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/profitability_triage.py",
+        "line": 489,
+        "is_method": false
+      },
+      {
+        "name": "triage_from_text",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/tools/triage_schema_failures.py",
+        "line": 59,
+        "is_method": false
+      },
+      {
+        "name": "validate_against_schema",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/schema_validator.py",
+        "line": 62,
+        "is_method": false
+      },
+      {
+        "name": "validate_bounty_accuracy",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/accuracy_validator.py",
+        "line": 356,
+        "is_method": false
+      },
+      {
+        "name": "validate_bounty_assessment",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/schema_validator.py",
+        "line": 91,
+        "is_method": false
+      },
+      {
+        "name": "validate_bounty_solution",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/schema_validator.py",
+        "line": 95,
+        "is_method": false
+      },
+      {
+        "name": "validate_execution_constraints",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/constraints/operating.py",
+        "line": 40,
+        "is_method": false
+      },
+      {
+        "name": "validate_parallelism_guarantees",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/analysis.py",
+        "line": 332,
+        "is_method": false
+      },
+      {
+        "name": "validate_pr_humanity",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/bounty/humanizer_validator.py",
+        "line": 256,
+        "is_method": false
+      },
+      {
+        "name": "validate_scan_report",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/quality/schema_validator.py",
+        "line": 87,
+        "is_method": false
+      },
+      {
+        "name": "verify_determinism",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/src/core/pipeline/determinism_verification.py",
+        "line": 8,
+        "is_method": false
+      },
+      {
+        "name": "weak_crypto",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/test_repositories/python_web_app/test_repositories/javascript_react/test_repositories/legacy_codebase/test_repositories/security_focused/insecure.py",
+        "line": 15,
+        "is_method": false
+      },
+      {
+        "name": "weak_crypto",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/test_repositories/security_focused/insecure.py",
+        "line": 15,
+        "is_method": false
+      }
+    ],
+    "imports": [
+      "abc.ABC",
+      "abc.abstractmethod",
+      "adr_engine.ADREngine",
+      "ai.inference_pipeline.AIModelRegistry",
+      "ai.inference_pipeline.ModelMetadata",
+      "ai.inference_pipeline.get_ai_pipeline",
+      "aiofiles",
+      "aiohttp",
+      "api_integration_engine.analyze_api_integration_points",
+      "argparse",
+      "ast",
+      "asyncio",
+      "collections.Counter",
+      "collections.defaultdict",
+      "collections.deque",
+      "concurrent.futures",
+      "concurrent.futures.ThreadPoolExecutor",
+      "concurrent.futures.as_completed",
+      "contextlib.contextmanager",
+      "csv",
+      "dataclasses.asdict",
+      "dataclasses.dataclass",
+      "dataclasses.field",
+      "datasets",
+      "datetime.datetime",
+      "datetime.timedelta",
+      "difflib",
+      "docker",
+      "docker.errors.DockerException",
+      "exceptions.ValidationError",
+      "fastapi.BackgroundTasks",
+      "fastapi.FastAPI",
+      "fastapi.File",
+      "fastapi.HTTPException",
+      "fastapi.UploadFile",
+      "fastapi.responses.FileResponse",
+      "fastapi.responses.JSONResponse",
+      "flask.Flask",
+      "flask.request",
+      "functools",
+      "functools.lru_cache",
+      "gc",
+      "git",
+      "git.Repo",
+      "hashlib",
+      "historical_forensics.HistoricalForensicsEngine",
+      "inference_pipeline.BaseAIModel",
+      "inference_pipeline.InferenceResult",
+      "inference_pipeline.ModelMetadata",
+      "json",
+      "jsonschema",
+      "jsonschema.Draft7Validator",
+      "llama_cpp.Llama",
+      "logging",
+      "maintainer_profile_engine.MaintainerProfileEngine",
+      "markdown",
+      "math",
+      "matplotlib.pyplot",
+      "monitoring.get_performance_monitor",
+      "numpy",
+      "os",
+      "pathlib.Path",
+      "performance_optimizer.OptimizedThreadPool",
+      "performance_optimizer.get_cached_model_loader",
+      "performance_optimizer.get_performance_optimizer",
+      "performance_optimizer.lazy_import",
+      "pickle",
+      "platform",
+      "profitability_triage.triage_bounty_profitability",
+      "psutil",
+      "pydantic.BaseModel",
+      "pydantic.Field",
+      "pytest",
+      "re",
+      "requests",
+      "setuptools.setup",
+      "shutil",
+      "src.core.ai.training.data_pipeline.TrainingDataPipeline",
+      "src.core.ai.training.lightweight_trainer.LightweightTrainer",
+      "src.core.ai.training.lightweight_trainer.create_fallback_models",
+      "src.core.bounty.accuracy_validator.BountyAccuracyValidator",
+      "src.core.bounty.accuracy_validator.validate_bounty_accuracy",
+      "src.core.bounty.api_integration_engine.APIIntegrationEngine",
+      "src.core.bounty.api_integration_engine.analyze_api_integration_points",
+      "src.core.bounty.bounty_performance_optimizer.BountyAnalysisBatch",
+      "src.core.bounty.bounty_performance_optimizer.ParallelBountyAnalyzer",
+      "src.core.bounty.maintainer_profile_engine.MaintainerProfileEngine",
+      "src.core.bounty.maintainer_profile_engine.generate_maintainer_profile",
+      "src.core.bounty.pr_automation.CommitFragmenter",
+      "src.core.bounty.pr_automation.PRAutomationEngine",
+      "src.core.bounty.pr_automation.SurgicalMinimalistFilter",
+      "src.core.bounty.pr_automation.generate_pr_for_bounty",
+      "src.core.bounty.profitability_triage.ProfitabilityTriageEngine",
+      "src.core.bounty.profitability_triage.triage_bounty_profitability",
+      "src.core.bounty.reputation_monitor.ReputationMonitor",
+      "src.core.exceptions.AnalysisError",
+      "src.core.exceptions.FileAccessError",
+      "src.core.exceptions.OutputGenerationError",
+      "src.core.exceptions.RepositoryDiscoveryError",
+      "src.core.exceptions.ScannerError",
+      "src.core.exceptions.ValidationError",
+      "src.core.monitoring.get_alert_manager",
+      "src.core.monitoring.get_health_checker",
+      "src.core.monitoring.get_metrics_collector",
+      "src.core.monitoring.get_performance_monitor",
+      "src.core.pipeline.advanced_code_analysis.analyze_advanced_code",
+      "src.core.pipeline.analysis.execute_pipeline",
+      "src.core.pipeline.api_analysis.analyze_api_definitions",
+      "src.core.pipeline.authority_ceiling_evaluation.evaluate_authority_ceiling",
+      "src.core.pipeline.code_comprehension.analyze_code_comprehension",
+      "src.core.pipeline.code_duplication_analysis.analyze_code_duplication",
+      "src.core.pipeline.compliance_analysis.analyze_compliance",
+      "src.core.pipeline.decision_artifact_generation.generate_decision_artifacts",
+      "src.core.pipeline.dependency_analysis.analyze_dependencies",
+      "src.core.pipeline.determinism_verification.verify_determinism",
+      "src.core.pipeline.governance_signal_analysis.analyze_governance_signals",
+      "src.core.pipeline.intent_posture_classification.classify_intent_posture",
+      "src.core.pipeline.misleading_signal_detection.analyze_misleading_signals",
+      "src.core.pipeline.repository_discovery.discover_repository_root",
+      "src.core.pipeline.repository_discovery.get_canonical_file_list",
+      "src.core.pipeline.risk_synthesis.synthesize_risks",
+      "src.core.pipeline.safe_change_surface_modeling.analyze_safe_change_surface",
+      "src.core.pipeline.security_analysis.analyze_security_vulnerabilities",
+      "src.core.pipeline.static_semantic_analysis.analyze_semantic_structure",
+      "src.core.pipeline.structural_modeling.analyze_repository_structure",
+      "src.core.pipeline.test_signal_analysis.analyze_test_signals",
+      "src.core.quality.output_contract.generate_executive_verdict",
+      "src.core.quality.output_contract.generate_machine_output",
+      "src.core.quality.output_contract.generate_primary_report",
+      "src.core.quality.schema_validator",
+      "src.core.validation.backtesting.BacktestResult",
+      "src.core.validation.backtesting.DifferentialLogicOracle",
+      "src.core.validation.backtesting.HistoricalPR",
+      "src.core.validation.build_sandbox.BuildLockIntegritySandbox",
+      "src.core.validation.style_audit.ContextualGraftingAudit",
+      "src.core.validation.style_audit.StyleProfile",
+      "src.core.validation.transparency_audit.EthicalTransparencyAudit",
+      "src.services.bounty_service.BountyService",
+      "static_semantic_analysis.analyze_semantic_structure",
+      "statistics",
+      "style_analyzer.StyleAnalyzer",
+      "subprocess",
+      "sys",
+      "tempfile",
+      "threading",
+      "time",
+      "torch",
+      "torch.nn",
+      "torch.optim.AdamW",
+      "torch.utils.data.DataLoader",
+      "torch.utils.data.Dataset",
+      "transformers",
+      "transformers.AutoModelForCausalLM",
+      "transformers.AutoModelForSequenceClassification",
+      "transformers.AutoTokenizer",
+      "transformers.DataCollatorForLanguageModeling",
+      "transformers.DataCollatorWithPadding",
+      "transformers.Trainer",
+      "transformers.TrainingArguments",
+      "transformers.pipeline",
+      "typing.Any",
+      "typing.Dict",
+      "typing.List",
+      "typing.Optional",
+      "typing.Set",
+      "typing.Tuple",
+      "typing.Union",
+      "unittest.mock.Mock",
+      "unittest.mock.patch",
+      "urllib.parse.urlparse",
+      "uuid",
+      "uvicorn",
+      "yaml"
+    ],
+    "exports": [],
+    "complexity_signals": [],
+    "test_coverage_signals": [],
+    "total_classes": 119,
+    "total_functions": 318,
+    "total_modules": 121
+  },
+  "javascript_analysis": {
+    "modules": [
+      "/home/dee/workspace/AI/Repo-Scanner/test_component.js",
+      "/home/dee/workspace/AI/Repo-Scanner/test_repositories/javascript_react/src/App.js",
+      "/home/dee/workspace/AI/Repo-Scanner/test_repositories/python_web_app/test_repositories/javascript_react/src/App.js"
+    ],
+    "classes": [],
+    "functions": [
+      {
+        "name": "App",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/test_component.js",
+        "line": 0
+      },
+      {
+        "name": "App",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/test_component.js",
+        "line": 0
+      },
+      {
+        "name": "App",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/test_repositories/javascript_react/src/App.js",
+        "line": 0
+      },
+      {
+        "name": "App",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/test_repositories/javascript_react/src/App.js",
+        "line": 0
+      },
+      {
+        "name": "App",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/test_repositories/python_web_app/test_repositories/javascript_react/src/App.js",
+        "line": 0
+      },
+      {
+        "name": "App",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/test_repositories/python_web_app/test_repositories/javascript_react/src/App.js",
+        "line": 0
+      }
+    ],
+    "imports": [
+      "axios",
+      "react"
+    ],
+    "exports": [
+      "default"
+    ],
+    "react_components": [
+      "App"
+    ],
+    "complexity_signals": [],
+    "test_coverage_signals": [],
+    "total_classes": 0,
+    "total_functions": 6,
+    "total_modules": 3,
+    "total_react_components": 1
+  },
+  "typescript_analysis": {
+    "typescript_files_count": 0,
+    "has_react_components": false,
+    "has_tests": false,
+    "has_config": false
+  },
+  "java_analysis": {
+    "modules": [
+      "/home/dee/workspace/AI/Repo-Scanner/TestService.java"
+    ],
+    "classes": [
+      {
+        "name": "TestService",
+        "file": "/home/dee/workspace/AI/Repo-Scanner/TestService.java",
+        "line": 0
+      }
+    ],
+    "interfaces": [],
+    "enums": [],
+    "methods": [],
+    "imports": [
+      "java.util.ArrayList",
+      "java.util.List"
+    ],
+    "packages": [
+      "com.example"
+    ],
+    "annotations": [],
+    "complexity_signals": [],
+    "test_coverage_signals": [],
+    "total_classes": 1,
+    "total_interfaces": 0,
+    "total_enums": 0,
+    "total_methods": 0,
+    "total_modules": 1
+  },
+  "imports": {},
+  "exports": {},
+  "dependencies": {},
+  "code_quality_signals": []
+}

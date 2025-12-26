@@ -22,7 +22,7 @@ def test_scan_report_includes_schema_version_if_defined(tmp_path):
     if "schema_version" not in governance_props:
         pytest.skip("Schema does not declare governance.schema_version; skipping compatibility assertion")
 
-    # Generate a minimal machine output and assert presence of schema_version
+    # Generate a minimal machine output and assert presence and correctness of schema_version
     analysis = {
         "repository_root": str(tmp_path),
         "files": [],
@@ -33,3 +33,18 @@ def test_scan_report_includes_schema_version_if_defined(tmp_path):
     assert "schema_version" in gov and gov.get("schema_version"), (
         "Schema declares governance.schema_version but generated output is missing governance.schema_version"
     )
+
+    # Ensure the produced schema_version matches docs/schemas/VERSION
+    verpath = Path('docs') / 'schemas' / 'VERSION'
+    if verpath.exists():
+        expected = verpath.read_text(encoding='utf-8').strip()
+        assert gov.get('schema_version') == expected, (
+            f"Generated governance.schema_version ({gov.get('schema_version')}) does not match docs/schemas/VERSION ({expected})"
+        )
+
+    # Validate the generated output against the scan_report schema
+    # This will raise an exception (fail test) if validation fails.
+    from src.core.quality import schema_validator
+    tmp_json = tmp_path / 'scan_report.json'
+    tmp_json.write_text(json.dumps(out), encoding='utf-8')
+    schema_validator.validate_scan_report(str(tmp_json))
