@@ -1,0 +1,18 @@
+{
+  "id": "case_dcfb9106",
+  "title": "Test Enterprise Complexity Case",
+  "description": "Testing SME review process with a complex enterprise repository",
+  "category": "enterprise_complexity",
+  "priority": "critical",
+  "repository_url": "https://github.com/kubernetes/kubernetes",
+  "repository_path": null,
+  "analysis_result": {},
+  "expected_behavior": "Analysis should handle large monorepo gracefully",
+  "actual_behavior": "Analysis took 45 minutes and showed complexity warnings",
+  "error_details": null,
+  "submitted_by": "cli",
+  "submitted_at": "2025-12-28T20:16:22.465115",
+  "assigned_to": null,
+  "status": "pending",
+  "review_deadline": null
+}

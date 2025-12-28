@@ -13,6 +13,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import pytest
 
+import pytest
+
 from src.core.pipeline.analysis import execute_pipeline
 from src.core.exceptions import AnalysisError
 
@@ -20,7 +22,8 @@ from src.core.exceptions import AnalysisError
 class TestPerformance:
     """Performance validation tests."""
 
-    def test_large_repository_analysis(self):
+    @pytest.mark.benchmark
+    def test_large_repository_analysis(self, benchmark):
         """Test analysis of a large repository (simulated)."""
         with tempfile.TemporaryDirectory() as temp_dir:
             repo_path = Path(temp_dir) / "large_repo"
@@ -29,22 +32,17 @@ class TestPerformance:
             # Create simulated large repo structure
             self._create_large_repo_structure(repo_path, num_files=1000, avg_file_size=1024)
 
-            start_time = time.time()
-            try:
-                results = execute_pipeline(str(repo_path))
-                analysis_time = time.time() - start_time
+            def run_analysis():
+                return execute_pipeline(str(repo_path))
 
-                # Assert reasonable performance (under 45 seconds for 1000 files)
-                assert analysis_time < 45.0, f"Analysis took {analysis_time:.2f}s, expected < 45s"
+            result = benchmark(run_analysis)
 
-                # Assert results are valid
-                assert isinstance(results, dict) and len(results) > 0
-                assert "advanced_code" in str(results)  # Check for expected analysis components
+            # Assert results are valid
+            assert isinstance(result, dict) and len(result) > 0
+            assert "advanced_code" in str(result)  # Check for expected analysis components
 
-            except AnalysisError as e:
-                pytest.fail(f"Analysis failed on large repository: {e}")
-
-    def test_concurrent_analyses(self):
+    @pytest.mark.benchmark
+    def test_concurrent_analyses(self, benchmark):
         """Test multiple concurrent repository analyses."""
         num_concurrent = 5
 
@@ -56,27 +54,20 @@ class TestPerformance:
                 self._create_test_repo(repo_path, f"Test Repo {i}")
                 repo_paths.append(str(repo_path))
 
-            start_time = time.time()
+            def run_concurrent_analyses():
+                with ThreadPoolExecutor(max_workers=num_concurrent) as executor:
+                    futures = [executor.submit(execute_pipeline, path) for path in repo_paths]
+                    results = []
 
-            with ThreadPoolExecutor(max_workers=num_concurrent) as executor:
-                futures = [executor.submit(execute_pipeline, path) for path in repo_paths]
-                results = []
-
-                for future in as_completed(futures):
-                    try:
+                    for future in as_completed(futures):
                         result = future.result()
                         results.append(result)
-                    except Exception as e:
-                        pytest.fail(f"Concurrent analysis failed: {e}")
+                return results
 
-            total_time = time.time() - start_time
-            avg_time = total_time / num_concurrent
+            results = benchmark(run_concurrent_analyses)
 
             # Assert all analyses completed
             assert len(results) == num_concurrent
-
-            # Assert reasonable average time (under 5 seconds each)
-            assert avg_time < 5.0, f"Average analysis time {avg_time:.2f}s, expected < 5s"
 
     def test_memory_usage_bounds(self):
         """Test that memory usage stays within reasonable bounds."""

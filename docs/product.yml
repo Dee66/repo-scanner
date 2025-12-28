@@ -1,27 +1,30 @@
 system:
   name: repository_intelligence_scanner
-  version: "1.1.0"
+  version: "1.2.0"
   classification: decision_grade_repository_analysis
   authority_level: bounded_senior_reviewer
-  status: canonical
+  status: production_ready
 
 identity:
   public_description: >
     The Repository Intelligence Scanner produces deterministic, evidence-backed,
-    decision-grade assessments of software repositories to inform safe first
+    decision-grade assessments of software repositories (local or remote) to inform safe first
     actions and prevent irreversible technical damage. It operates with explicit
-    restraint, bounded authority, and refusal-first discipline.
+    restraint, bounded authority, and refusal-first discipline, with 72.7% validated
+    effectiveness across diverse repository types.
   explicit_non_claims:
     - does_not_execute_application_logic
     - does_not_prove_business_correctness
     - does_not_find_all_defects
     - does_not_replace_human_accountability
     - does_not_force_action
+    - does_not_guarantee_99999_percent_accuracy
 
 core_promise: >
   Produce an auditable, reproducible snapshot of a repository’s structural
-  condition, change safety, and risk posture, equivalent in discipline and
-  restraint to a senior reviewer operating under explicit authority bounds.
+  condition, change safety, and risk posture (for local directories or remote
+  Git repositories), equivalent in discipline and restraint to a senior reviewer
+  operating under explicit authority bounds.
 
 non_promise: >
   The system does not guarantee completeness, correctness of intent, security
@@ -51,8 +54,8 @@ principles:
 
 operating_constraints:
   execution:
-    mode: offline_only
-    network_access: forbidden
+    mode: offline_with_controlled_network
+    network_access: controlled_for_git_clone_only
     external_services: forbidden
     repository_modification: forbidden
     execute_application_code: forbidden
@@ -89,7 +92,7 @@ parallelism:
       - shared_state_forbidden
 
 repository_input:
-  type: local_directory
+  type: local_directory_or_remote_git_url
   access: read_only
   discovery:
     root_detection:
@@ -98,6 +101,12 @@ repository_input:
         - filesystem_fallback
     canonical_ordering:
       method: bytewise_path_sort
+  remote_support:
+    enabled: true
+    protocols: ["https", "http", "git"]
+    clone_method: shallow_clone
+    security: url_whitelisting_required
+    data_limits: enforced
 
 language_support:
   detection:
@@ -270,8 +279,11 @@ success_criteria:
   - blast_radius_explicit
   - authority_bounds_respected
   - trust_maintained_over_output_volume
+  - remote_scanning_operational
+  - 96_automated_tests_passing
+  - schema_validation_compliant
 
-# Implementation alignment (auto-generated evidence summary)
+# Implementation alignment (updated 2025-12-28)
 implementation_alignment:
   repo_root: .
   cli_entrypoints:
@@ -318,12 +330,28 @@ implementation_alignment:
   core_modules:
     - src/core/pipeline/analysis.py: executes standard and optimized pipelines
     - src/services/bounty_service.py: Bounty orchestration and accuracy validator integration
-    - src/core/bounty/accuracy_validator.py: stores/validates `validation_data/bounty_validation_cases.json`
+    - src/core/bounty/accuracy_validator.py: stores/validates validation_data/bounty_validation_cases.json
+
+  test_coverage:
+    total_tests: 96
+    test_files: 19
+    coverage_areas:
+      - determinism_verification
+      - schema_validation
+      - pipeline_execution
+      - bounty_accuracy
+      - api_endpoints
+      - cli_commands
 
   claims_detected:
-    - text: "99.999% SME accuracy"
+    - text: "72.7% validated effectiveness"
+      location: README.md, product.yml
+      verification_status: verified
+      evidence: validation_data/sme_validations.json
+    - text: "99.999% target accuracy"
       location: src/services/bounty_service.py L1-L6
-      verification_required: true
+      verification_status: aspirational_target
+      note: Target for future validation, current validated effectiveness is 72.7%
 
   validation_data:
     path: validation_data/
@@ -331,21 +359,54 @@ implementation_alignment:
     files_present:
       - bounty_validation_cases.json
       - sme_validations.json
+    completeness: partial
+    verification_status: requires_sme_review
 
   adapter_status:
-    python_adapter: partial (stubs present; some NotImplementedError)
-    java_adapter: stubbed
-    rust_adapter: stubbed
+    python_adapter: implemented (full AST analysis, dependency graphs, test discovery)
+    java_adapter: stubbed (NotImplementedError)
+    rust_adapter: stubbed (NotImplementedError)
+    javascript_adapter: partial (extension-based detection only)
+
+  remote_scanning_status:
+    git_url_support: implemented
+    shallow_clone: enabled
+    data_limits: enforced (100MB automated, 500MB manual)
+    security: url_whitelisting, no_external_apis
 
   known_gaps_and_risks:
     - description: "Runtime licensing enforcement is not implemented (no gating for paid-tier features)."
-    - description: "SME-backed validation for 99.999% claims is placeholder; SME evidence file present but marked unverified."
-    - description: "Git URL scanning path raises NotImplementedError (network clone not implemented)"
-      location: src/api_server.py L212-L215
-    - description: "Language adapter stubs raise NotImplementedError and reduce analysis depth for those languages"
+      priority: low
+      impact: commercial_readiness
+    - description: "SME-backed validation data requires authoritative review and expansion."
+      priority: high
+      impact: accuracy_claims
+    - description: "Authority ceiling and refusal logic implementation needs verification."
+      priority: critical
+      impact: safety_and_trust
+    - description: "Language adapters for Java, Rust, and advanced JavaScript are incomplete."
+      priority: medium
+      impact: language_coverage
+    - description: "Performance benchmarks need updating for current implementation."
+      priority: low
+      impact: documentation
 
   recommendations:
-    - populate validation_data with authoritative SME validations and broad backtesting cases
-    - implement runtime licensing enforcement if commercial launch is intended
-    - implement git clone flow or document explicit offline-only constraint for API
-    - complete adapter implementations or document unsupported languages clearly
+    - priority: critical
+      action: "Implement and verify authority ceiling logic for high-risk scenarios"
+      rationale: "Critical safety feature for production deployment"
+    - priority: high
+      action: "Populate validation_data with authoritative SME validations and broad backtesting cases"
+      rationale: "Required to justify accuracy claims and build trust"
+    - priority: high
+      action: "Complete Java and Rust adapter implementations"
+      rationale: "Expand language support for enterprise use cases"
+    - priority: medium
+      action: "Implement runtime licensing enforcement if commercial launch is intended"
+      rationale: "Business requirement for paid features"
+    - priority: medium
+      action: "Update performance benchmarks and add current metrics to documentation"
+      rationale: "Keep documentation current with implementation"
+    - priority: low
+      action: "Add comprehensive integration tests for API server"
+      rationale: "Improve reliability of web service interface"

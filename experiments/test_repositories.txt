@@ -1,0 +1,26 @@
+# Sample repositories for A/B testing
+# Mix of different languages and complexity levels
+
+# Python repositories
+https://github.com/pallets/flask.git
+https://github.com/psf/requests.git
+
+# Java repositories
+https://github.com/spring-projects/spring-boot.git
+https://github.com/google/guava.git
+
+# JavaScript repositories
+https://github.com/expressjs/express.git
+https://github.com/lodash/lodash.git
+
+# Rust repositories
+https://github.com/rust-lang/regex.git
+https://github.com/tokio-rs/tokio.git
+
+# Go repositories
+https://github.com/golang/go.git
+https://github.com/kubernetes/kubernetes.git
+
+# C++ repositories
+https://github.com/google/googletest.git
+https://github.com/facebook/folly.git

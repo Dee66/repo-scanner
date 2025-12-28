@@ -1,0 +1,149 @@
+"""Request timeouts and resource limits for operational stability."""
+
+import os
+import signal
+import time
+import threading
+from contextlib import contextmanager
+from typing import Optional, Callable, Any
+import psutil
+import resource
+
+# Timeout and resource limit configuration
+TIMEOUT_CONFIG = {
+    "git_clone_timeout": int(os.getenv("REPO_SCANNER_GIT_CLONE_TIMEOUT", "300")),  # 5 minutes
+    "analysis_timeout": int(os.getenv("REPO_SCANNER_ANALYSIS_TIMEOUT", "600")),   # 10 minutes
+    "api_request_timeout": int(os.getenv("REPO_SCANNER_API_TIMEOUT", "60")),      # 1 minute
+    "health_check_timeout": int(os.getenv("REPO_SCANNER_HEALTH_TIMEOUT", "30")),  # 30 seconds
+}
+
+RESOURCE_LIMITS = {
+    "max_memory_mb": int(os.getenv("REPO_SCANNER_MAX_MEMORY_MB", "2048")),  # 2GB
+    "max_cpu_percent": int(os.getenv("REPO_SCANNER_MAX_CPU_PERCENT", "80")),  # 80%
+    "max_file_descriptors": int(os.getenv("REPO_SCANNER_MAX_FD", "1024")),    # 1024 files
+}
+
+class TimeoutError(Exception):
+    """Exception raised when an operation times out."""
+    pass
+
+class ResourceLimitError(Exception):
+    """Exception raised when resource limits are exceeded."""
+    pass
+
+def set_process_limits():
+    """Set resource limits for the current process."""
+    try:
+        # Set memory limit (soft limit)
+        memory_bytes = RESOURCE_LIMITS["max_memory_mb"] * 1024 * 1024
+        resource.setrlimit(resource.RLIMIT_AS, (memory_bytes, memory_bytes * 2))
+
+        # Set file descriptor limit
+        resource.setrlimit(resource.RLIMIT_NOFILE, (RESOURCE_LIMITS["max_file_descriptors"],
+                                                   RESOURCE_LIMITS["max_file_descriptors"] * 2))
+
+        # Set CPU time limit (prevent infinite loops)
+        cpu_seconds = TIMEOUT_CONFIG["analysis_timeout"] * 2  # Allow 2x analysis time
+        resource.setrlimit(resource.RLIMIT_CPU, (cpu_seconds, cpu_seconds * 2))
+
+    except (OSError, ValueError) as e:
+        # Resource limits may not be available on all platforms
+        pass
+
+def check_resource_usage() -> dict:
+    """Check current resource usage against limits."""
+    try:
+        process = psutil.Process()
+        memory_mb = process.memory_info().rss / 1024 / 1024
+        cpu_percent = process.cpu_percent(interval=1.0)
+
+        return {
+            "memory_mb": memory_mb,
+            "cpu_percent": cpu_percent,
+            "memory_limit_exceeded": memory_mb > RESOURCE_LIMITS["max_memory_mb"],
+            "cpu_limit_exceeded": cpu_percent > RESOURCE_LIMITS["max_cpu_percent"],
+        }
+    except Exception:
+        return {
+            "memory_mb": 0,
+            "cpu_percent": 0,
+            "memory_limit_exceeded": False,
+            "cpu_limit_exceeded": False,
+        }
+
+@contextmanager
+def timeout_context(seconds: int, operation_name: str = "operation"):
+    """Context manager for operation timeouts."""
+    def timeout_handler(signum, frame):
+        raise TimeoutError(f"{operation_name} timed out after {seconds} seconds")
+
+    # Set up the timeout
+    old_handler = signal.signal(signal.SIGALRM, timeout_handler)
+    signal.alarm(seconds)
+
+    try:
+        yield
+    finally:
+        # Clean up the timeout
+        signal.alarm(0)
+        signal.signal(signal.SIGALRM, old_handler)
+
+def with_timeout(timeout_seconds: int, operation_name: str = "operation"):
+    """Decorator to add timeout to functions."""
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            with timeout_context(timeout_seconds, operation_name):
+                return func(*args, **kwargs)
+        return wrapper
+    return decorator
+
+def with_resource_limits(operation_name: str = "operation"):
+    """Decorator to enforce resource limits during execution."""
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            # Set process limits
+            set_process_limits()
+
+            # Monitor resources in background
+            stop_monitoring = threading.Event()
+            resource_violations = []
+
+            def monitor_resources():
+                while not stop_monitoring.is_set():
+                    usage = check_resource_usage()
+                    if usage["memory_limit_exceeded"]:
+                        resource_violations.append(f"Memory limit exceeded: {usage['memory_mb']:.1f}MB > {RESOURCE_LIMITS['max_memory_mb']}MB")
+                    if usage["cpu_limit_exceeded"]:
+                        resource_violations.append(f"CPU limit exceeded: {usage['cpu_percent']:.1f}% > {RESOURCE_LIMITS['max_cpu_percent']}%")
+
+                    time.sleep(5)  # Check every 5 seconds
+
+            monitor_thread = threading.Thread(target=monitor_resources, daemon=True)
+            monitor_thread.start()
+
+            try:
+                result = func(*args, **kwargs)
+
+                # Check for resource violations
+                if resource_violations:
+                    raise ResourceLimitError(f"{operation_name} exceeded resource limits: {'; '.join(resource_violations)}")
+
+                return result
+
+            finally:
+                stop_monitoring.set()
+                monitor_thread.join(timeout=1.0)  # Wait up to 1 second for monitor to stop
+
+        return wrapper
+    return decorator
+
+# Specific timeout decorators for common operations
+git_clone_timeout = with_timeout(TIMEOUT_CONFIG["git_clone_timeout"], "git_clone")
+analysis_timeout = with_timeout(TIMEOUT_CONFIG["analysis_timeout"], "analysis")
+api_timeout = with_timeout(TIMEOUT_CONFIG["api_request_timeout"], "api_request")
+health_check_timeout = with_timeout(TIMEOUT_CONFIG["health_check_timeout"], "health_check")
+
+# Resource limit decorators
+git_clone_limits = with_resource_limits("git_clone")
+analysis_limits = with_resource_limits("analysis")
+api_limits = with_resource_limits("api_request")

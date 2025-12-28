@@ -26,5 +26,12 @@ DATA_USAGE_CONFIG = {
         "track_large_files_threshold_mb": 50,
         "log_usage_stats": True,
         "ci_stricter_limits": True
+    },
+    "performance": {
+        "cpu_threshold_percent": 80,
+        "memory_threshold_percent": 85,
+        "disk_threshold_percent": 90,
+        "load_average_multiplier": 2.0,
+        "response_time_ms_threshold": 5000
     }
 }

@@ -3,12 +3,16 @@
 import time
 import psutil
 import logging
+import asyncio
+import threading
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
 from collections import defaultdict, deque
 import threading
 from dataclasses import dataclass, field
 from contextlib import contextmanager
+import os
+import sys
 
 logger = logging.getLogger(__name__)
 
@@ -99,6 +103,10 @@ class MetricsCollector:
         with self.lock:
             if name in self.metrics:
                 self.metrics[name].points.append(point)
+
+    def increment_counter(self, name: str, value: float = 1.0, labels: Dict[str, str] = None):
+        """Increment a counter metric (alias for increment)."""
+        self.increment(name, value, labels)
 
     def observe_histogram(self, name: str, value: float, labels: Dict[str, str] = None):
         """Observe a histogram metric value."""
@@ -219,15 +227,39 @@ class MetricsCollector:
         return result
 
 class HealthChecker:
-    """Comprehensive health checking for the scanner."""
+    """Comprehensive health checking for 99.999% uptime monitoring."""
 
     def __init__(self):
         self.last_health_check = 0
         self.health_cache = {}
         self.cache_ttl = 30  # seconds
 
+        # Uptime tracking for 99.999% SLA
+        self.start_time = time.time()
+        self.uptime_history = deque(maxlen=1000)  # Track last 1000 health checks
+        self.downtime_events = []
+        self.last_downtime_start = None
+
+        # Performance thresholds for 99.999% uptime
+        self.performance_thresholds = {
+            'cpu_percent': 95,  # Max CPU usage
+            'memory_percent': 90,  # Max memory usage
+            'disk_percent': 95,  # Max disk usage
+            'response_time_seconds': 30,  # Max response time
+            'error_rate_percent': 0.001,  # Max error rate (0.001% for 99.999%)
+        }
+
+        # Dependency health checks
+        self.dependency_checks = {
+            'circuit_breakers': self._check_circuit_breakers,
+            'error_handling': self._check_error_handling,
+            'external_apis': self._check_external_apis,
+            'filesystem': self._check_filesystem,
+            'network': self._check_network,
+        }
+
     def check_health(self) -> Dict[str, Any]:
-        """Perform comprehensive health check."""
+        """Perform comprehensive health check for 99.999% uptime."""
         now = time.time()
 
         # Use cached result if recent
@@ -237,29 +269,116 @@ class HealthChecker:
         health_status = {
             'status': 'healthy',
             'timestamp': datetime.utcnow().isoformat(),
+            'uptime': self._calculate_uptime(),
+            'sla_compliance': self._check_sla_compliance(),
             'checks': {},
-            'overall_healthy': True
+            'overall_healthy': True,
+            'version': '1.1.0'
         }
 
         # System resource checks
         health_status['checks']['cpu'] = self._check_cpu()
         health_status['checks']['memory'] = self._check_memory()
         health_status['checks']['disk'] = self._check_disk()
+        health_status['checks']['load_average'] = self._check_load_average()
 
         # Application checks
         health_status['checks']['imports'] = self._check_imports()
         health_status['checks']['database'] = self._check_database()
+        health_status['checks']['configuration'] = self._check_configuration()
+        health_status['checks']['circuit_breakers'] = self._check_circuit_breakers()
+        health_status['checks']['error_handling'] = self._check_error_handling()
+
+        # External dependency checks
+        health_status['checks']['external_apis'] = self._check_external_apis()
+        health_status['checks']['filesystem'] = self._check_filesystem()
+        health_status['checks']['network'] = self._check_network()
+
+        # Dependency checks
+        for dep_name, check_func in self.dependency_checks.items():
+            try:
+                health_status['checks'][dep_name] = check_func()
+            except Exception as e:
+                health_status['checks'][dep_name] = {
+                    'healthy': False,
+                    'error': f'Health check failed: {e}'
+                }
+
+        # Performance checks
+        health_status['checks']['performance'] = self._check_performance()
 
         # Determine overall health
         for check_name, check_result in health_status['checks'].items():
             if not check_result.get('healthy', True):
                 health_status['overall_healthy'] = False
                 health_status['status'] = 'unhealthy'
+                self._record_downtime()
+                break
+        else:
+            self._record_uptime()
 
+        # Update cache
         self.last_health_check = now
         self.health_cache = health_status
 
         return health_status
+
+    def _calculate_uptime(self) -> Dict[str, Any]:
+        """Calculate uptime statistics for 99.999% SLA monitoring."""
+        total_runtime = time.time() - self.start_time
+        healthy_checks = sum(1 for status in self.uptime_history if status)
+        total_checks = len(self.uptime_history)
+
+        uptime_percentage = (healthy_checks / max(total_checks, 1)) * 100
+        sla_compliant = uptime_percentage >= 99.999  # 99.999% = 5.26 minutes downtime per year
+
+        return {
+            'total_seconds': total_runtime,
+            'uptime_percentage': uptime_percentage,
+            'sla_compliant': sla_compliant,
+            'downtime_events': len(self.downtime_events),
+            'last_downtime': self.downtime_events[-1] if self.downtime_events else None
+        }
+
+    def _check_sla_compliance(self) -> Dict[str, Any]:
+        """Check SLA compliance for 99.999% uptime."""
+        uptime_info = self._calculate_uptime()
+
+        # Calculate allowed downtime (5.26 minutes per year for 99.999%)
+        total_runtime_hours = uptime_info['total_seconds'] / 3600
+        allowed_downtime_minutes = total_runtime_hours * (1 - 0.99999) * 60
+
+        actual_downtime_minutes = sum(
+            (end - start) for start, end in self.downtime_events
+            if end is not None
+        ) / 60
+
+        return {
+            'compliant': uptime_info['sla_compliant'],
+            'uptime_percentage': uptime_info['uptime_percentage'],
+            'allowed_downtime_minutes': allowed_downtime_minutes,
+            'actual_downtime_minutes': actual_downtime_minutes,
+            'remaining_downtime_budget': max(0, allowed_downtime_minutes - actual_downtime_minutes)
+        }
+
+    def _record_uptime(self):
+        """Record a successful health check."""
+        self.uptime_history.append(True)
+        if self.last_downtime_start is not None:
+            # End current downtime period
+            self.downtime_events.append((self.last_downtime_start, time.time()))
+            self.last_downtime_start = None
+
+    def _record_downtime(self):
+        """Record a failed health check."""
+        self.uptime_history.append(False)
+        if self.last_downtime_start is None:
+            # Start new downtime period
+            self.last_downtime_start = time.time()
+
+    async def check_system_health(self) -> Dict[str, Any]:
+        """Async wrapper for health check."""
+        return self.check_health()
 
     def _check_cpu(self) -> Dict[str, Any]:
         """Check CPU usage."""
@@ -340,6 +459,241 @@ class HealthChecker:
             return {
                 'healthy': True,
                 'message': 'In-memory storage accessible'
+            }
+        except Exception as e:
+            return {
+                'healthy': False,
+                'error': str(e)
+            }
+
+    def _check_load_average(self) -> Dict[str, Any]:
+        """Check system load average."""
+        try:
+            load_avg = os.getloadavg()
+            cpu_count = os.cpu_count() or 1
+            # Consider unhealthy if load average > 2x CPU count
+            threshold = cpu_count * 2
+            current_load = load_avg[0]  # 1-minute load average
+
+            return {
+                'healthy': current_load < threshold,
+                'value': current_load,
+                'unit': 'load',
+                'threshold': threshold,
+                'details': {
+                    '1min': load_avg[0],
+                    '5min': load_avg[1],
+                    '15min': load_avg[2],
+                    'cpu_count': cpu_count
+                }
+            }
+        except Exception as e:
+            return {
+                'healthy': False,
+                'error': str(e)
+            }
+
+    def _check_configuration(self) -> Dict[str, Any]:
+        """Check configuration validity."""
+        try:
+            from src.core.system_config import DATA_USAGE_CONFIG
+            # Check that critical config values are present and valid
+            required_keys = ['limits', 'monitoring', 'performance']
+            for key in required_keys:
+                if key not in DATA_USAGE_CONFIG:
+                    return {
+                        'healthy': False,
+                        'error': f'Missing required config key: {key}'
+                    }
+
+            return {
+                'healthy': True,
+                'message': 'Configuration valid'
+            }
+        except Exception as e:
+            return {
+                'healthy': False,
+                'error': str(e)
+            }
+
+    def _check_circuit_breakers(self) -> Dict[str, Any]:
+        """Check circuit breaker health."""
+        try:
+            from .circuit_breaker import get_circuit_breaker_registry
+            registry = get_circuit_breaker_registry()
+            metrics = registry.get_all_metrics()
+
+            # Check if any circuit breakers are stuck open
+            open_breakers = []
+            total_requests = 0
+            failed_requests = 0
+
+            for name, breaker_metrics in metrics.items():
+                if breaker_metrics['state'] == 'open':
+                    open_breakers.append(name)
+                total_requests += breaker_metrics['metrics']['total_requests']
+                failed_requests += breaker_metrics['metrics']['failed_requests']
+
+            # Consider unhealthy if >50% of breakers are open or error rate >1%
+            error_rate = (failed_requests / max(total_requests, 1)) * 100
+            too_many_open = len(open_breakers) > len(metrics) * 0.5
+
+            return {
+                'healthy': not too_many_open and error_rate < 1.0,
+                'total_breakers': len(metrics),
+                'open_breakers': open_breakers,
+                'error_rate_percent': error_rate,
+                'details': metrics
+            }
+        except Exception as e:
+            return {
+                'healthy': False,
+                'error': str(e)
+            }
+
+    def _check_error_handling(self) -> Dict[str, Any]:
+        """Check error handling system health."""
+        try:
+            from .error_handling import get_error_handler
+            error_handler = get_error_handler()
+            metrics = error_handler.get_error_metrics()
+
+            # Check error rates - unhealthy if >0.1% error rate in recent history
+            total_errors = metrics.get('total_errors', 0)
+            recent_errors = len(metrics.get('recent_errors', []))
+
+            # For 99.999% uptime, we want very low error rates
+            error_rate_acceptable = total_errors < 10 or recent_errors < 1
+
+            return {
+                'healthy': error_rate_acceptable,
+                'total_errors': total_errors,
+                'recent_errors': recent_errors,
+                'recovery_strategies': len(metrics.get('recovery_strategies', [])),
+                'details': metrics
+            }
+        except Exception as e:
+            return {
+                'healthy': False,
+                'error': str(e)
+            }
+
+    def _check_external_apis(self) -> Dict[str, Any]:
+        """Check external API connectivity (lightweight checks only)."""
+        try:
+            import requests
+
+            # Quick connectivity check to a reliable external service
+            # Using a fast, reliable endpoint that doesn't cost anything
+            test_urls = [
+                'https://httpbin.org/status/200',  # Free test service
+                'https://httpstat.us/200'  # Another free test service
+            ]
+
+            for url in test_urls:
+                try:
+                    response = requests.get(url, timeout=5)
+                    if response.status_code == 200:
+                        return {
+                            'healthy': True,
+                            'message': 'External API connectivity confirmed',
+                            'response_time_ms': response.elapsed.total_seconds() * 1000
+                        }
+                except Exception:
+                    continue  # Try next URL
+
+            return {
+                'healthy': False,
+                'error': 'All external API connectivity checks failed'
+            }
+        except Exception as e:
+            return {
+                'healthy': False,
+                'error': str(e)
+            }
+
+    def _check_filesystem(self) -> Dict[str, Any]:
+        """Check filesystem health."""
+        try:
+            import tempfile
+
+            # Test write permissions
+            with tempfile.NamedTemporaryFile(mode='w', delete=True) as f:
+                f.write('test')
+                f.flush()
+
+            # Test read permissions on critical directories
+            critical_paths = [
+                '/tmp',
+                os.getcwd(),
+                os.path.dirname(sys.executable) if sys.executable else '/usr'
+            ]
+
+            for path in critical_paths:
+                if os.path.exists(path):
+                    try:
+                        os.listdir(path)
+                    except PermissionError:
+                        return {
+                            'healthy': False,
+                            'error': f'No read permission for {path}'
+                        }
+
+            return {
+                'healthy': True,
+                'message': 'Filesystem access confirmed'
+            }
+        except Exception as e:
+            return {
+                'healthy': False,
+                'error': str(e)
+            }
+
+    def _check_network(self) -> Dict[str, Any]:
+        """Check basic network connectivity."""
+        try:
+            import socket
+
+            # Test DNS resolution
+            socket.gethostbyname('google.com')
+
+            # Test basic connectivity
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.settimeout(5)
+            result = sock.connect_ex(('8.8.8.8', 53))  # Google DNS
+            sock.close()
+
+            return {
+                'healthy': result == 0,
+                'message': 'Network connectivity confirmed' if result == 0 else 'Network connectivity failed'
+            }
+        except Exception as e:
+            return {
+                'healthy': False,
+                'error': str(e)
+            }
+
+    def _check_performance(self) -> Dict[str, Any]:
+        """Check system performance against thresholds."""
+        try:
+            # Get current metrics
+            cpu_check = self._check_cpu()
+            memory_check = self._check_memory()
+            load_check = self._check_load_average()
+
+            # Check against performance thresholds
+            cpu_healthy = cpu_check['value'] < self.performance_thresholds['cpu_percent']
+            memory_healthy = memory_check['value'] < self.performance_thresholds['memory_percent']
+            load_healthy = load_check['healthy']
+
+            overall_healthy = cpu_healthy and memory_healthy and load_healthy
+
+            return {
+                'healthy': overall_healthy,
+                'cpu_usage': cpu_check['value'],
+                'memory_usage': memory_check['value'],
+                'load_average': load_check['value'],
+                'thresholds': self.performance_thresholds
             }
         except Exception as e:
             return {

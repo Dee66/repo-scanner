@@ -1,0 +1,114 @@
+{
+  "id": "test_misleading_detection_improvements_1766945422",
+  "name": "Test Misleading Detection Improvements",
+  "description": "Testing enhanced misleading signal detection algorithms",
+  "status": "draft",
+  "created_at": "2025-12-28T20:10:22.765075",
+  "variants": [
+    {
+      "name": "control",
+      "type": "control",
+      "config": {
+        "description": "Control configuration - baseline analysis settings",
+        "pipeline": {
+          "complexity_threshold": 1000,
+          "enable_enterprise_handling": true,
+          "enable_misleading_detection": true
+        },
+        "adapters": {
+          "java": {
+            "enable_ast_analysis": true,
+            "enable_dependency_graph": true
+          },
+          "rust": {
+            "enable_regex_parsing": true
+          },
+          "javascript": {
+            "enable_npm_analysis": true
+          }
+        }
+      },
+      "description": "Baseline configuration"
+    },
+    {
+      "name": "treatment_1",
+      "type": "treatment",
+      "config": {
+        "description": "Treatment 1 - Enhanced misleading signal detection with higher sensitivity",
+        "pipeline": {
+          "complexity_threshold": 1000,
+          "enable_enterprise_handling": true,
+          "enable_misleading_detection": true,
+          "misleading_detection_sensitivity": 0.8
+        },
+        "adapters": {
+          "java": {
+            "enable_ast_analysis": true,
+            "enable_dependency_graph": true
+          },
+          "rust": {
+            "enable_regex_parsing": true
+          },
+          "javascript": {
+            "enable_npm_analysis": true
+          }
+        }
+      },
+      "description": "Treatment variant 1"
+    },
+    {
+      "name": "treatment_2",
+      "type": "treatment",
+      "config": {
+        "description": "Treatment 2 - Performance optimized analysis with reduced complexity threshold",
+        "pipeline": {
+          "complexity_threshold": 500,
+          "enable_enterprise_handling": true,
+          "enable_misleading_detection": true,
+          "performance_mode": true
+        },
+        "adapters": {
+          "java": {
+            "enable_ast_analysis": false,
+            "enable_dependency_graph": true
+          },
+          "rust": {
+            "enable_regex_parsing": true
+          },
+          "javascript": {
+            "enable_npm_analysis": true
+          }
+        }
+      },
+      "description": "Treatment variant 2"
+    }
+  ],
+  "test_repositories": [
+    "# Sample repositories for A/B testing",
+    "# Mix of different languages and complexity levels",
+    "# Python repositories",
+    "https://github.com/pallets/flask.git",
+    "https://github.com/psf/requests.git",
+    "# Java repositories",
+    "https://github.com/spring-projects/spring-boot.git",
+    "https://github.com/google/guava.git",
+    "# JavaScript repositories",
+    "https://github.com/expressjs/express.git",
+    "https://github.com/lodash/lodash.git",
+    "# Rust repositories",
+    "https://github.com/rust-lang/regex.git",
+    "https://github.com/tokio-rs/tokio.git",
+    "# Go repositories",
+    "https://github.com/golang/go.git",
+    "https://github.com/kubernetes/kubernetes.git",
+    "# C++ repositories",
+    "https://github.com/google/googletest.git",
+    "https://github.com/facebook/folly.git"
+  ],
+  "metrics": [
+    "success_rate",
+    "analysis_time"
+  ],
+  "results": [],
+  "analysis": null
+}

@@ -1,0 +1,20 @@
+{
+  "description": "Control configuration - baseline analysis settings",
+  "pipeline": {
+    "complexity_threshold": 1000,
+    "enable_enterprise_handling": true,
+    "enable_misleading_detection": true
+  },
+  "adapters": {
+    "java": {
+      "enable_ast_analysis": true,
+      "enable_dependency_graph": true
+    },
+    "rust": {
+      "enable_regex_parsing": true
+    },
+    "javascript": {
+      "enable_npm_analysis": true
+    }
+  }
+}

@@ -162,6 +162,23 @@ api:
       memory: "2Gi"
       cpu: "1000m"
 
+# Secure Configuration Management
+secureConfig:
+  enabled: true
+  encryptionKey: "your-encryption-key-here"  # Generate a strong key
+  configDir: "/app/config"
+  
+  # Default configuration values
+  defaults:
+    api_server.enabled: true
+    api_server.port: 8080
+    api_server.host: "0.0.0.0"
+    security.rate_limit_per_minute: 100
+    security.max_file_size_mb: 100
+    health_monitoring.enabled: true
+    metrics.enabled: true
+    circuit_breaker.enabled: true
+
 ingress:
   enabled: true
   hosts:
@@ -177,6 +194,54 @@ autoscaling:
   enabled: true
   minReplicas: 2
   maxReplicas: 10
+```
+
+##### Secure Configuration Management
+
+The scanner includes enterprise-grade secure configuration management:
+
+**Features:**
+- Encrypted configuration storage
+- Schema validation for all settings
+- Audit trails for configuration changes
+- API endpoints for configuration management
+- Environment variable integration
+
+**Configuration Keys:**
+- `api_server.*`: API server settings
+- `security.*`: Security and rate limiting
+- `health_monitoring.*`: Health check configuration
+- `metrics.*`: Metrics collection settings
+- `circuit_breaker.*`: Circuit breaker protection
+- `tracing.*`: Distributed tracing
+- `alerting.*`: Alert notification settings
+
+**API Endpoints:**
+```bash
+# Set configuration
+curl -X POST https://scanner.yourcompany.com/api/config/set \
+  -H "Content-Type: application/json" \
+  -d '{"key": "security.rate_limit_per_minute", "value": 200}'
+
+# Get configuration
+curl https://scanner.yourcompany.com/api/config/get/security.rate_limit_per_minute
+
+# List all configurations
+curl https://scanner.yourcompany.com/api/config/list
+
+# View audit trail
+curl https://scanner.yourcompany.com/api/config/audit
+```
+
+**Environment Variables:**
+```bash
+# Required for encryption
+REPO_SCANNER_CONFIG_KEY="your-encryption-key"
+REPO_SCANNER_CONFIG_DIR="/app/config"
+
+# Optional: Pre-populate configuration
+REPO_SCANNER_API_PORT=8080
+REPO_SCANNER_API_HOST=0.0.0.0
 ```
 
 #### CI/CD Pipeline

@@ -175,6 +175,248 @@ class TestCrossPlatform:
             results = execute_pipeline(str(repo_path))
             assert isinstance(results, dict) and len(results) > 0
 
+    def test_line_endings(self):
+        """Test handling of different line ending styles."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            repo_path = Path(temp_dir) / "line_endings_repo"
+            repo_path.mkdir()
+            self._init_git_repo(repo_path)
+
+            # Create files with different line endings
+            lf_content = "line1\nline2\nline3\n"  # Unix LF
+            crlf_content = "line1\r\nline2\r\nline3\r\n"  # Windows CRLF
+            cr_content = "line1\rline2\rline3\r"  # Old Mac CR
+
+            (repo_path / "unix_style.py").write_text(lf_content)
+            (repo_path / "windows_style.py").write_text(crlf_content)
+            (repo_path / "mac_style.py").write_text(cr_content)
+
+            self._git_add_commit(repo_path, "Add line ending test files")
+
+            # Analysis should handle all line ending styles
+            results = execute_pipeline(str(repo_path))
+            assert isinstance(results, dict) and len(results) > 0
+
+    def test_case_sensitivity(self):
+        """Test handling of case-sensitive vs case-insensitive filesystems."""
+        system = platform.system().lower()
+        case_sensitive = system in ["linux", "darwin"]  # Unix-like systems are case-sensitive
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            repo_path = Path(temp_dir) / "case_test_repo"
+            repo_path.mkdir()
+            self._init_git_repo(repo_path)
+
+            # Create files with similar names but different case
+            (repo_path / "Test.py").write_text("class TestClass:\n    pass\n")
+            (repo_path / "test.py").write_text("def test_function():\n    pass\n")
+
+            if case_sensitive:
+                # On case-sensitive systems, both files should exist
+                assert (repo_path / "Test.py").exists()
+                assert (repo_path / "test.py").exists()
+            else:
+                # On case-insensitive systems, second file might overwrite first
+                # This is expected behavior, just ensure analysis doesn't crash
+                pass
+
+            self._git_add_commit(repo_path, "Add case sensitivity test files")
+
+            # Analysis should handle case sensitivity appropriately
+            results = execute_pipeline(str(repo_path))
+            assert isinstance(results, dict) and len(results) > 0
+
+    def test_symlinks(self):
+        """Test handling of symbolic links."""
+        if platform.system().lower() == "windows":
+            pytest.skip("Symlink test not applicable on Windows without admin privileges")
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            repo_path = Path(temp_dir) / "symlink_test_repo"
+            repo_path.mkdir()
+            self._init_git_repo(repo_path)
+
+            # Create a real file
+            real_file = repo_path / "real_file.py"
+            real_file.write_text("print('real file')")
+
+            # Create a symlink to it
+            symlink_file = repo_path / "symlink_file.py"
+            symlink_file.symlink_to(real_file)
+
+            # Create a directory and symlink to it
+            real_dir = repo_path / "real_dir"
+            real_dir.mkdir()
+            (real_dir / "nested.py").write_text("print('nested')")
+
+            symlink_dir = repo_path / "symlink_dir"
+            symlink_dir.symlink_to(real_dir)
+
+            self._git_add_commit(repo_path, "Add symlink test files")
+
+            # Analysis should handle symlinks gracefully
+            results = execute_pipeline(str(repo_path))
+            assert isinstance(results, dict) and len(results) > 0
+
+    def test_large_files(self):
+        """Test handling of large files."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            repo_path = Path(temp_dir) / "large_file_repo"
+            repo_path.mkdir()
+            self._init_git_repo(repo_path)
+
+            # Create a large file (10MB)
+            large_file = repo_path / "large_file.py"
+            large_content = "# Large file\n" + "x = " + str(list(range(100000))) + "\n"
+            large_file.write_text(large_content)
+
+            # Create a normal file
+            normal_file = repo_path / "normal.py"
+            normal_file.write_text("print('normal file')")
+
+            self._git_add_commit(repo_path, "Add large file test")
+
+            # Analysis should handle large files without crashing
+            results = execute_pipeline(str(repo_path))
+            assert isinstance(results, dict) and len(results) > 0
+
+    def test_special_characters_in_paths(self):
+        """Test handling of special characters in file paths."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            repo_path = Path(temp_dir) / "special_chars_repo"
+            repo_path.mkdir()
+            self._init_git_repo(repo_path)
+
+            # Create files with special characters in names
+            special_files = [
+                "file@symbol.py",
+                "file#hash.py",
+                "file$dollar.py",
+                "file%percent.py",
+                "file&ampersand.py",
+                "file*asterisk.py",  # This might cause issues on some systems
+            ]
+
+            created_files = []
+            for filename in special_files:
+                try:
+                    file_path = repo_path / filename
+                    file_path.write_text(f'"""File with special char: {filename}"""\nx = 1')
+                    created_files.append(filename)
+                except (OSError, ValueError):
+                    # Skip files that can't be created
+                    continue
+
+            if created_files:  # Only commit if we created some files
+                self._git_add_commit(repo_path, "Add special character test files")
+
+                # Analysis should handle special characters in paths
+                results = execute_pipeline(str(repo_path))
+                assert isinstance(results, dict) and len(results) > 0
+
+    def test_empty_and_whitespace_files(self):
+        """Test handling of empty files and files with only whitespace."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            repo_path = Path(temp_dir) / "empty_files_repo"
+            repo_path.mkdir()
+            self._init_git_repo(repo_path)
+
+            # Create various types of minimal files
+            (repo_path / "empty.py").write_text("")
+            (repo_path / "whitespace_only.py").write_text("   \n\t\n  \n")
+            (repo_path / "comment_only.py").write_text("# Just a comment\n")
+            (repo_path / "minimal.py").write_text("x=1")
+
+            self._git_add_commit(repo_path, "Add empty/whitespace test files")
+
+            # Analysis should handle empty and whitespace files gracefully
+            results = execute_pipeline(str(repo_path))
+            assert isinstance(results, dict) and len(results) > 0
+
+    def test_nested_directory_depth(self):
+        """Test handling of deeply nested directory structures."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            repo_path = Path(temp_dir) / "nested_repo"
+            repo_path.mkdir()
+            self._init_git_repo(repo_path)
+
+            # Create deeply nested structure
+            current_path = repo_path
+            for i in range(10):  # 10 levels deep
+                current_path = current_path / f"level_{i}"
+                current_path.mkdir()
+                (current_path / f"file_{i}.py").write_text(f"print('level {i}')")
+
+            self._git_add_commit(repo_path, "Add nested directory test")
+
+            # Analysis should handle deep directory structures
+            results = execute_pipeline(str(repo_path))
+            assert isinstance(results, dict) and len(results) > 0
+
+    def test_mixed_file_types(self):
+        """Test handling of repositories with mixed file types."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            repo_path = Path(temp_dir) / "mixed_types_repo"
+            repo_path.mkdir()
+            self._init_git_repo(repo_path)
+
+            # Create files of different types
+            file_types = [
+                ("python.py", "def hello():\n    print('python')"),
+                ("javascript.js", "function hello() {\n    console.log('javascript');\n}"),
+                ("markdown.md", "# Markdown\n\nThis is a markdown file."),
+                ("json.json", '{"key": "value"}'),
+                ("yaml.yml", "key: value\n"),
+                ("text.txt", "Plain text file"),
+                ("binary.bin", b"\x00\x01\x02\x03"),  # Binary content
+            ]
+
+            for filename, content in file_types:
+                file_path = repo_path / filename
+                if isinstance(content, str):
+                    file_path.write_text(content)
+                else:
+                    file_path.write_bytes(content)
+
+            self._git_add_commit(repo_path, "Add mixed file types test")
+
+            # Analysis should handle mixed file types gracefully
+            results = execute_pipeline(str(repo_path))
+            assert isinstance(results, dict) and len(results) > 0
+
+    def test_timezone_handling(self):
+        """Test handling of different timezone configurations."""
+        import time
+        original_tz = os.environ.get('TZ')
+
+        try:
+            # Test with different timezone settings
+            timezones = ['UTC', 'America/New_York', 'Europe/London', 'Asia/Tokyo']
+
+            for tz in timezones:
+                os.environ['TZ'] = tz
+                time.tzset()  # Update timezone
+
+                with tempfile.TemporaryDirectory() as temp_dir:
+                    repo_path = Path(temp_dir) / f"tz_{tz.replace('/', '_')}_repo"
+                    repo_path.mkdir()
+                    self._init_git_repo(repo_path)
+
+                    (repo_path / "test.py").write_text("import time\nprint(time.time())")
+                    self._git_add_commit(repo_path, f"Add timezone test for {tz}")
+
+                    # Analysis should work regardless of timezone
+                    results = execute_pipeline(str(repo_path))
+                    assert isinstance(results, dict) and len(results) > 0
+
+        finally:
+            # Restore original timezone
+            if original_tz:
+                os.environ['TZ'] = original_tz
+            else:
+                os.environ.pop('TZ', None)
+            time.tzset()
+
     def _init_git_repo(self, path: Path):
         """Initialize a git repository."""
         import subprocess

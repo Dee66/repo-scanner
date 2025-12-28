@@ -1,6 +1,8 @@
 """Authority Ceiling Evaluation for Repository Intelligence Scanner."""
 
 from typing import Dict, List
+from src.core.safety.blast_radius_calculator import BlastRadiusCalculator, should_refuse_analysis, generate_refusal_reason
+from src.core.safety.governance_signal_validator import GovernanceSignalValidator, governance_signals_require_attention
 
 
 def evaluate_authority_ceiling(file_list: List[str], structure: Dict, semantic: Dict,
@@ -33,8 +35,44 @@ def evaluate_authority_ceiling(file_list: List[str], structure: Dict, semantic: 
     # Get current authority ceiling from decision artifacts
     current_ceiling = decision_artifacts.get("authority_ceiling", {})
 
+    # Calculate blast radius to check for unbounded scenarios
+    blast_radius_calculator = BlastRadiusCalculator()
+    repository_analysis = {
+        "file_list": file_list,
+        "structure": structure,
+        "semantic": semantic,
+        "test_signals": test_signals,
+        "governance": governance,
+        "intent_posture": intent_posture,
+        "misleading_signals": misleading_signals,
+        "safe_change_surface": safe_change_surface,
+        "risk_synthesis": risk_synthesis,
+        "decision_artifacts": decision_artifacts
+    }
+    blast_radius_result = blast_radius_calculator.calculate_blast_radius(repository_analysis)
+
+    # Validate governance signals for consistency and contradictions
+    governance_validator = GovernanceSignalValidator()
+    governance_validation = governance_validator.validate_governance_signals(governance)
+
+    # Check for unbounded blast radius - this triggers immediate refusal
+    if should_refuse_analysis(blast_radius_result):
+        refusal_reason = generate_refusal_reason(blast_radius_result)
+        return {
+            "refusal_required": True,
+            "refusal_reason": refusal_reason,
+            "blast_radius_analysis": blast_radius_result,
+            "governance_validation": governance_validation,
+            "final_authority_ceiling": {"level": "refused", "reason": "unbounded_blast_radius"},
+            "evaluation_timestamp": "2025-01-01T00:00:00Z",
+            "evaluation_version": "1.0.0"
+        }
+
+    # Check for governance signal issues - may elevate authority requirements
+    governance_attention_required = governance_signals_require_attention(governance_validation)
+
     # Evaluate authority constraints
-    authority_constraints = _evaluate_authority_constraints(risk_synthesis, intent_posture, governance)
+    authority_constraints = _evaluate_authority_constraints(risk_synthesis, intent_posture, governance, blast_radius_result, governance_validation)
 
     # Assess organizational factors
     organizational_factors = _assess_organizational_factors(structure, intent_posture)
@@ -49,17 +87,20 @@ def evaluate_authority_ceiling(file_list: List[str], structure: Dict, semantic: 
     authority_confidence = _assess_authority_confidence(final_ceiling, decision_artifacts)
 
     return {
+        "refusal_required": False,
         "final_authority_ceiling": final_ceiling,
         "authority_constraints": authority_constraints,
         "organizational_factors": organizational_factors,
         "authority_rationale": authority_rationale,
         "authority_confidence": authority_confidence,
+        "blast_radius_analysis": blast_radius_result,
+        "governance_analysis": governance_validation,
         "evaluation_timestamp": "2025-01-01T00:00:00Z",  # Fixed timestamp for determinism
         "evaluation_version": "1.0.0"
     }
 
 
-def _evaluate_authority_constraints(risk_synthesis: Dict, intent_posture: Dict, governance: Dict) -> Dict:
+def _evaluate_authority_constraints(risk_synthesis: Dict, intent_posture: Dict, governance: Dict, blast_radius: Dict, governance_validation: Dict) -> Dict:
     """Evaluate constraints that affect authority levels."""
     overall_risk = risk_synthesis.get("overall_risk_assessment", {})
     risk_level = overall_risk.get("overall_risk_level", "low")
@@ -70,6 +111,42 @@ def _evaluate_authority_constraints(risk_synthesis: Dict, intent_posture: Dict, 
     governance_maturity = governance.get("governance_maturity_score", 0)
 
     constraints = []
+
+    # Blast radius constraints - highest priority
+    if not blast_radius.get("bounded", True):
+        radius_estimate = blast_radius.get("radius_estimate", "unknown")
+        unbounded_reasons = blast_radius.get("unbounded_reasons", [])
+        
+        if radius_estimate == "unbounded":
+            constraints.append({
+                "constraint_type": "blast_radius",
+                "severity": "critical",
+                "description": f"Unbounded blast radius: {', '.join(unbounded_reasons)}",
+                "authority_minimum": "senior_architect",
+                "rationale": "Unbounded blast radius requires highest authority level to prevent catastrophic impact"
+            })
+
+    # Governance signal contradiction constraints
+    if governance_signals_require_attention(governance_validation):
+        contradictions = governance_validation.get("contradictions", [])
+        completeness = governance_validation.get("completeness_score", 0)
+        
+        if len(contradictions) > 0:
+            constraints.append({
+                "constraint_type": "governance_contradiction",
+                "severity": "high",
+                "description": f"Governance signal contradictions detected: {len(contradictions)} issues",
+                "authority_minimum": "senior_technical_lead",
+                "rationale": "Contradictory governance signals require senior oversight to resolve"
+            })
+        elif completeness < 0.7:
+            constraints.append({
+                "constraint_type": "governance_incomplete",
+                "severity": "medium",
+                "description": f"Incomplete governance signals: {completeness:.1%} complete",
+                "authority_minimum": "technical_lead",
+                "rationale": "Incomplete governance requires experienced oversight"
+            })
 
     # Risk-based constraints
     if risk_level == "high":
@@ -125,10 +202,15 @@ def _evaluate_authority_constraints(risk_synthesis: Dict, intent_posture: Dict, 
             "rationale": "Governance gaps need experienced oversight"
         })
 
+    # Calculate highest severity with proper ordering
+    severity_order = {"low": 0, "medium": 1, "high": 2, "critical": 3}
+    severities = [c.get("severity", "low") for c in constraints]
+    highest_severity = max(severities, key=lambda s: severity_order.get(s, 0), default="low")
+
     return {
         "constraints": constraints,
         "constraint_count": len(constraints),
-        "highest_severity": max([c.get("severity", "low") for c in constraints], default="low")
+        "highest_severity": highest_severity
     }
 
 

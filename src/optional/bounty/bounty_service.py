@@ -16,8 +16,14 @@ from src.core.bounty.pr_automation import PRAutomationEngine, generate_pr_for_bo
 from src.core.bounty.accuracy_validator import BountyAccuracyValidator, validate_bounty_accuracy
 from src.core.bounty.reputation_monitor import ReputationMonitor
 from src.core.bounty.bounty_performance_optimizer import ParallelBountyAnalyzer, BountyAnalysisBatch
+from ..circuit_breaker import circuit_breaker, API_CALLS_CONFIG, HTTP_REQUESTS_CONFIG
+from ..error_handling import with_error_handling, async_with_error_handling, API_RETRY_CONFIG, NETWORK_RETRY_CONFIG
+from ..recovery_strategies import register_all_recovery_strategies
 
 logger = logging.getLogger(__name__)
+
+# Initialize recovery strategies
+register_all_recovery_strategies()
 
 
 class BountyService:
@@ -32,15 +38,22 @@ class BountyService:
         self.reputation_monitor = ReputationMonitor()
         self.parallel_analyzer = ParallelBountyAnalyzer(max_workers=max_workers) if enable_parallel else None
 
+    @circuit_breaker("algora_api", API_CALLS_CONFIG)
+    @with_error_handling("fetch_bounties", "bounty_service", API_RETRY_CONFIG)
+    def _make_algora_request(self, url: str, payload: Dict) -> Dict:
+        """Make HTTP request to Algora API with circuit breaker and error handling protection."""
+        response = requests.post(url, json=payload, timeout=API_CALLS_CONFIG.timeout)
+        response.raise_for_status()
+        return response.json()
+
+    @with_error_handling("fetch_bounties", "bounty_service")
     def fetch_bounties(self, org: str, limit: int = 10, status: str = "active") -> List[Dict]:
-        """Fetch bounties from Algora.io API."""
-        url = "https://console.algora.io/api/trpc/bounty.list"
-        payload = {"input": {"org": org, "limit": limit, "status": status}}
-        
+        """Fetch bounties from Algora.io API with comprehensive error handling."""
         try:
-            response = requests.post(url, json=payload, timeout=30)
-            response.raise_for_status()
-            data = response.json()
+            url = "https://console.algora.io/api/trpc/bounty.list"
+            payload = {"input": {"org": org, "limit": limit, "status": status}}
+            
+            data = self._make_algora_request(url, payload)
             
             # Extract items from the response
             result_data = data.get("result", {}).get("data", {})
@@ -83,21 +96,28 @@ class BountyService:
             logger.error(f"Failed to fetch bounties from Algora: {e}")
             raise
 
+    @circuit_breaker("github_api", HTTP_REQUESTS_CONFIG)
+    @with_error_handling("fetch_github_issues", "bounty_service", NETWORK_RETRY_CONFIG)
+    def _make_github_request(self, url: str, params: Dict) -> List[Dict]:
+        """Make HTTP request to GitHub API with circuit breaker and error handling protection."""
+        response = requests.get(url, params=params, timeout=HTTP_REQUESTS_CONFIG.timeout)
+        response.raise_for_status()
+        return response.json()
+
+    @with_error_handling("fetch_github_issues", "bounty_service")
     def fetch_github_issues(self, repo: str, labels: str = "bounty", limit: int = 10) -> List[Dict]:
-        """Fetch GitHub issues labeled as bounties."""
-        url = f"https://api.github.com/repos/{repo}/issues"
-        params = {
-            "state": "open",
-            "labels": labels,
-            "per_page": min(limit, 100),  # GitHub max 100 per page
-            "sort": "created",
-            "direction": "asc"  # Oldest first for less time-sensitive
-        }
-        
+        """Fetch GitHub issues labeled as bounties with comprehensive error handling."""
         try:
-            response = requests.get(url, params=params, timeout=30)
-            response.raise_for_status()
-            issues = response.json()
+            url = f"https://api.github.com/repos/{repo}/issues"
+            params = {
+                "state": "open",
+                "labels": labels,
+                "per_page": min(limit, 100),  # GitHub max 100 per page
+                "sort": "created",
+                "direction": "asc"  # Oldest first for less time-sensitive
+            }
+            
+            issues = self._make_github_request(url, params)
             
             # Limit to requested number
             issues = issues[:limit]

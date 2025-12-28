@@ -8,7 +8,24 @@ from pathlib import Path
 from typing import Dict, List, Any
 
 from ..performance_optimizer import OptimizedThreadPool, get_performance_optimizer
-from ..monitoring import get_performance_monitor
+
+# Optional monitoring import
+try:
+    from src.optional.monitoring import get_performance_monitor
+except ImportError:
+    # Fallback when monitoring is not available
+    def get_performance_monitor():
+        return None
+
+# Optional tracing import
+try:
+    from src.optional.tracing import get_tracer
+    TRACING_AVAILABLE = True
+except ImportError:
+    TRACING_AVAILABLE = False
+
+# Timeout and resource limit imports
+from ..timeouts_and_limits import analysis_timeout, analysis_limits
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +48,7 @@ from src.core.pipeline.risk_synthesis import synthesize_risks
 from src.core.pipeline.decision_artifact_generation import generate_decision_artifacts
 from src.core.pipeline.authority_ceiling_evaluation import evaluate_authority_ceiling
 from src.core.pipeline.determinism_verification import verify_determinism
+from src.core.pipeline.enterprise_edge_case_handler import EnterpriseRepositoryHandler, EdgeCaseConfig
 
 
 class FileCache:
@@ -88,11 +106,33 @@ PARALLELISM_MODEL = {
     ]
 }
 
+@analysis_timeout
+@analysis_limits
 def execute_pipeline(repository_path: str) -> dict:
     """Execute the full analysis pipeline with automatic optimization selection."""
     start_time = time.time()
     performance_optimizer = get_performance_optimizer()
     performance_monitor = get_performance_monitor()
+
+    # Start distributed tracing span if enabled
+    span = None
+    if TRACING_AVAILABLE:
+        tracer = get_tracer(__name__)
+        if tracer:
+            span = tracer.start_as_span("execute_pipeline", attributes={"repository_path": repository_path})
+            span.set_attribute("component", "analysis_pipeline")
+
+    # Optional metrics collection
+    metrics_collector = None
+    operation_start = None
+    try:
+        from src.optional.metrics_collector import get_metrics_collector, record_operation_start
+        metrics_collector = get_metrics_collector()
+        operation_start = record_operation_start("analysis_pipeline", {"repository_path": repository_path})
+        print(f"DEBUG: Metrics recording started for {repository_path}, operation_start={operation_start}")
+    except ImportError as e:
+        print(f"DEBUG: Failed to import metrics collector: {e}")
+        pass
 
     # Start performance tracking
     performance_monitor.start_operation("pipeline_execution", {"repository_path": repository_path})
@@ -108,10 +148,63 @@ def execute_pipeline(repository_path: str) -> dict:
 
         if not isinstance(file_list, list):
             file_list = []
+        
+        # Debug: check file_list contents
+        logger.info(f"Repository root: {repo_root}")
+        logger.info(f"File list length: {len(file_list)}")
+        if file_list:
+            logger.info(f"First file: {file_list[0]}, type: {type(file_list[0])}")
+            # Check if any items are not strings
+            non_strings = [f for f in file_list if not isinstance(f, str)]
+            if non_strings:
+                logger.error(f"Non-string items in file_list: {len(non_strings)} items, first 5: {non_strings[:5]}")
 
         # Auto-select pipeline based on repository complexity
-        if len(file_list) > 200 or _estimate_repository_complexity(file_list) > 50:
+        complexity_threshold = 1000  # Much higher threshold for enterprise repos
+        if len(file_list) > complexity_threshold or _estimate_enterprise_complexity(file_list, repository_path) > 100:
+            logger.info(f"Enterprise-scale repository detected ({len(file_list)} files), using enterprise edge case handler")
+
+            # Use enterprise edge case handler for very complex repositories
+            edge_case_config = EdgeCaseConfig(
+                max_file_size_mb=100,  # Allow larger files for enterprise
+                max_memory_usage_mb=4096,  # Allow more memory
+                analysis_timeout_seconds=3600,  # 1 hour timeout
+                max_concurrent_threads=12,
+                batch_size=50  # Smaller batches for stability
+            )
+
+            handler = EnterpriseRepositoryHandler(edge_case_config)
+            enterprise_result = handler.process_repository(repository_path, file_list)
+
+            # Complete performance tracking
+            execution_time = time.time() - start_time
+            performance_monitor.complete_operation("pipeline_execution", {
+                "execution_time": execution_time,
+                "file_count": len(file_list),
+                "pipeline_type": "enterprise_edge_case",
+                "status": "success" if "results" in enterprise_result else "partial",
+                "edge_cases_handled": enterprise_result.get("edge_cases_handled", {})
+            })
+
+            # Optional metrics completion for enterprise pipeline
+            if metrics_collector and operation_start:
+                try:
+                    from src.optional.metrics_collector import record_operation_end
+                    record_operation_end("analysis_pipeline", operation_start, "results" in enterprise_result, None, {
+                        "execution_time": execution_time,
+                        "file_count": len(file_list),
+                        "pipeline_type": "enterprise_edge_case",
+                        "edge_cases_handled": enterprise_result.get("edge_cases_handled", {})
+                    })
+                    print(f"DEBUG: Metrics recorded for enterprise pipeline, success={'results' in enterprise_result}")
+                except ImportError:
+                    pass
+
+            return enterprise_result
+
+        elif len(file_list) > 200 or _estimate_repository_complexity(file_list) > 50:
             logger.info(f"Complex repository detected ({len(file_list)} files), using optimized pipeline")
+            logger.info(f"Repository path type: {type(repository_path)}, value: {repository_path}")
             try:
                 from .optimized_analysis import execute_optimized_pipeline
                 result = execute_optimized_pipeline(repository_path)
@@ -123,6 +216,20 @@ def execute_pipeline(repository_path: str) -> dict:
                     "pipeline_type": "optimized",
                     "status": "success"
                 })
+
+                # Optional metrics completion for optimized pipeline
+                if metrics_collector and operation_start:
+                    try:
+                        from src.optional.metrics_collector import record_operation_end
+                        record_operation_end("analysis_pipeline", operation_start, True, None, {
+                            "execution_time": execution_time,
+                            "file_count": len(file_list),
+                            "pipeline_type": "optimized"
+                        })
+                        print(f"DEBUG: Metrics recorded for optimized pipeline")
+                    except ImportError:
+                        pass
+
                 return result
             except ImportError as e:
                 logger.warning(f"Optimized pipeline not available ({e}), falling back to standard pipeline")
@@ -142,6 +249,26 @@ def execute_pipeline(repository_path: str) -> dict:
             "status": "success"
         })
 
+        # Optional metrics completion
+        if metrics_collector and operation_start:
+            try:
+                from src.optional.metrics_collector import record_operation_end
+                record_operation_end("analysis_pipeline", operation_start, True, None, {
+                    "execution_time": execution_time,
+                    "file_count": len(file_list),
+                    "pipeline_type": "standard"
+                })
+                print(f"DEBUG: Metrics recorded for standard pipeline")
+            except ImportError:
+                pass
+
+        # Close tracing span
+        if span:
+            span.set_attribute("execution_time", execution_time)
+            span.set_attribute("file_count", len(file_list))
+            span.set_attribute("status", "success")
+            span.end()
+
         return result
 
     except Exception as e:
@@ -152,12 +279,38 @@ def execute_pipeline(repository_path: str) -> dict:
             "status": "failed",
             "error": str(e)
         })
+
+        # Optional metrics completion for failed operations
+        if metrics_collector and operation_start:
+            try:
+                from src.optional.metrics_collector import record_operation_end
+                record_operation_end("analysis_pipeline", operation_start, False, str(e), {
+                    "execution_time": execution_time,
+                    "error": str(e)
+                })
+            except ImportError:
+                pass
+
+        # Close tracing span with error
+        if span:
+            span.set_attribute("execution_time", execution_time)
+            span.set_attribute("status", "failed")
+            span.set_attribute("error", str(e))
+            span.end()
+
         raise
 
 def _estimate_repository_complexity(file_list: List[str]) -> float:
     """Estimate repository complexity based on file count and types."""
     if not file_list:
         return 0.0
+
+    # Validate input
+    if not all(isinstance(f, str) for f in file_list):
+        non_strings = [f for f in file_list if not isinstance(f, str)]
+        print(f"DEBUG: Non-string items in file_list for complexity estimation: {non_strings[:5]} (types: {[type(f) for f in non_strings[:5]]})")
+        # Filter out non-strings
+        file_list = [f for f in file_list if isinstance(f, str)]
 
     complexity = len(file_list)
 
@@ -202,6 +355,65 @@ def _estimate_repository_complexity(file_list: List[str]) -> float:
 
     return complexity
 
+
+def _estimate_enterprise_complexity(file_list: List[str], repo_path: str) -> float:
+    """Estimate enterprise repository complexity with additional factors."""
+    base_complexity = _estimate_repository_complexity(file_list)
+
+    if not file_list:
+        return base_complexity
+
+    # Enterprise-specific complexity factors
+    enterprise_factors = 0.0
+
+    # Factor 1: Directory depth and nesting
+    try:
+        max_depth = 0
+        for file_path in file_list[:500]:  # Sample for performance
+            try:
+                rel_path = os.path.relpath(file_path, repo_path)
+                depth = len(rel_path.split(os.sep)) - 1
+                max_depth = max(max_depth, depth)
+            except (ValueError, OSError):
+                pass
+        if max_depth > 10:
+            enterprise_factors += (max_depth - 10) * 0.5
+    except Exception:
+        pass
+
+    # Factor 2: Large file count (enterprise repos often have many large files)
+    large_file_count = 0
+    total_size = 0
+    for file_path in file_list[:200]:  # Sample for performance
+        try:
+            size = Path(file_path).stat().st_size
+            total_size += size
+            if size > 500000:  # > 500KB
+                large_file_count += 1
+        except (OSError, IOError):
+            pass
+
+    if large_file_count > 5:
+        enterprise_factors += large_file_count * 0.3
+
+    # Factor 3: Total repository size (enterprise repos are often massive)
+    if total_size > 1000000000:  # > 1GB
+        enterprise_factors += 2.0
+    elif total_size > 500000000:  # > 500MB
+        enterprise_factors += 1.0
+
+    # Factor 4: Language diversity (enterprise repos often have many languages)
+    languages = set()
+    for file_path in file_list[:300]:
+        ext = Path(file_path).suffix.lower()
+        if ext in ['.py', '.java', '.js', '.ts', '.cpp', '.c', '.go', '.rs', '.php', '.rb', '.scala', '.kt', '.swift']:
+            languages.add(ext)
+
+    if len(languages) > 5:
+        enterprise_factors += (len(languages) - 5) * 0.2
+
+    return base_complexity + enterprise_factors
+
 def _execute_standard_pipeline(repository_path: str, repo_root: str, file_list: List[str],
                              start_time: float, initial_memory: Dict[str, Any]) -> dict:
     """Execute the standard analysis pipeline for smaller repositories."""
@@ -234,7 +446,13 @@ def _execute_standard_pipeline(repository_path: str, repo_root: str, file_list: 
         return res
 
     # Structural modeling (must be first)
-    structure = _run_stage('structural_modeling', analyze_repository_structure, file_list)
+    try:
+        structure = _run_stage('structural_modeling', analyze_repository_structure, file_list)
+    except Exception as e:
+        print(f"DEBUG: Error in standard pipeline analyze_repository_structure: {e}")
+        print(f"DEBUG: file_list sample: {file_list[:5]}")
+        print(f"DEBUG: file_list types: {[type(f) for f in file_list[:5]]}")
+        raise
 
     # Static semantic analysis (must be second)
     semantic = _run_stage('static_semantic_analysis', analyze_semantic_structure, file_list, structure)

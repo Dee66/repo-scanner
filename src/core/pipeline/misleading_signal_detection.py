@@ -1,11 +1,19 @@
-"""Misleading Signal Detection for Repository Intelligence Scanner."""
+"""Misleading Signal Detection for Repository Intelligence Scanner.
 
-from typing import Dict, List
+Enhanced algorithms for detecting deceptive or misleading signals in repositories
+that could indicate poor quality, security risks, or maintenance issues.
+"""
+
+import re
+import math
+from typing import Dict, List, Any, Tuple, Set
+from collections import Counter, defaultdict
+from datetime import datetime, timedelta
 
 
 def analyze_misleading_signals(file_list: List[str], structure: Dict, semantic: Dict,
                               test_signals: Dict, governance: Dict, intent_posture: Dict) -> Dict:
-    """Analyze repository for misleading or deceptive signals."""
+    """Analyze repository for misleading or deceptive signals with enhanced algorithms."""
     # Safety checks
     if not isinstance(file_list, list):
         file_list = []
@@ -26,40 +34,31 @@ def analyze_misleading_signals(file_list: List[str], structure: Dict, semantic: 
         "governance_conflicts": [],
         "intent_mismatches": [],
         "maintenance_indicators": [],
-        "security_deceptions": []
+        "security_deceptions": [],
+        "dependency_risks": [],
+        "architecture_deceptions": [],
+        "temporal_anomalies": []
     }
 
-    # Analyze code quality inconsistencies
+    # Enhanced analysis with multiple detection algorithms
     _detect_code_quality_inconsistencies(file_list, structure, semantic, misleading_signals)
-
-    # Analyze documentation discrepancies
     _detect_documentation_discrepancies(file_list, structure, semantic, misleading_signals)
-
-    # Analyze governance conflicts
     _detect_governance_conflicts(governance, misleading_signals)
-
-    # Analyze intent mismatches
     _detect_intent_mismatches(file_list, structure, intent_posture, misleading_signals)
-
-    # Analyze maintenance indicators
     _detect_maintenance_indicators(file_list, structure, test_signals, governance, misleading_signals)
-
-    # Analyze security deceptions
     _detect_security_deceptions(governance, intent_posture, misleading_signals)
+    _detect_dependency_risks(structure, semantic, misleading_signals)
+    _detect_architecture_deceptions(file_list, structure, semantic, misleading_signals)
+    _detect_temporal_anomalies(file_list, structure, misleading_signals)
 
-    # Calculate overall misleading score
-    total_signals = sum(len(signals) for signals in misleading_signals.values())
-    overall_risk = "low"
-    if total_signals >= 5:
-        overall_risk = "high"
-    elif total_signals >= 3:
-        overall_risk = "medium"
+    # Calculate comprehensive risk scoring
+    risk_metrics = _calculate_risk_metrics(misleading_signals, structure, semantic, test_signals, governance)
 
     return {
         "misleading_signals": misleading_signals,
-        "total_misleading_signals": total_signals,
-        "overall_misleading_risk": overall_risk,
-        "requires_caution": total_signals > 0
+        "risk_metrics": risk_metrics,
+        "overall_assessment": _generate_overall_assessment(risk_metrics),
+        "recommendations": _generate_recommendations(misleading_signals, risk_metrics)
     }
 
 
@@ -228,7 +227,8 @@ def _detect_security_deceptions(governance: Dict, intent_posture: Dict, misleadi
             "type": "low_security_score",
             "description": "Security practices score is very low",
             "severity": "high",
-            "evidence": f"Security score: {security_score}/10"
+            "evidence": f"Security score: {security_score}/10",
+            "risk_score": 9.0
         })
 
     # Check for security tools without proper configuration
@@ -239,5 +239,305 @@ def _detect_security_deceptions(governance: Dict, intent_posture: Dict, misleadi
             "type": "tools_without_policy",
             "description": "Security tools present but no security policy",
             "severity": "medium",
-            "evidence": f"Tools: {tools}, Policy: missing"
+            "evidence": f"Tools: {tools}, Policy: missing",
+            "risk_score": 7.0
         })
+
+
+def _detect_dependency_risks(structure: Dict, semantic: Dict, misleading_signals: Dict) -> None:
+    """Detect risky dependency patterns and potential supply chain issues."""
+    dependencies = structure.get("dependencies", {})
+    if not isinstance(dependencies, dict):
+        dependencies = {}
+
+    # Check for extremely high number of dependencies
+    total_deps = len(dependencies.get("direct", [])) + len(dependencies.get("transitive", []))
+    if total_deps > 100:
+        misleading_signals["dependency_risks"].append({
+            "type": "excessive_dependencies",
+            "description": "Repository has an unusually high number of dependencies",
+            "severity": "high",
+            "evidence": f"Total dependencies: {total_deps}",
+            "risk_score": 8.5
+        })
+
+    # Check for outdated dependency patterns
+    outdated_deps = dependencies.get("outdated", [])
+    if isinstance(outdated_deps, list) and len(outdated_deps) > 5:
+        misleading_signals["dependency_risks"].append({
+            "type": "many_outdated_dependencies",
+            "description": "Many dependencies are significantly outdated",
+            "severity": "medium",
+            "evidence": f"Outdated dependencies: {len(outdated_deps)}",
+            "risk_score": 6.0
+        })
+
+    # Check for dependency version conflicts
+    conflicts = dependencies.get("conflicts", [])
+    if isinstance(conflicts, list) and conflicts:
+        misleading_signals["dependency_risks"].append({
+            "type": "dependency_conflicts",
+            "description": "Dependency version conflicts detected",
+            "severity": "high",
+            "evidence": f"Conflicts: {len(conflicts)}",
+            "risk_score": 9.0
+        })
+
+
+def _detect_architecture_deceptions(file_list: List[str], structure: Dict, semantic: Dict,
+                                   misleading_signals: Dict) -> None:
+    """Detect architectural deceptions and anti-patterns."""
+    file_counts = structure.get("file_counts", {})
+    code_files = file_counts.get("code", 0)
+
+    # Check for monolithic structure in large codebases
+    if code_files > 200:
+        # Look for lack of modular structure
+        directories = set()
+        for file_path in file_list:
+            if "/" in file_path:
+                directories.add(file_path.split("/")[0])
+
+        if len(directories) < 3:
+            misleading_signals["architecture_deceptions"].append({
+                "type": "monolithic_structure",
+                "description": "Large codebase with minimal directory structure suggests monolithic architecture",
+                "severity": "medium",
+                "evidence": f"{code_files} files in {len(directories)} top-level directories",
+                "risk_score": 5.5
+            })
+
+    # Check for mixed language antipatterns
+    language_counts = structure.get("language_distribution", {})
+    if isinstance(language_counts, dict) and len(language_counts) > 3:
+        misleading_signals["architecture_deceptions"].append({
+            "type": "language_soup",
+            "description": "Too many programming languages in a single repository",
+            "severity": "low",
+            "evidence": f"Languages detected: {', '.join(language_counts.keys())}",
+            "risk_score": 4.0
+        })
+
+    # Check for god object/file antipatterns
+    large_files = [f for f in file_list if _estimate_file_size(f) > 5000]  # >5000 lines
+    if large_files:
+        misleading_signals["architecture_deceptions"].append({
+            "type": "large_files",
+            "description": "Repository contains unusually large source files",
+            "severity": "medium",
+            "evidence": f"Large files: {len(large_files)}",
+            "risk_score": 6.0
+        })
+
+
+def _detect_temporal_anomalies(file_list: List[str], structure: Dict, misleading_signals: Dict) -> None:
+    """Detect temporal anomalies that might indicate deceptive practices."""
+    temporal_data = structure.get("temporal_analysis", {})
+
+    # Check for suspicious commit patterns
+    commit_patterns = temporal_data.get("commit_patterns", {})
+    if isinstance(commit_patterns, dict):
+        # Check for burst commits (many commits in short time)
+        recent_commits = commit_patterns.get("recent_burst", 0)
+        if recent_commits > 50:
+            misleading_signals["temporal_anomalies"].append({
+                "type": "commit_burst",
+                "description": "Unusual burst of recent commits may indicate rushed work or cleanup",
+                "severity": "low",
+                "evidence": f"Recent commits: {recent_commits}",
+                "risk_score": 3.5
+            })
+
+    # Check for file age inconsistencies
+    file_ages = temporal_data.get("file_age_distribution", {})
+    if isinstance(file_ages, dict):
+        very_old_files = file_ages.get("very_old", 0)
+        very_new_files = file_ages.get("very_new", 0)
+
+        if very_old_files > 0 and very_new_files > very_old_files * 2:
+            misleading_signals["temporal_anomalies"].append({
+                "type": "age_inconsistency",
+                "description": "Many new files alongside old files may indicate inconsistent maintenance",
+                "severity": "medium",
+                "evidence": f"Old files: {very_old_files}, New files: {very_new_files}",
+                "risk_score": 5.0
+            })
+
+
+def _calculate_risk_metrics(misleading_signals: Dict, structure: Dict, semantic: Dict,
+                           test_signals: Dict, governance: Dict) -> Dict:
+    """Calculate comprehensive risk metrics from detected signals."""
+    # Count signals by severity
+    severity_counts = {"low": 0, "medium": 0, "high": 0}
+    total_risk_score = 0.0
+    signal_count = 0
+
+    for category, signals in misleading_signals.items():
+        for signal in signals:
+            severity = signal.get("severity", "low")
+            risk_score = signal.get("risk_score", 1.0)
+
+            severity_counts[severity] += 1
+            total_risk_score += risk_score
+            signal_count += 1
+
+    # Calculate weighted risk score
+    if signal_count > 0:
+        average_risk = total_risk_score / signal_count
+        # Weight high severity signals more heavily
+        weighted_score = (severity_counts["high"] * 3.0 + severity_counts["medium"] * 2.0 + severity_counts["low"] * 1.0) / max(signal_count, 1)
+        final_score = min(10.0, (average_risk + weighted_score) / 2)
+    else:
+        final_score = 0.0
+
+    # Determine risk level
+    if final_score >= 7.0:
+        risk_level = "critical"
+    elif final_score >= 5.0:
+        risk_level = "high"
+    elif final_score >= 3.0:
+        risk_level = "medium"
+    elif final_score >= 1.0:
+        risk_level = "low"
+    else:
+        risk_level = "minimal"
+
+    # Calculate confidence in assessment
+    confidence = _calculate_assessment_confidence(structure, semantic, test_signals, governance)
+
+    return {
+        "overall_risk_score": round(final_score, 2),
+        "risk_level": risk_level,
+        "signal_counts": {
+            "total": signal_count,
+            "by_severity": severity_counts
+        },
+        "assessment_confidence": confidence,
+        "risk_factors": _identify_top_risk_factors(misleading_signals)
+    }
+
+
+def _calculate_assessment_confidence(structure: Dict, semantic: Dict, test_signals: Dict,
+                                   governance: Dict) -> float:
+    """Calculate confidence level in the misleading signal assessment."""
+    confidence = 1.0  # Base confidence
+
+    # Reduce confidence if data is incomplete
+    if not structure.get("file_counts"):
+        confidence *= 0.8
+    if not semantic.get("functions"):
+        confidence *= 0.9
+    if not test_signals:
+        confidence *= 0.85
+    if not governance:
+        confidence *= 0.9
+
+    # Increase confidence with more comprehensive data
+    if structure.get("temporal_analysis"):
+        confidence *= 1.1
+    if semantic.get("code_quality_signals"):
+        confidence *= 1.05
+    if test_signals.get("testing_maturity_score", 0) > 0.5:
+        confidence *= 1.1
+
+    return min(1.0, confidence)
+
+
+def _identify_top_risk_factors(misleading_signals: Dict) -> List[str]:
+    """Identify the top risk factors from detected signals."""
+    risk_factors = []
+
+    for category, signals in misleading_signals.items():
+        for signal in signals:
+            risk_score = signal.get("risk_score", 0)
+            if risk_score >= 6.0:  # High risk signals
+                risk_factors.append(signal.get("type", "unknown"))
+
+    return risk_factors[:5]  # Top 5 risk factors
+
+
+def _generate_overall_assessment(risk_metrics: Dict) -> Dict:
+    """Generate overall assessment based on risk metrics."""
+    risk_level = risk_metrics["risk_level"]
+    risk_score = risk_metrics["overall_risk_score"]
+
+    assessments = {
+        "minimal": {
+            "description": "Repository appears trustworthy with minimal misleading signals",
+            "recommendation": "Proceed with standard due diligence",
+            "action_required": False
+        },
+        "low": {
+            "description": "Some minor inconsistencies detected but overall trustworthy",
+            "recommendation": "Review identified issues before proceeding",
+            "action_required": False
+        },
+        "medium": {
+            "description": "Moderate misleading signals suggest caution",
+            "recommendation": "Thorough review recommended, consider additional verification",
+            "action_required": True
+        },
+        "high": {
+            "description": "Significant misleading signals indicate potential risks",
+            "recommendation": "Strong caution advised, extensive verification required",
+            "action_required": True
+        },
+        "critical": {
+            "description": "Critical misleading signals suggest high risk",
+            "recommendation": "Avoid or conduct comprehensive security audit",
+            "action_required": True
+        }
+    }
+
+    assessment = assessments.get(risk_level, assessments["medium"])
+    assessment["risk_score"] = risk_score
+    assessment["confidence"] = risk_metrics["assessment_confidence"]
+
+    return assessment
+
+
+def _generate_recommendations(misleading_signals: Dict, risk_metrics: Dict) -> List[str]:
+    """Generate specific recommendations based on detected signals."""
+    recommendations = []
+
+    # General recommendations based on risk level
+    risk_level = risk_metrics["risk_level"]
+    if risk_level in ["high", "critical"]:
+        recommendations.append("Conduct comprehensive security audit before use")
+        recommendations.append("Review all third-party dependencies for vulnerabilities")
+    elif risk_level == "medium":
+        recommendations.append("Perform additional code review and testing")
+        recommendations.append("Verify dependency security and update status")
+
+    # Specific recommendations based on signal types
+    signal_types = set()
+    for category, signals in misleading_signals.items():
+        for signal in signals:
+            signal_types.add(signal.get("type", ""))
+
+    if "ci_without_security" in signal_types:
+        recommendations.append("Implement automated security scanning in CI/CD pipeline")
+    if "missing_documentation" in signal_types:
+        recommendations.append("Add comprehensive documentation and README files")
+    if "multiple_licenses" in signal_types:
+        recommendations.append("Clarify and consolidate license usage")
+    if "excessive_dependencies" in signal_types:
+        recommendations.append("Audit and minimize dependency footprint")
+    if "monolithic_structure" in signal_types:
+        recommendations.append("Consider modular architecture refactoring")
+
+    return recommendations
+
+
+def _estimate_file_size(file_path: str) -> int:
+    """Estimate file size in lines (simplified heuristic)."""
+    # This is a rough heuristic - in practice you'd read the actual file
+    # For now, we'll use file path patterns to estimate
+    if "test" in file_path.lower():
+        return 100  # Test files tend to be smaller
+    elif "config" in file_path.lower():
+        return 50   # Config files are usually small
+    elif file_path.endswith(('.py', '.js', '.java', '.cpp', '.c')):
+        return 200  # Average source file size
+    else:
+        return 100  # Default estimate

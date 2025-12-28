@@ -7,6 +7,13 @@ from typing import Dict, List, Set
 
 def analyze_repository_structure(file_list: List[str]) -> Dict:
     """Analyze the structural composition of the repository."""
+    # Validate input
+    if not all(isinstance(f, str) for f in file_list):
+        non_strings = [f for f in file_list if not isinstance(f, str)]
+        print(f"DEBUG: Non-string items in file_list: {non_strings[:5]} (types: {[type(f) for f in non_strings[:5]]})")
+        # Filter out non-strings
+        file_list = [f for f in file_list if isinstance(f, str)]
+    
     structure = {
         "languages": detect_languages(file_list),
         "frameworks": detect_frameworks(file_list),

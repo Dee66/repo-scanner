@@ -1,0 +1,21 @@
+{
+  "description": "Treatment 1 - Enhanced misleading signal detection with higher sensitivity",
+  "pipeline": {
+    "complexity_threshold": 1000,
+    "enable_enterprise_handling": true,
+    "enable_misleading_detection": true,
+    "misleading_detection_sensitivity": 0.8
+  },
+  "adapters": {
+    "java": {
+      "enable_ast_analysis": true,
+      "enable_dependency_graph": true
+    },
+    "rust": {
+      "enable_regex_parsing": true
+    },
+    "javascript": {
+      "enable_npm_analysis": true
+    }
+  }
+}

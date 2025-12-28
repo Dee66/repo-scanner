@@ -15,8 +15,11 @@ This document is the developer-grade single source of truth for the project. It 
 - `src/core/bounty/adr_engine.py` — ADR analysis engine; extracts ADR files and relevant decisions.
 - `src/core/bounty/historical_forensics.py` — Forensics engine for contextual anchors.
 - `src/core/quality/output_contract.py` — Functions to generate `scan_report.json` / markdown outputs used by CLI `scan`.
+- `src/optional/secure_config.py` — Secure configuration management with encryption, validation, and audit logging.
+- `src/optional/config_schema.py` — Configuration schema definitions and validation rules.
+- `src/optional/api_server.py` — Enterprise API server with secure configuration endpoints.
 
-Other supporting modules are in `src/core/pipeline/*` and `src/core/bounty/*` — see repository tree for a full list.
+Other supporting modules are in `src/core/pipeline/*`, `src/core/bounty/*`, and `src/optional/*` — see repository tree for a full list.
 
 ---
 

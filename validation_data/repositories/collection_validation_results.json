@@ -1,0 +1,36 @@
+{
+  "total_repositories": 55,
+  "collected_count": 55,
+  "failed_count": 0,
+  "language_distribution": {
+    "python": 8,
+    "unknown": 15,
+    "java": 7,
+    "rust": 6,
+    "javascript": 8,
+    "go": 6,
+    "cpp": 5
+  },
+  "type_distribution": {
+    "libraries": 28,
+    "web_apps": 8,
+    "data_science": 3,
+    "cli_tools": 8,
+    "enterprise": 2,
+    "web_services": 3,
+    "tools": 2,
+    "applications": 1
+  },
+  "complexity_distribution": {
+    "medium": 24,
+    "enterprise": 18,
+    "complex": 11,
+    "simple": 2
+  },
+  "size_distribution": {
+    "small": 31,
+    "medium": 19,
+    "large": 5
+  },
+  "coverage_gaps": []
+}

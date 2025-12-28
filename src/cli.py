@@ -13,7 +13,40 @@ from src.core.exceptions import ScannerError, RepositoryDiscoveryError, Analysis
 from src.core.pipeline.analysis import execute_pipeline
 from src.core.quality.output_contract import generate_primary_report, generate_machine_output, generate_executive_verdict
 from src.core.quality import schema_validator
-from src.services.bounty_service import BountyService
+
+# Import timeout and resource limit exceptions
+from src.core.timeouts_and_limits import TimeoutError as OperationTimeoutError, ResourceLimitError
+
+# Optional feature imports (conditionally loaded)
+bounty_service = None
+circuit_breaker = None
+with_error_handling = None
+register_all_recovery_strategies = None
+
+# Load optional features based on configuration
+try:
+    from src.optional.optional_config import is_feature_enabled, warn_about_spec_compliance
+
+    if is_feature_enabled("bounty_service"):
+        from src.optional.bounty.bounty_service import BountyService as bounty_service
+
+    if is_feature_enabled("circuit_breakers"):
+        from src.optional.circuit_breaker import circuit_breaker, GIT_OPERATIONS_CONFIG
+
+    if is_feature_enabled("error_handling"):
+        from src.optional.error_handling import with_error_handling, FILESYSTEM_RETRY_CONFIG
+
+    if is_feature_enabled("graceful_degradation"):
+        from src.optional.recovery_strategies import register_all_recovery_strategies
+        if register_all_recovery_strategies:
+            register_all_recovery_strategies()
+
+    # Warn about spec compliance
+    warn_about_spec_compliance()
+
+except ImportError:
+    # Optional features not available, continue with core functionality
+    pass
 
 
 def validate_git_url(url: str) -> bool:
@@ -31,6 +64,19 @@ def validate_git_url(url: str) -> bool:
         return True
     except Exception:
         return False
+
+def clone_git_repository(url: str, target_dir: str, **kwargs) -> 'git.Repo':
+    """Clone Git repository with timeout and resource limits."""
+    import git
+    from src.core.timeouts_and_limits import git_clone_timeout, git_clone_limits
+
+    # Apply timeout and resource limits
+    @git_clone_timeout
+    @git_clone_limits
+    def do_clone():
+        return git.Repo.clone_from(url, target_dir, **kwargs)
+
+    return do_clone()
 
 
 def check_repo_limits(repo_path: Path, max_files: int = 10000, max_size_mb: int = 500) -> None:
@@ -91,6 +137,62 @@ def check_repo_limits(repo_path: Path, max_files: int = 10000, max_size_mb: int 
                 raise ValidationError(f"Repository has too many files for automated scanning: {total_files} (limit: {ci_limits['max_files']})")
 
 
+def print_error_message(exception: Exception, context=None) -> None:
+    """Print user-friendly error message based on error context."""
+    from src.core.exceptions import (
+        ValidationError, RepositoryDiscoveryError, AnalysisError,
+        OutputGenerationError, ScannerError
+    )
+
+    error_messages = {
+        "ValidationError": f"Validation error: {exception.message}",
+        "RepositoryDiscoveryError": f"Repository discovery error: {exception.message}",
+        "AnalysisError": f"Analysis error: {exception.message}",
+        "OutputGenerationError": f"Output generation error: {exception.message}",
+        "ScannerError": f"Scanner error: {exception.message}",
+    }
+    
+    error_type = type(exception).__name__
+    message = error_messages.get(error_type, f"Unexpected error: {exception}")
+    
+    print(message, file=sys.stderr)
+    
+    if hasattr(exception, 'details') and exception.details:
+        print(f"Details: {exception.details}", file=sys.stderr)
+    
+    if context.category.value == "network":
+        print("This appears to be a network connectivity issue. Please check your internet connection.", file=sys.stderr)
+    elif context.category.value == "filesystem":
+        print("This appears to be a file system issue. Please check file permissions and disk space.", file=sys.stderr)
+    elif context.category.value == "external_api":
+        print("This appears to be an external API issue. The service may be temporarily unavailable.", file=sys.stderr)
+
+
+def get_exit_code_for_error(context) -> int:
+    """Get appropriate exit code based on error context."""
+    # Import error types conditionally
+    try:
+        from src.optional.error_handling import ErrorSeverity, ErrorCategory
+    except ImportError:
+        # Fallback for basic error handling
+        class ErrorSeverity:
+            CRITICAL = "critical"
+            HIGH = "high"
+        class ErrorCategory:
+            pass
+
+    if hasattr(context, 'severity') and context.severity == ErrorSeverity.CRITICAL:
+        return 1
+    elif hasattr(context, 'severity') and context.severity == ErrorSeverity.HIGH:
+        return 1
+    elif context.category == ErrorCategory.VALIDATION:
+        return 2  # Invalid usage
+    elif isinstance(context, KeyboardInterrupt):
+        return 130  # Standard for SIGINT
+    else:
+        return 1  # General error
+
+
 def main():
     """Main entry point for the CLI."""
     try:
@@ -132,7 +234,43 @@ def main():
             help="Type of report to generate (comprehensive: full analysis, verdict: executive verdict, both: both reports). Takes precedence over --format if both are specified."
         )
 
-        # Bounty analysis command
+        parser.add_argument(
+            "--enable-api-server",
+            action="store_true",
+            help="Enable web API server for remote access (may violate spec compliance)"
+        )
+        parser.add_argument(
+            "--enable-health-monitoring",
+            action="store_true",
+            help="Enable health monitoring and 99.999%% uptime tracking (may violate spec compliance)"
+        )
+        parser.add_argument(
+            "--enable-circuit-breakers",
+            action="store_true",
+            help="Enable circuit breaker protection for external services (may violate spec compliance)"
+        )
+        parser.add_argument(
+            "--enable-bounties",
+            action="store_true",
+            help="Enable bounty analysis features (may violate spec compliance)"
+        )
+        parser.add_argument(
+            "--enable-error-handling",
+            action="store_true",
+            help="Enable advanced error handling and recovery (may violate spec compliance)"
+        )
+        parser.add_argument(
+            "--enable-degradation",
+            action="store_true",
+            help="Enable graceful degradation for component failures (may violate spec compliance)"
+        )
+        parser.add_argument(
+            "--enable-metrics",
+            action="store_true",
+            help="Enable Prometheus-compatible metrics collection (may violate spec compliance)"
+        )
+
+        # Bounty analysis command (optional feature)
         bounty_parser = subparsers.add_parser('bounty', help='Analyze bounty opportunities')
         bounty_parser.add_argument(
             "repository_path",
@@ -220,7 +358,63 @@ def main():
             help="Directory to write validation report (default: current directory)"
         )
 
+        # API server command
+        api_parser = subparsers.add_parser('api', help='Start the web API server')
+        api_parser.add_argument(
+            "--host",
+            type=str,
+            default="localhost",
+            help="Host to bind the server to (default: localhost)"
+        )
+        api_parser.add_argument(
+            "--port",
+            type=int,
+            default=8000,
+            help="Port to bind the server to (default: 8000)"
+        )
+        api_parser.add_argument(
+            "--workers",
+            type=int,
+            default=1,
+            help="Number of worker processes (default: 1)"
+        )
+
+        # Metrics command
+        metrics_parser = subparsers.add_parser('metrics', help='Display Prometheus-compatible metrics')
+        metrics_parser.add_argument(
+            "--format",
+            choices=["prometheus", "json"],
+            default="prometheus",
+            help="Output format (default: prometheus)"
+        )
+
         args = parser.parse_args()
+
+        # Set environment variables for optional features based on CLI flags
+        if args.enable_api_server:
+            os.environ["REPO_SCANNER_ENABLE_API"] = "true"
+        if args.enable_health_monitoring:
+            os.environ["REPO_SCANNER_ENABLE_HEALTH"] = "true"
+        if args.enable_circuit_breakers:
+            os.environ["REPO_SCANNER_ENABLE_CIRCUIT_BREAKERS"] = "true"
+        if args.enable_bounties:
+            os.environ["REPO_SCANNER_ENABLE_BOUNTIES"] = "true"
+        if args.enable_error_handling:
+            os.environ["REPO_SCANNER_ENABLE_ERROR_HANDLING"] = "true"
+        if args.enable_degradation:
+            os.environ["REPO_SCANNER_ENABLE_DEGRADATION"] = "true"
+        if args.enable_metrics:
+            os.environ["REPO_SCANNER_ENABLE_METRICS"] = "true"
+
+        # Re-import optional config after setting environment variables
+        try:
+            import importlib
+            import src.optional.optional_config
+            importlib.reload(src.optional.optional_config)
+            from src.optional.optional_config import is_feature_enabled, warn_about_spec_compliance
+            warn_about_spec_compliance()
+        except ImportError:
+            pass
 
         # Handle different commands
         if args.command == 'scan' or args.command is None:
@@ -230,45 +424,61 @@ def main():
             handle_bounty_command(args)
         elif args.command == 'validate':
             handle_validate_command(args)
+        elif args.command == 'api':
+            handle_api_command(args)
+        elif args.command == 'metrics':
+            handle_metrics_command(args)
         else:
             parser.print_help()
             sys.exit(1)
         
-    except ValidationError as e:
-        print(f"Validation error: {e.message}", file=sys.stderr)
-        if e.details:
-            print(f"Details: {e.details}", file=sys.stderr)
-        sys.exit(1)
-    except RepositoryDiscoveryError as e:
-        print(f"Repository discovery error: {e.message}", file=sys.stderr)
-        if e.details:
-            print(f"Details: {e.details}", file=sys.stderr)
-        sys.exit(1)
-    except AnalysisError as e:
-        print(f"Analysis error: {e.message}", file=sys.stderr)
-        if e.details:
-            print(f"Details: {e.details}", file=sys.stderr)
-        sys.exit(1)
-    except OutputGenerationError as e:
-        print(f"Output generation error: {e.message}", file=sys.stderr)
-        if e.details:
-            print(f"Details: {e.details}", file=sys.stderr)
-        sys.exit(1)
-    except ScannerError as e:
-        print(f"Scanner error: {e.message}", file=sys.stderr)
-        if e.details:
-            print(f"Details: {e.details}", file=sys.stderr)
-        sys.exit(1)
-    except KeyboardInterrupt:
-        print("Operation cancelled by user", file=sys.stderr)
-        sys.exit(130)
     except Exception as e:
-        print(f"Unexpected error: {e}", file=sys.stderr)
+        # Handle timeout and resource limit errors specifically
+        if isinstance(e, OperationTimeoutError):
+            print(f"❌ Operation timed out: {e}")
+            print("This may indicate the repository is too large or the operation is hanging.")
+            print("Try reducing repository size or increasing timeout limits via environment variables.")
+            sys.exit(1)
+        elif isinstance(e, ResourceLimitError):
+            print(f"❌ Resource limit exceeded: {e}")
+            print("The operation consumed too many system resources.")
+            print("Try reducing repository size or increasing resource limits via environment variables.")
+            sys.exit(1)
+
+        # Use optional comprehensive error handling if available
+        if with_error_handling:
+            from src.optional.error_handling import get_error_handler, ErrorContext
+            error_handler = get_error_handler()
+            context = ErrorContext(operation="cli_execution", component="cli")
+            context = error_handler.classify_error(e, context)
+            error_handler.log_error(e, context)
+
+            # Print user-friendly error message
+            print_error_message(e, context)
+
+            # Attempt recovery
+            try:
+                recovery_result = error_handler.attempt_recovery(e, context)
+                if recovery_result is not None:
+                    print(f"Recovered from error: {recovery_result}")
+                    return  # Exit successfully after recovery
+            except Exception as recovery_error:
+                print(f"Recovery failed: {recovery_error}")
+
+        # Fallback to basic error handling
+        print(f"Error: {e}")
+        import traceback
+        if os.getenv('DEBUG', '').lower() == 'true':
+            traceback.print_exc()
         sys.exit(1)
 
 
 def handle_scan_command(args):
     """Handle repository scanning command."""
+    # Clear caches to ensure fresh analysis
+    from src.core.pipeline.repository_discovery import clear_caches
+    clear_caches()
+    
     # Validate inputs
     if args.url:
         if not validate_git_url(args.url):
@@ -283,10 +493,9 @@ def handle_scan_command(args):
     if args.url:
         # Clone the repo
         import tempfile
-        import git
         temp_dir = tempfile.mkdtemp()
         try:
-            repo = git.Repo.clone_from(args.url, temp_dir, depth=1)
+            repo = clone_git_repository(args.url, temp_dir, depth=1)
             repo_path = Path(temp_dir)
         except Exception as e:
             import shutil
@@ -378,8 +587,40 @@ def handle_scan_command(args):
     print("Scan completed successfully")
 
 
-def handle_bounty_command(args):
+def handle_api_command(args):
+    """Handle API server command."""
+    # Check if API server is enabled
+    try:
+        from src.optional.optional_config import is_feature_enabled
+        if not is_feature_enabled("api_server"):
+            raise ValidationError(
+                "API server is not enabled. Use --enable-api-server flag or set REPO_SCANNER_ENABLE_API=true"
+            )
+    except ImportError:
+        raise ValidationError("API server features are not available in this installation")
+
+    # Set environment variables for API config
+    os.environ["REPO_SCANNER_API_HOST"] = args.host
+    os.environ["REPO_SCANNER_API_PORT"] = str(args.port)
+    os.environ["REPO_SCANNER_API_WORKERS"] = str(args.workers)
+
+    # Launch the API server
+    try:
+        from src.optional.api_server_launcher import main as launch_api
+        launch_api()
+    except ImportError as e:
+        raise ValidationError(f"API server launcher not available: {e}")
     """Handle bounty analysis command."""
+    # Check if bounty features are enabled
+    try:
+        from src.optional.optional_config import is_feature_enabled
+        if not is_feature_enabled("bounty_service"):
+            raise ValidationError(
+                "Bounty features are not enabled. Use --enable-bounties flag or set REPO_SCANNER_ENABLE_BOUNTIES=true"
+            )
+    except ImportError:
+        raise ValidationError("Bounty features are not available in this installation")
+
     # Validate inputs
     if args.fetch_algora_bounties:
         if not args.org:
@@ -754,6 +995,37 @@ def generate_pr_markdown(pr_content: dict) -> str:
         markdown += f"- [{checked}] {item.get('item', '')}\n"
 
     return markdown
+
+
+def handle_metrics_command(args):
+    """Handle the metrics command to display Prometheus-compatible metrics."""
+    try:
+        from src.optional.metrics_collector import get_metrics_collector
+        from src.optional.optional_config import is_feature_enabled
+
+        if not is_feature_enabled("metrics"):
+            print("❌ Metrics collection is not enabled.")
+            print("Enable with: --enable-metrics or REPO_SCANNER_ENABLE_METRICS=true")
+            sys.exit(1)
+
+        collector = get_metrics_collector()
+
+        if args.format == "prometheus":
+            # Output in Prometheus format
+            metrics_output = collector.get_prometheus_metrics()
+            print(metrics_output)
+        elif args.format == "json":
+            # Output in JSON format for easier parsing
+            metrics_data = collector.get_metrics_data()
+            print(json.dumps(metrics_data, indent=2))
+
+    except ImportError as e:
+        print(f"❌ Metrics collection not available: {e}")
+        print("This feature requires the optional metrics module.")
+        sys.exit(1)
+    except Exception as e:
+        print(f"❌ Error retrieving metrics: {e}")
+        sys.exit(1)
 
 
 if __name__ == "__main__":

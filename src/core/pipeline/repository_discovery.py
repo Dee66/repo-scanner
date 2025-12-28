@@ -87,7 +87,13 @@ def clear_caches():
 def get_canonical_file_list(repository_root: str) -> list[str]:
     """Get a canonical, sorted list of all files in the repository with caching."""
     if repository_root in _file_list_cache:
-        return _file_list_cache[repository_root].copy()
+        cached_files = _file_list_cache[repository_root]
+        # Validate cache integrity
+        if not all(isinstance(f, str) for f in cached_files):
+            print(f"DEBUG: Cache corruption detected for {repository_root}, rebuilding...")
+            _file_list_cache.pop(repository_root, None)
+        else:
+            return cached_files.copy()
     
     if not isinstance(repository_root, str):
         return []
@@ -129,9 +135,24 @@ def get_canonical_file_list(repository_root: str) -> list[str]:
     try:
         # Use os.walk for better performance than rglob
         for dirpath, dirnames, filenames in os.walk(root_path):
+            if not isinstance(dirpath, str):
+                print(f"DEBUG: Non-string dirpath: {dirpath} (type: {type(dirpath)})")
+                continue
+            if not all(isinstance(d, str) for d in dirnames):
+                non_strings = [d for d in dirnames if not isinstance(d, str)]
+                print(f"DEBUG: Non-string dirnames: {non_strings[:5]} (types: {[type(d) for d in non_strings[:5]]})")
+                dirnames[:] = [d for d in dirnames if isinstance(d, str)]
+            if not all(isinstance(f, str) for f in filenames):
+                non_strings = [f for f in filenames if not isinstance(f, str)]
+                print(f"DEBUG: Non-string filenames: {non_strings[:5]} (types: {[type(f) for f in non_strings[:5]]})")
+                filenames[:] = [f for f in filenames if isinstance(f, str)]
+            
             # Filter dirnames in-place to control traversal. Keep '.git' only.
             filtered = []
             for d in dirnames:
+                if not isinstance(d, str):
+                    print(f"DEBUG: Non-string dirname: {d} (type: {type(d)})")
+                    continue
                 if d == '.git':
                     filtered.append(d)
                     continue
@@ -144,6 +165,9 @@ def get_canonical_file_list(repository_root: str) -> list[str]:
             dirnames[:] = filtered
 
             for filename in filenames:
+                if not isinstance(filename, str):
+                    print(f"DEBUG: Non-string filename: {filename} (type: {type(filename)})")
+                    continue
                 # Skip compiled and temporary files
                 if filename.endswith(('.pyc', '.pyo', '.class', '.so')):
                     continue
@@ -155,7 +179,11 @@ def get_canonical_file_list(repository_root: str) -> list[str]:
                 file_path = Path(dirpath) / filename
                 # Get absolute path for consistent file access
                 try:
-                    files.append(str(file_path.resolve()))
+                    resolved_path = str(file_path.resolve())
+                    if not isinstance(resolved_path, str):
+                        print(f"DEBUG: Non-string resolved path: {resolved_path} (type: {type(resolved_path)})")
+                        continue
+                    files.append(resolved_path)
                 except (OSError, RuntimeError):
                     # Skip problematic files
                     continue

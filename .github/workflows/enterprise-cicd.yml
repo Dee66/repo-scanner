@@ -38,7 +38,113 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest tests/ -v --cov=src --cov-report=xml --cov-report=html
+          pytest tests/ -v --cov=src --cov-report=xml --cov-report=html --strict-markers --tb=short --maxfail=1
+
+      - name: Validate 100% Test Pass Requirement
+        run: |
+          ./ci/validate_test_pass_rate.sh
+
+      - name: Validate Coverage Requirements
+        run: |
+          echo "📊 Running Coverage Validation (Initial minimums - will be increased over time)"
+          ./ci/validate_coverage.sh
+
+      - name: Detect Performance Regressions
+        run: |
+          ./ci/detect_performance_regression.sh
+
+      - name: Scan Dependencies for Vulnerabilities
+        run: |
+          echo "🔍 Scanning Python dependencies for known vulnerabilities..."
+          safety scan --target . --output json --save-json safety-results.json
+          # Check for vulnerabilities and fail on high/critical ones
+          if [ -f safety-results.json ]; then
+            vuln_count=$(python -c "
+import json
+with open('safety-results.json', 'r') as f:
+    data = json.load(f)
+vulnerabilities = data.get('vulnerabilities', [])
+high_critical = [v for v in vulnerabilities if v.get('severity') in ['high', 'critical']]
+print(len(high_critical))
+")
+            if [ "$vuln_count" -gt 0 ]; then
+              echo "❌ CRITICAL DEPENDENCY VULNERABILITIES FOUND: $vuln_count high/critical vulnerabilities detected"
+              echo "💡 Review safety-results.json for details"
+              exit 1
+            else
+              echo "✅ No high/critical dependency vulnerabilities found"
+            fi
+          fi
+
+      - name: Security Code Analysis
+        run: |
+          echo "🔒 Running security code analysis..."
+          bandit -r src/ -f json -o bandit-results.json || true
+          # Check for high-severity issues
+          if [ -f bandit-results.json ]; then
+            high_issues=$(python -c "
+import json
+with open('bandit-results.json', 'r') as f:
+    data = json.load(f)
+high_count = sum(1 for issue in data.get('results', []) if issue.get('issue_severity') == 'HIGH')
+print(high_count)
+")
+            if [ "$high_issues" -gt 0 ]; then
+              echo "❌ SECURITY ISSUES FOUND: $high_issues high-severity security issues detected"
+              echo "💡 Review bandit-results.json for details"
+              exit 1
+            else
+              echo "✅ No high-severity security issues found"
+            fi
+          fi
+
+      - name: Validate CI Configuration
+        run: |
+          echo "🔧 Validating CI Configuration..."
+          # Check that workflow will fail on test failures
+          if ! grep -q "validate_test_pass_rate.sh" .github/workflows/enterprise-cicd.yml; then
+            echo "❌ CI CONFIGURATION ERROR: Test validation script not found in workflow"
+            exit 1
+          fi
+
+          # Check that workflow will fail on insufficient coverage
+          if ! grep -q "validate_coverage.sh" .github/workflows/enterprise-cicd.yml; then
+            echo "❌ CI CONFIGURATION ERROR: Coverage validation script not found in workflow"
+            exit 1
+          fi
+
+          # Check that workflow will fail on performance regressions
+          if ! grep -q "detect_performance_regression.sh" .github/workflows/enterprise-cicd.yml; then
+            echo "❌ CI CONFIGURATION ERROR: Performance regression detection script not found in workflow"
+            exit 1
+          fi
+
+          # Check that workflow scans dependencies for vulnerabilities
+          if ! grep -q "safety scan" .github/workflows/enterprise-cicd.yml; then
+            echo "❌ CI CONFIGURATION ERROR: Dependency vulnerability scanning not found in workflow"
+            exit 1
+          fi
+
+          # Check that workflow runs security code analysis
+          if ! grep -q "bandit -r src/" .github/workflows/enterprise-cicd.yml; then
+            echo "❌ CI CONFIGURATION ERROR: Security code analysis not found in workflow"
+            exit 1
+          fi
+
+          # Check that workflow runs on pull requests
+          if ! grep -A 5 "pull_request:" .github/workflows/enterprise-cicd.yml | grep -q "main"; then
+            echo "❌ CI CONFIGURATION ERROR: Workflow does not run on PRs to main"
+            exit 1
+          fi
+
+          echo "✅ CI CONFIGURATION VALIDATED"
+          echo "   - Test validation enforced"
+          echo "   - Coverage requirements enforced"
+          echo "   - Performance regression detection enforced"
+          echo "   - Dependency vulnerability scanning enforced"
+          echo "   - Security code analysis enforced"
+          echo "   - Runs on pull requests to main"
+          echo "   - Will block merges with failing tests, insufficient coverage, performance regressions, or security issues"
 
       - name: Upload coverage
         uses: codecov/codecov-action@v3

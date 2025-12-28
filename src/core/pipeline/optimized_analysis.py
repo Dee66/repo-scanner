@@ -256,11 +256,20 @@ class OptimizedAnalysisPipeline:
         performance_optimizer = get_performance_optimizer()
 
         logger.info(f"Starting optimized analysis pipeline for {repository_path}")
+        logger.info(f"Repository path type: {type(repository_path)}, value: {repository_path}")
 
         # Initial setup
         initial_memory = performance_optimizer.get_memory_usage()
         self.repo_root = self._discover_repository(repository_path)
+        logger.info(f"Repository root: {self.repo_root}, type: {type(self.repo_root)}")
         file_list = self._get_file_list(self.repo_root)
+        logger.info(f"File list length: {len(file_list)}")
+        if file_list:
+            logger.info(f"First file: {file_list[0]}, type: {type(file_list[0])}")
+            # Check for non-strings
+            non_strings = [f for f in file_list[:5] if not isinstance(f, str)]
+            if non_strings:
+                logger.error(f"Non-string items in file_list: {non_strings}")
 
         # Quick analysis for small repositories
         if len(file_list) < 100:
@@ -327,8 +336,13 @@ class OptimizedAnalysisPipeline:
 
     def _get_file_list(self, repo_root: str) -> List[str]:
         """Get canonical file list with caching."""
+        print(f"DEBUG: _get_file_list called with repo_root: {repo_root} (type: {type(repo_root)})")
         from src.core.pipeline.repository_discovery import get_canonical_file_list
         file_list = get_canonical_file_list(repo_root)
+        print(f"DEBUG: file_list length: {len(file_list) if isinstance(file_list, list) else 'not list'}")
+        if file_list and not all(isinstance(f, str) for f in file_list):
+            non_strings = [f for f in file_list if not isinstance(f, str)]
+            print(f"DEBUG: Non-string items in file_list: {non_strings[:5]} (types: {[type(f) for f in non_strings[:5]]})")
         return file_list if isinstance(file_list, list) else []
 
     def _analyze_structure_optimized(self, file_list: List[str]) -> Dict[str, Any]:
@@ -338,7 +352,13 @@ class OptimizedAnalysisPipeline:
         self.performance_stats['stages_completed'] += 1
         start_time = time.time()
 
-        structure = analyze_repository_structure(file_list)
+        try:
+            structure = analyze_repository_structure(file_list)
+        except Exception as e:
+            print(f"DEBUG: Error in analyze_repository_structure: {e}")
+            print(f"DEBUG: file_list sample: {file_list[:5]}")
+            print(f"DEBUG: file_list types: {[type(f) for f in file_list[:5]]}")
+            raise
 
         logger.info(f"Structure analysis completed in {time.time() - start_time:.2f}s")
         return structure

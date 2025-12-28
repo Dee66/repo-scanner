@@ -2,19 +2,19 @@
 
 ## Executive Summary
 
-Analysis completed for repository: /home/dee/workspace/algora/zio-schema
-270 files analyzed
+Analysis completed for repository: /tmp/tmpuufq0a82
+30 files analyzed
 Analysis timestamp: Generated on demand
 
 ## System Characterization
 
-**Repository:** /home/dee/workspace/algora/zio-schema
-**Files Analyzed:** 270
+**Repository:** /tmp/tmpuufq0a82
+**Files Analyzed:** 30
 
 ### Repository Structure
 
 - **Primary Language:** Unknown
-- **Framework Detection:** Node.js
+- **Framework Detection:** None detected
 - **Build System:** Unknown
 - **Package Management:** Unknown
 
@@ -26,15 +26,15 @@ Analysis timestamp: Generated on demand
 
 ### Testing Signals
 
-- **Test Files:** 80
+- **Test Files:** 0
 - **Test Frameworks:** None detected
-- **Testing Maturity:** 0.2/10
+- **Testing Maturity:** 0.0/10
 
 ### Governance Signals
 
 - **Documentation:** 0.0/10
 - **Version Control:** Not detected
-- **CI/CD:** GitHub Actions
+- **CI/CD:** None detected
 
 ### Intent Posture
 
@@ -46,8 +46,8 @@ Analysis timestamp: Generated on demand
 
 ### Key Technical Indicators
 
-- **Testing:** Limited testing infrastructure (maturity score: 0.2/10)
-- **CI/CD:** Automated pipelines detected (GitHub Actions)
+- **Testing:** Limited testing infrastructure (maturity score: 0.0/10)
+- **Security:** No security vulnerabilities detected
 
 ## Misleading Signals
 
@@ -66,21 +66,21 @@ Analysis timestamp: Generated on demand
 
 ### Critical Issues
 
-- **Critical code duplication detected:** critical severity
+- **Fundamental quality and governance gaps:** critical severity
 
 ## Decision Artifacts
 
 **Executive Verdict:** INSUFFICIENT_EVIDENCE
 
-**Final Authority Ceiling:** Technical Lead
-**Decision Scope:** Feature Changes Allowed
+**Final Authority Ceiling:** Senior Technical Lead
+**Decision Scope:** Major Changes Only
 **Oversight:** Required
 **Applied Constraints:** 1 factor(s) elevated authority
 
-**Authority Rationale:** Authority elevated to technical lead due to 1 constraining factor(s) Governance Based: Moderate governance requires oversight Decision scope limited to feature changes allowed with oversight required
+**Authority Rationale:** Authority elevated to senior technical lead due to 1 constraining factor(s) Governance Based: Low governance maturity requires authority elevation Decision scope limited to major changes only with oversight required
 
 **Key Factors:**
-- Moderate governance requires oversight
+- Low governance maturity requires authority elevation
 
 **Authority Confidence:** HIGH (0.90)
 **Assessment:** Strong confidence in authority ceiling determination
@@ -96,7 +96,7 @@ Analysis timestamp: Generated on demand
 ## Confidence and Limits
 
 **Confidence Level:** high
-**Confidence Score:** 0.84
+**Confidence Score:** 0.83
 
 ## Validity and Expiry
 

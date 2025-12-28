@@ -1,0 +1,21 @@
+{
+  "description": "Treatment 2 - Performance optimized analysis with reduced complexity threshold",
+  "pipeline": {
+    "complexity_threshold": 500,
+    "enable_enterprise_handling": true,
+    "enable_misleading_detection": true,
+    "performance_mode": true
+  },
+  "adapters": {
+    "java": {
+      "enable_ast_analysis": false,
+      "enable_dependency_graph": true
+    },
+    "rust": {
+      "enable_regex_parsing": true
+    },
+    "javascript": {
+      "enable_npm_analysis": true
+    }
+  }
+}

@@ -203,6 +203,10 @@ kubectl logs deployment/repo-scanner -n repo-scanner --since=1h
 kubectl get configmap -n repo-scanner -o yaml
 kubectl get secret -n repo-scanner -o yaml
 
+# Secure configuration audit
+curl -H "Authorization: Bearer <token>" https://scanner.company.com/api/config/list
+curl -H "Authorization: Bearer <token>" https://scanner.company.com/api/config/audit
+
 # 4. External dependency checks
 # Database, cache, external APIs
 ```
@@ -254,15 +258,22 @@ kubectl get secret -n repo-scanner -o yaml
 # - Unusual access patterns
 # - Security alert analysis
 
-# 2. Update security signatures
+# 2. Secure configuration audit
+# - Review configuration change audit trails
+# - Validate configuration encryption
+# - Check for unauthorized configuration changes
+curl -H "Authorization: Bearer <token>" https://scanner.company.com/api/config/audit
+
+# 3. Update security signatures
 # - Container image updates
 # - Dependency vulnerability patches
 # - Security rule updates
 
-# 3. Access review
+# 4. Access review
 # - User access audits
 # - Permission validation
 # - RBAC policy review
+# - Configuration access permissions
 ```
 
 ### Friday Afternoon (Weekly - 4:00 PM)

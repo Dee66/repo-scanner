@@ -2,10 +2,10 @@
 
 [![Python Version](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/tests-51%20passing-brightgreen.svg)](tests/)
+[![Tests](https://img.shields.io/badge/tests-96%20passing-brightgreen.svg)](tests/)
 [![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-orange.svg)](.github/workflows/)
 
-> **Decision-grade repository analysis with 99.999% SME accuracy** 🧠✨
+> **Decision-grade repository analysis with 72.7% validated effectiveness** 🧠✨
 
 A sophisticated static analysis system that transforms software repositories into actionable intelligence. Scan local or remote repos, hunt bounties, and generate evidence-based reports for safe software changes and profitable opportunities.
 
@@ -32,8 +32,9 @@ A sophisticated static analysis system that transforms software repositories int
 ### 🤖 **Automation & Scale**
 - **CI/CD Integration**: GitHub Actions workflows for automated scanning
 - **Batch Processing**: Parallel bounty analysis for multiple opportunities
-- **API Server**: RESTful API for programmatic access
+- **API Server**: RESTful API for programmatic access with secure configuration
 - **Container Ready**: Docker support for isolated execution
+- **Secure Configuration**: Encrypted configuration management with audit trails
 
 ## 🛠️ Installation
 
@@ -85,6 +86,10 @@ curl http://localhost:8080/data-usage
 
 # Start a scan job
 curl -X POST http://localhost:8080/scan -H "Content-Type: application/json" -d '{"repository_url": "https://github.com/octocat/Hello-World"}'
+
+# Manage secure configuration
+curl -X POST http://localhost:8080/api/config/set -H "Content-Type: application/json" -d '{"key": "api_server.enabled", "value": true}'
+curl http://localhost:8080/api/config/get/api_server.enabled
 ```
 
 ## 🏗️ Architecture
@@ -105,11 +110,12 @@ curl -X POST http://localhost:8080/scan -H "Content-Type: application/json" -d '
 
 ### Core Components
 - **CLI** (`src/cli.py`): Command-line interface with validation
-- **API Server** (`src/api_server.py`): RESTful API with job tracking
+- **API Server** (`src/optional/api_server.py`): RESTful API with job tracking and secure configuration
 - **Pipeline** (`src/core/pipeline/`): Multi-stage analysis engine
 - **Services** (`src/services/`): Bounty hunting and external integrations
 - **Quality** (`src/core/quality/`): Output contracts and evaluation
 - **Monitoring** (`src/core/monitoring/`): Performance and health tracking
+- **Security** (`src/optional/`): Secure configuration, audit logging, and incident response
 
 ## 📋 Data Usage Controls
 
@@ -124,6 +130,44 @@ Configure limits via environment variables:
 ```bash
 export REPO_SCANNER_MAX_FILES=20000
 export REPO_SCANNER_MAX_SIZE_MB=1000
+```
+
+## 🔐 Secure Configuration
+
+Enterprise-grade configuration management with encryption and audit trails:
+
+### Environment Variables
+```bash
+# Basic configuration
+export REPO_SCANNER_API_PORT=8080
+export REPO_SCANNER_API_HOST=localhost
+
+# Secure configuration (encrypted storage)
+export REPO_SCANNER_CONFIG_KEY="your-encryption-key-here"
+export REPO_SCANNER_CONFIG_DIR="./config"
+```
+
+### Configuration Keys
+- **API Server**: `api_server.enabled`, `api_server.port`, `api_server.host`
+- **Security**: `security.rate_limit_per_minute`, `security.max_file_size_mb`
+- **Monitoring**: `health_monitoring.enabled`, `metrics.enabled`
+- **Circuit Breaker**: `circuit_breaker.enabled`, `circuit_breaker.failure_threshold`
+
+### API Configuration Management
+```bash
+# Set configuration via API
+curl -X POST http://localhost:8080/api/config/set \
+  -H "Content-Type: application/json" \
+  -d '{"key": "api_server.port", "value": 9090}'
+
+# Get configuration
+curl http://localhost:8080/api/config/get/api_server.port
+
+# List all configurations
+curl http://localhost:8080/api/config/list
+
+# View audit trail
+curl http://localhost:8080/api/config/audit
 ```
 
 ## 🧪 Testing & Quality
@@ -142,7 +186,7 @@ pytest tests/test_determinism.py
 pytest tests/test_schema_version_compatibility.py
 ```
 
-- **51 Tests**: Comprehensive coverage including adversarial cases
+- **96 Tests**: Comprehensive coverage including adversarial cases
 - **Deterministic**: Identical inputs produce identical outputs
 - **Schema Validated**: All JSON outputs conform to strict schemas
 - **Golden Repos**: Benchmark against curated reference repositories
@@ -224,7 +268,7 @@ Complete bounty solution package including:
 
 ## 🎯 Algora Bounty Hunting
 
-The Repository Intelligence Scanner includes comprehensive bounty hunting capabilities designed for Algora with 99.999% SME accuracy:
+The Repository Intelligence Scanner includes comprehensive bounty hunting capabilities designed for Algora with 72.7% validated effectiveness:
 
 ### Bounty Analysis Pipeline
 
@@ -264,7 +308,7 @@ repo-scanner validate --output-dir ./validation_reports
 
 ### Accuracy Framework
 
-- **99.999% Target Accuracy**: Rigorous validation framework
+- **72.7% Validated Effectiveness**: Rigorous validation framework
 - **Bayesian Probability**: Advanced statistical modeling
 - **Continuous Validation**: Real-time accuracy monitoring
 - **Historical Analysis**: Backtesting against past bounty outcomes
@@ -310,7 +354,7 @@ python -m src.api_server
 - ✅ **Production Monitoring** - comprehensive observability and alerting
 - ✅ **Comprehensive Risk Assessment** - 14 component analysis
 - ✅ **Performance Optimized** - 3.71s average execution time
-- 🎯 **99.999% SME Accuracy** - Bayesian bounty viability predictions
+- 🎯 **72.7% Validated Effectiveness** - Bayesian bounty viability predictions
 - 🎯 **Complete PR Automation** - Automated pull request generation
 - 🎯 **Maintainer Profiling** - Advanced maintainer preference analysis
 - 🎯 **Accuracy Validation** - Continuous prediction accuracy monitoring

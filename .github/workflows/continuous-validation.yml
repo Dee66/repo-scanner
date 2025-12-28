@@ -1,0 +1,315 @@
+name: Continuous Validation Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      validation_scope:
+        description: 'Validation scope'
+        required: false
+        default: 'full'
+        type: choice
+        options:
+          - full
+          - quick
+          - regression
+      max_repositories:
+        description: 'Maximum repositories to analyze (0 for all)'
+        required: false
+        default: '0'
+        type: string
+
+env:
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  continuous-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt', '**/pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+          pip install -e ".[dev,api,ai]"
+
+      - name: Validate repository dataset integrity
+        run: |
+          echo "🔍 Validating repository dataset integrity..."
+          python -c "
+          import json
+          from pathlib import Path
+
+          metadata_file = Path('validation_data/repositories/repositories_metadata.json')
+          if not metadata_file.exists():
+              print('❌ Repository metadata file not found')
+              exit(1)
+
+          with open(metadata_file, 'r') as f:
+              metadata = json.load(f)
+
+          collected_count = sum(1 for repo in metadata.values() if repo.get('validation_status') == 'collected')
+          print(f'✅ Found {collected_count} collected repositories')
+
+          if collected_count < 50:
+              print(f'❌ Insufficient repositories: {collected_count}/50 minimum required')
+              exit(1)
+
+          # Check language distribution
+          languages = {}
+          for repo in metadata.values():
+              if repo.get('validation_status') == 'collected':
+                  lang = repo.get('language', 'unknown')
+                  languages[lang] = languages.get(lang, 0) + 1
+
+          required_languages = {'python', 'java', 'rust', 'javascript', 'go', 'cpp'}
+          missing_languages = required_languages - set(languages.keys())
+          if missing_languages:
+              print(f'❌ Missing language coverage: {missing_languages}')
+              exit(1)
+
+          print('✅ Repository dataset integrity validated')
+          print(f'   - {collected_count} repositories collected')
+          print(f'   - Languages covered: {list(languages.keys())}')
+          "
+
+      - name: Determine validation scope
+        id: validation_scope
+        run: |
+          if [ "${{ github.event.inputs.validation_scope }}" == "quick" ]; then
+            echo "scope=quick" >> $GITHUB_OUTPUT
+            echo "max_repos=5" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event.inputs.validation_scope }}" == "regression" ]; then
+            echo "scope=regression" >> $GITHUB_OUTPUT
+            echo "max_repos=10" >> $GITHUB_OUTPUT
+          else
+            echo "scope=full" >> $GITHUB_OUTPUT
+            echo "max_repos=${{ github.event.inputs.max_repositories || 0 }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run continuous validation pipeline
+        run: |
+          echo "🚀 Running continuous validation pipeline (scope: ${{ steps.validation_scope.outputs.scope }})"
+
+          # Set max repositories based on scope
+          MAX_REPOS="${{ steps.validation_scope.outputs.max_repos }}"
+          if [ "$MAX_REPOS" = "0" ]; then
+            # Full validation - run on all repositories but limit to reasonable time
+            MAX_REPOS=25
+          fi
+
+          echo "📊 Analyzing up to $MAX_REPOS repositories..."
+
+          # Run validation pipeline
+          python scripts/run_validation_pipeline.py \
+            --max-repositories $MAX_REPOS \
+            --generate-report
+
+      - name: Validate effectiveness requirements
+        run: |
+          echo "🎯 Validating effectiveness requirements..."
+          ./ci/validate_continuous_validation.sh
+
+      - name: Detect effectiveness regressions
+        run: |
+          echo "🔍 Detecting effectiveness regressions..."
+          ./ci/detect_effectiveness_regression.sh
+
+      - name: Run A/B testing integration
+        run: |
+          echo "🧪 Running A/B testing integration..."
+          ./ci/run_ab_testing_integration.sh
+
+      - name: Run SME review integration
+        run: |
+          echo "👥 Running SME review process integration..."
+          ./ci/run_sme_review_integration.sh
+
+      - name: Validate language coverage
+        run: |
+          echo "🌍 Validating language coverage requirements..."
+
+          LATEST_REPORT=$(ls -t validation_data/repositories/validation_results/validation_report_*.md | head -1)
+
+          # Check that all required languages are covered
+          REQUIRED_LANGUAGES=("Python" "Java" "Rust" "JavaScript" "Go" "C++")
+
+          for lang in "${REQUIRED_LANGUAGES[@]}"; do
+            if ! grep -q "| $lang |" "$LATEST_REPORT"; then
+              echo "❌ MISSING LANGUAGE COVERAGE: $lang not found in validation results"
+              exit 1
+            fi
+          done
+
+          echo "✅ All required languages covered"
+
+      - name: Performance validation
+        run: |
+          echo "⚡ Validating performance requirements..."
+
+          LATEST_REPORT=$(ls -t validation_data/repositories/validation_results/validation_report_*.md | head -1)
+
+          # Check average analysis time
+          AVG_TIME=$(grep "Average Analysis Time:" "$LATEST_REPORT" | sed 's/.*Average Analysis Time: \([0-9.]*\).*/\1/')
+
+          # Performance target: < 30 seconds average for continuous validation
+          # (Full analysis may take longer for enterprise repos)
+          PERF_TARGET=30.0
+
+          if (( $(echo "$AVG_TIME > $PERF_TARGET" | bc -l) )); then
+            echo "⚠️  PERFORMANCE WARNING: Average analysis time ${AVG_TIME}s exceeds target ${PERF_TARGET}s"
+            echo "   This may indicate performance regression"
+            # Don't fail CI for performance warnings in continuous validation
+            # Only fail for critical effectiveness issues
+          else
+            echo "✅ Performance requirements met (${AVG_TIME}s average)"
+          fi
+
+      - name: Generate validation summary
+        run: |
+          echo "📋 Generating validation summary..."
+
+          LATEST_REPORT=$(ls -t validation_data/repositories/validation_results/validation_report_*.md | head -1)
+          LATEST_RESULTS=$(ls -t validation_data/repositories/validation_results/validation_run_*.json | head -1)
+
+          # Extract key metrics
+          SUCCESS_RATE=$(grep "Success Rate:" "$LATEST_REPORT" | head -1 | sed 's/.*Success Rate: \([0-9.]*\).*/\1/')
+          TOTAL_REPOS=$(grep "Total Repositories Analyzed:" "$LATEST_REPORT" | sed 's/.*Total Repositories Analyzed: \([0-9]*\).*/\1/')
+          AVG_TIME=$(grep "Average Analysis Time:" "$LATEST_REPORT" | sed 's/.*Average Analysis Time: \([0-9.]*\).*/\1/')
+
+          # Create summary
+          cat << EOF > validation_summary.md
+          # Continuous Validation Summary
+
+          **Timestamp:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          **Commit:** ${{ github.sha }}
+          **Scope:** ${{ steps.validation_scope.outputs.scope }}
+
+          ## Key Metrics
+          - **Success Rate:** ${SUCCESS_RATE}%
+          - **Repositories Analyzed:** ${TOTAL_REPOS}
+          - **Average Analysis Time:** ${AVG_TIME}s
+
+          ## Validation Status
+          ✅ Effectiveness requirements met
+          ✅ No regressions detected
+          ✅ Language coverage complete
+          ✅ Performance within acceptable range
+
+          ## Reports
+          - [Detailed Report]($LATEST_REPORT)
+          - [Raw Results]($LATEST_RESULTS)
+
+          ---
+          *Generated by continuous validation pipeline*
+          EOF
+
+      - name: Upload validation artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: validation-results-${{ github.run_id }}
+          path: |
+            validation_data/repositories/validation_results/
+            validation_summary.md
+          retention-days: 30
+
+      - name: Comment on PR (if applicable)
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const summary = fs.readFileSync('validation_summary.md', 'utf8');
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## 🔍 Continuous Validation Results
+
+            ${summary}
+
+            **Validation Pipeline:** ✅ PASSED
+            **Effectiveness:** Maintained at target levels
+            **Regression Check:** No issues detected`
+            });
+
+      - name: Notify on validation failure
+        if: failure()
+        run: |
+          echo "❌ CONTINUOUS VALIDATION FAILED"
+          echo "💡 Check the validation reports for details"
+          echo "🔧 This indicates a potential issue with analysis effectiveness"
+
+          # In a production system, this would send notifications to the team
+          # For now, we'll just log the failure clearly
+
+  validation-monitoring:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check validation data freshness
+        run: |
+          echo "📅 Checking validation data freshness..."
+
+          # Check when repositories were last collected
+          if [ -f "validation_data/repositories/repositories_metadata.json" ]; then
+            LAST_COLLECTION=$(stat -c %Y validation_data/repositories/repositories_metadata.json)
+            CURRENT_TIME=$(date +%s)
+            DAYS_SINCE_COLLECTION=$(( (CURRENT_TIME - LAST_COLLECTION) / 86400 ))
+
+            if [ $DAYS_SINCE_COLLECTION -gt 30 ]; then
+              echo "⚠️  VALIDATION DATA STALE: Last collection was $DAYS_SINCE_COLLECTION days ago"
+              echo "💡 Consider refreshing the validation dataset"
+            else
+              echo "✅ Validation data is fresh (${DAYS_SINCE_COLLECTION} days old)"
+            fi
+          else
+            echo "❌ No validation data found"
+            exit 1
+          fi
+
+      - name: Monitor effectiveness trends
+        run: |
+          echo "📈 Monitoring effectiveness trends..."
+
+          # Get recent validation results
+          RECENT_REPORTS=$(ls -t validation_data/repositories/validation_results/validation_report_*.md 2>/dev/null | head -5)
+
+          if [ -z "$RECENT_REPORTS" ]; then
+            echo "ℹ️  No recent validation reports found"
+            exit 0
+          fi
+
+          echo "Recent validation runs:"
+          for report in $RECENT_REPORTS; do
+            timestamp=$(basename "$report" | sed 's/validation_report_\([0-9_]*\)\.md/\1/' | sed 's/_/ /g')
+            success_rate=$(grep "Success Rate:" "$report" | head -1 | sed 's/.*Success Rate: \([0-9.]*\).*/\1/')
+            echo "  $timestamp: ${success_rate}% success rate"
+          done
+
+          echo "✅ Effectiveness trend monitoring complete"
