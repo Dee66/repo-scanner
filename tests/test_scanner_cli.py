@@ -38,9 +38,13 @@ def output_dir(tmp_path):
     return out_dir
 
 
-def run_scanner(repo_path, output_dir, format="both", report_type=None):
+def run_scanner(repo_path, output_dir, format="both", report_type=None, url=None):
     """Run the scanner CLI and return the result."""
-    cmd = [sys.executable, "-m", "src.cli", "scan", str(repo_path), "--output-dir", str(output_dir)]
+    cmd = [sys.executable, "-m", "src.cli", "scan", "--output-dir", str(output_dir)]
+    if url:
+        cmd.extend(["--url", url])
+    else:
+        cmd.append(str(repo_path))
     if format != "both":
         cmd.extend(["--format", format])
     if report_type:
@@ -286,6 +290,20 @@ def test_cli_report_type_default(test_repo, output_dir):
     assert (output_dir / "scan_report.md").exists()
     assert (output_dir / "scan_report.json").exists()
     assert not (output_dir / "verdict_report.md").exists()
+
+
+def test_scan_url_validation(output_dir):
+    """Test URL validation for remote scanning."""
+    # Test invalid URL
+    result = run_scanner(None, output_dir, url="not-a-url")
+    assert result.returncode != 0
+    assert "Invalid or unsafe Git URL" in result.stderr
+
+    # Test valid GitHub URL format (but we'll mock the cloning)
+    # This would normally try to clone, but we'll test the validation part
+    result = run_scanner(None, output_dir, url="https://github.com/user/repo.git")
+    # This will fail at cloning stage, but URL validation should pass
+    assert "Invalid or unsafe Git URL" not in result.stderr
 
 
 if __name__ == "__main__":

@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import os
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -397,6 +398,14 @@ def handle_bounty_command(args):
             raise ValidationError("Bounty data cannot be empty")
         if args.generate_solution and (not args.solution_code or not args.solution_code.strip()):
             raise ValidationError("Solution code is required when generating solution")
+
+    # Initialize common variables
+    repo_path = None
+    output_dir = Path(args.output_dir)
+
+    # Set repo_path for regular bounty processing
+    if not args.fetch_algora_bounties and not args.fetch_github_issues:
+        repo_path = Path(args.repository_path)
 
     if args.fetch_algora_bounties:
         bounty_service = BountyService()
