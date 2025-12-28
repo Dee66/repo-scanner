@@ -253,3 +253,47 @@ def test_generate_executive_verdict_word_limit():
     
     word_count = len(verdict.split())
     assert word_count <= 300, f"Verdict has {word_count} words, exceeds 300 word limit"
+
+
+def test_evaluate_output_consistency():
+    """Test output consistency evaluation."""
+    from src.core.quality.output_contract import evaluate_output_consistency
+    
+    # This would normally run multiple scans, but for testing we'll mock it
+    # Since it's a placeholder, we'll just check it returns a dict
+    result = evaluate_output_consistency("/fake/repo", runs=1)
+    assert isinstance(result, dict)
+    assert "consistency_score" in result
+    assert "runs" in result
+
+
+def test_evaluate_output_metrics():
+    """Test output metrics evaluation."""
+    from src.core.quality.output_contract import evaluate_output_metrics
+    
+    analysis_result = {
+        "files": ["file1.py", "file2.py"],
+        "risk_assessment": {"overall_risk": "low"},
+        "evidence": {"total_issues": 5}
+    }
+    
+    result = evaluate_output_metrics(analysis_result)
+    assert isinstance(result, dict)
+    assert "completeness" in result
+    assert "total_issues" in result
+    assert "high_issue_ratio" in result
+
+
+def test_benchmark_against_golden_repos():
+    """Test benchmarking against golden repositories."""
+    from src.core.quality.output_contract import benchmark_against_golden_repos
+    
+    analysis_result = {
+        "files": ["file1.py"],
+        "risk_assessment": {"overall_risk": "low"}
+    }
+    
+    result = benchmark_against_golden_repos("/fake/repo", [])
+    assert isinstance(result, dict)
+    assert "current_metrics" in result
+    assert "overall_score" in result

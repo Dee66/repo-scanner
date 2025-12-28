@@ -1,0 +1,83 @@
+name: Remote Repository Scanning
+
+on:
+  schedule:
+    - cron: '0 2 * * 1'  # Weekly on Monday 2 AM UTC
+  workflow_dispatch:
+    inputs:
+      repo_url:
+        description: 'Git URL to scan (max 100MB, 5000 files for automated runs)'
+        required: false
+        default: 'https://github.com/octocat/Hello-World'
+
+jobs:
+  scan-remote-repo:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout scanner
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e .
+        
+    - name: Check repository size before cloning
+      run: |
+        REPO_URL="${{ github.event.inputs.repo_url || 'https://github.com/octocat/Hello-World' }}"
+        echo "Checking repository: $REPO_URL"
+        
+        # Quick size check using GitHub API if it's a GitHub repo
+        if [[ $REPO_URL == https://github.com/* ]]; then
+          OWNER=$(echo $REPO_URL | cut -d'/' -f4)
+          REPO=$(echo $REPO_URL | cut -d'/' -f5)
+          echo "Checking GitHub repo: $OWNER/$REPO"
+          
+          # Get repo size from GitHub API
+          RESPONSE=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/$OWNER/$REPO")
+          
+          SIZE_KB=$(echo $RESPONSE | jq -r '.size // 0')
+          SIZE_MB=$((SIZE_KB / 1024))
+          
+          if [ "$SIZE_MB" -gt 100 ]; then
+            echo "Repository too large for automated scanning: ${SIZE_MB}MB (limit: 100MB)"
+            exit 1
+          fi
+          
+          echo "Repository size: ${SIZE_MB}MB - proceeding with scan"
+        fi
+        
+    - name: Run remote scan
+      run: |
+        REPO_URL="${{ github.event.inputs.repo_url || 'https://github.com/octocat/Hello-World' }}"
+        OUTPUT_DIR="./scan_output"
+        echo "Starting scan of: $REPO_URL"
+        python -m src.cli scan --url "$REPO_URL" --output-dir "$OUTPUT_DIR"
+        
+    - name: Evaluate output consistency
+      run: |
+        python -c "
+        from src.core.quality.output_contract import evaluate_output_consistency
+        result = evaluate_output_consistency('./scan_output')
+        print(f'Consistency Score: {result[\"consistency_score\"]}')
+        "
+        
+    - name: Log data usage
+      run: |
+        echo "=== Data Usage Summary ==="
+        du -sh ./scan_output/
+        find ./scan_output/ -type f -exec wc -c {} + | tail -1 | awk '{print "Total bytes:", $1}'
+        
+    - name: Upload results
+      uses: actions/upload-artifact@v4
+      with:
+        name: scan-results-${{ github.run_id }}
+        path: ./scan_output/
+        retention-days: 7  # Shorter retention to save storage

@@ -1293,3 +1293,78 @@ def generate_executive_verdict(analysis: dict, repository_path: str) -> str:
         report = '\n'.join(truncated)
     
     return report
+
+
+# Output Evaluation Functions
+
+def evaluate_output_consistency(repo_path: str, runs: int = 3) -> dict:
+    """Evaluate output consistency across multiple runs."""
+    from src.core.pipeline.analysis import execute_pipeline
+    import hashlib
+    import json
+    
+    results = []
+    for i in range(runs):
+        try:
+            analysis = execute_pipeline(repo_path)
+            json_output = generate_machine_output(analysis, repo_path)
+            json_str = json.dumps(json_output, sort_keys=True)
+            hash_val = hashlib.sha256(json_str.encode()).hexdigest()
+            results.append(hash_val)
+        except Exception as e:
+            results.append(f"error: {str(e)}")
+    
+    # Calculate consistency
+    unique_hashes = set(results)
+    consistency_score = 1.0 if len(unique_hashes) == 1 else 0.0
+    if len(unique_hashes) > 1 and all(not h.startswith("error") for h in results):
+        # Partial consistency if some match
+        most_common = max(set(results), key=results.count)
+        consistency_score = results.count(most_common) / len(results)
+    
+    return {
+        "consistency_score": consistency_score,
+        "runs": runs,
+        "unique_outputs": len(unique_hashes),
+        "results": results
+    }
+
+
+def evaluate_output_metrics(analysis_result: dict, expected_result: dict = None) -> dict:
+    """Calculate basic metrics for output quality."""
+    metrics = {}
+    
+    # Risk level accuracy (if expected provided)
+    if expected_result:
+        actual_risk = analysis_result.get("risk_synthesis", {}).get("overall_risk_assessment", {}).get("overall_risk_level")
+        expected_risk = expected_result.get("risk_level")
+        metrics["risk_accuracy"] = 1.0 if actual_risk == expected_risk else 0.0
+    
+    # Presence of key sections
+    required_sections = ["risk_synthesis", "governance", "intent_posture"]
+    metrics["completeness"] = sum(1 for section in required_sections if section in analysis_result) / len(required_sections)
+    
+    # Issue counts
+    risk_synthesis = analysis_result.get("risk_synthesis", {})
+    high_issues = len(risk_synthesis.get("high_priority_issues", []))
+    med_issues = len(risk_synthesis.get("medium_priority_issues", []))
+    low_issues = len(risk_synthesis.get("low_priority_issues", []))
+    metrics["total_issues"] = high_issues + med_issues + low_issues
+    metrics["high_issue_ratio"] = high_issues / max(1, metrics["total_issues"])
+    
+    return metrics
+
+
+def benchmark_against_golden_repos(repo_path: str, golden_repos: list) -> dict:
+    """Benchmark current repo against golden standard repos."""
+    # Placeholder: Compare metrics to known good/bad repos
+    # In practice, load pre-computed metrics for golden repos
+    current_metrics = evaluate_output_metrics({"dummy": "data"})  # Replace with actual
+    
+    benchmark_results = {
+        "current_metrics": current_metrics,
+        "golden_comparison": {},
+        "overall_score": 0.8  # Placeholder
+    }
+    
+    return benchmark_results

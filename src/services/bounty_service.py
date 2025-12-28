@@ -5,8 +5,9 @@ capabilities with 99.999% SME accuracy.
 """
 
 from typing import Dict, List, Optional, Any
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 import logging
+import requests
 
 from src.core.bounty.maintainer_profile_engine import MaintainerProfileEngine, generate_maintainer_profile
 from src.core.bounty.profitability_triage import ProfitabilityTriageEngine, triage_bounty_profitability
@@ -30,6 +31,98 @@ class BountyService:
         self.validator = BountyAccuracyValidator()
         self.reputation_monitor = ReputationMonitor()
         self.parallel_analyzer = ParallelBountyAnalyzer(max_workers=max_workers) if enable_parallel else None
+
+    def fetch_bounties(self, org: str, limit: int = 10, status: str = "active") -> List[Dict]:
+        """Fetch bounties from Algora.io API."""
+        url = "https://console.algora.io/api/trpc/bounty.list"
+        payload = {"input": {"org": org, "limit": limit, "status": status}}
+        
+        try:
+            response = requests.post(url, json=payload, timeout=30)
+            response.raise_for_status()
+            data = response.json()
+            
+            # Extract items from the response
+            result_data = data.get("result", {}).get("data", {})
+            items = result_data.get("items", [])
+            
+            # Filter for bounties older than 30 days
+            cutoff = datetime.now(timezone.utc) - timedelta(days=30)
+            filtered_items = []
+            
+            for item in items:
+                created_at_str = item.get("created_at")
+                if created_at_str:
+                    # Parse ISO format, handle Z timezone
+                    created_at = datetime.fromisoformat(created_at_str.replace('Z', '+00:00'))
+                    if created_at < cutoff:
+                        filtered_items.append(item)
+                else:
+                    # If no date, include anyway
+                    filtered_items.append(item)
+            
+            # Transform to expected bounty format
+            bounties = []
+            for item in filtered_items:
+                task = item.get("task", {})
+                bounty = {
+                    "id": f"{org}/{task.get('repo_name', 'unknown')}#{task.get('number', 'unknown')}",
+                    "title": task.get("title", "Unknown Title"),
+                    "description": item.get("description", ""),
+                    "reward": item.get("reward", {}),
+                    "status": item.get("status", status),
+                    "created_at": item.get("created_at"),
+                    "repo_name": task.get("repo_name"),
+                    "issue_number": task.get("number")
+                }
+                bounties.append(bounty)
+            
+            return bounties
+            
+        except requests.RequestException as e:
+            logger.error(f"Failed to fetch bounties from Algora: {e}")
+            raise
+
+    def fetch_github_issues(self, repo: str, labels: str = "bounty", limit: int = 10) -> List[Dict]:
+        """Fetch GitHub issues labeled as bounties."""
+        url = f"https://api.github.com/repos/{repo}/issues"
+        params = {
+            "state": "open",
+            "labels": labels,
+            "per_page": min(limit, 100),  # GitHub max 100 per page
+            "sort": "created",
+            "direction": "asc"  # Oldest first for less time-sensitive
+        }
+        
+        try:
+            response = requests.get(url, params=params, timeout=30)
+            response.raise_for_status()
+            issues = response.json()
+            
+            # Limit to requested number
+            issues = issues[:limit]
+            
+            # Transform to bounty format
+            bounties = []
+            for issue in issues:
+                bounty = {
+                    "id": f"{repo}#{issue['number']}",
+                    "title": issue["title"],
+                    "description": issue.get("body", ""),
+                    "reward": {},  # GitHub issues don't have rewards, could parse from body
+                    "status": "active",
+                    "created_at": issue["created_at"],
+                    "repo_name": repo,
+                    "issue_number": issue["number"],
+                    "url": issue["html_url"]
+                }
+                bounties.append(bounty)
+            
+            return bounties
+            
+        except requests.RequestException as e:
+            logger.error(f"Failed to fetch issues from GitHub: {e}")
+            raise
 
     def analyze_bounty_opportunity(self, repository_url: str, bounty_data: Dict,
                                  analysis_results: Dict) -> Dict:

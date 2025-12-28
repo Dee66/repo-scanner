@@ -64,6 +64,14 @@ def test_main(capsys):
 
         (repo_dir / "requirements.txt").write_text("pytest>=6.0.0\n")
 
+        # Initialize git repository
+        import subprocess
+        subprocess.run(['git', 'init'], cwd=repo_dir, check=True)
+        subprocess.run(['git', 'config', 'user.name', 'Test User'], cwd=repo_dir, check=True)
+        subprocess.run(['git', 'config', 'user.email', 'test@example.com'], cwd=repo_dir, check=True)
+        subprocess.run(['git', 'add', '.'], cwd=repo_dir, check=True)
+        subprocess.run(['git', 'commit', '-m', 'Initial commit'], cwd=repo_dir, check=True)
+
         return repo_dir
 
     @pytest.fixture
@@ -282,3 +290,88 @@ def test_main(capsys):
 
         assert result.returncode != 0, "Command should fail with file as repo"
         assert "not a directory" in result.stderr
+
+    def test_fetch_bounties_method(self, monkeypatch):
+        """Test the fetch_bounties method with mocked API."""
+        from src.services.bounty_service import BountyService
+
+        # Mock the requests.post call
+        mock_response = {
+            "result": {
+                "data": {
+                    "items": [
+                        {
+                            "task": {
+                                "repo_name": "test/repo",
+                                "number": 1,
+                                "title": "Test Bounty"
+                            },
+                            "description": "A test bounty",
+                            "reward": {"amount": 100},
+                            "status": "active",
+                            "created_at": "2024-01-01T00:00:00Z"
+                        }
+                    ],
+                    "next_cursor": None
+                }
+            }
+        }
+
+        def mock_post(url, json=None, **kwargs):
+            class MockResponse:
+                def __init__(self, json_data):
+                    self.json_data = json_data
+                def raise_for_status(self):
+                    pass
+                def json(self):
+                    return self.json_data
+            return MockResponse(mock_response)
+
+        monkeypatch.setattr("src.services.bounty_service.requests.post", mock_post)
+
+        service = BountyService()
+        bounties = service.fetch_bounties("testorg", limit=1, status="active")
+
+        assert len(bounties) == 1
+        bounty = bounties[0]
+        assert bounty["id"] == "testorg/test/repo#1"
+        assert bounty["title"] == "Test Bounty"
+        assert bounty["description"] == "A test bounty"
+        assert bounty["repo_name"] == "test/repo"
+
+    def test_fetch_github_issues_method(self, monkeypatch):
+        """Test the fetch_github_issues method with mocked API."""
+        from src.services.bounty_service import BountyService
+
+        # Mock the requests.get call
+        mock_response = [
+            {
+                "number": 1,
+                "title": "Test Issue",
+                "body": "A test issue",
+                "created_at": "2024-01-01T00:00:00Z",
+                "html_url": "https://github.com/test/repo/issues/1"
+            }
+        ]
+
+        def mock_get(url, params=None, **kwargs):
+            class MockResponse:
+                def __init__(self, json_data):
+                    self.json_data = json_data
+                def raise_for_status(self):
+                    pass
+                def json(self):
+                    return self.json_data
+            return MockResponse(mock_response)
+
+        monkeypatch.setattr("src.services.bounty_service.requests.get", mock_get)
+
+        service = BountyService()
+        issues = service.fetch_github_issues("test/repo", labels="bounty", limit=1)
+
+        assert len(issues) == 1
+        issue = issues[0]
+        assert issue["id"] == "test/repo#1"
+        assert issue["title"] == "Test Issue"
+        assert issue["description"] == "A test issue"
+        assert issue["repo_name"] == "test/repo"

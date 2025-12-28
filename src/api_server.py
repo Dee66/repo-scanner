@@ -10,6 +10,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 import uvicorn
+import git
+import shutil
 
 from fastapi import FastAPI, HTTPException, BackgroundTasks, UploadFile, File
 from fastapi.responses import JSONResponse, FileResponse
@@ -22,9 +24,99 @@ try:
     from src.core.quality.output_contract import generate_primary_report, generate_machine_output, generate_executive_verdict
     from src.core.exceptions import ScannerError, RepositoryDiscoveryError, AnalysisError, OutputGenerationError, ValidationError
     from src.core.monitoring import get_metrics_collector, get_health_checker, get_performance_monitor, get_alert_manager
+    from src.core.system_config import DATA_USAGE_CONFIG
 except ImportError as e:
     logging.error(f"Failed to import scanner components: {e}")
     raise
+
+# Helper functions for remote repository scanning
+def validate_git_url(url: str) -> bool:
+    """Validate Git URL for security and format."""
+    import re
+    from urllib.parse import urlparse
+
+    # Basic URL validation
+    try:
+        parsed = urlparse(url)
+        if not parsed.scheme or not parsed.netloc:
+            return False
+    except Exception:
+        return False
+
+    # Only allow HTTPS for security
+    if parsed.scheme.lower() != 'https':
+        return False
+
+    # Block localhost and private IPs
+    hostname = parsed.hostname.lower()
+    if hostname in ['localhost', '127.0.0.1', '::1'] or hostname.startswith('192.168.') or hostname.startswith('10.') or hostname.startswith('172.'):
+        return False
+
+    # Allow common Git hosting services
+    allowed_domains = [
+        'github.com', 'gitlab.com', 'bitbucket.org',
+        'codeberg.org', 'sourceforge.net', 'git.kernel.org'
+    ]
+
+    if hostname not in allowed_domains:
+        return False
+
+    return True
+
+def check_repo_limits(repo_path: Path, max_files: int = None, max_size_mb: int = None) -> None:
+    """Check repository size limits to prevent abuse."""
+    # Use config values if not specified
+    if max_files is None or max_size_mb is None:
+        is_ci = os.getenv('CI') == 'true' or os.getenv('GITHUB_ACTIONS') == 'true'
+        limits = DATA_USAGE_CONFIG["limits"]["automated_scans" if is_ci else "manual_scans"]
+        max_files = max_files or limits["max_files"]
+        max_size_mb = max_size_mb or limits["max_size_mb"]
+    
+    total_files = 0
+    total_size = 0
+    large_files = []
+    
+    for root, dirs, files in os.walk(repo_path):
+        # Skip .git directory
+        if '.git' in dirs:
+            dirs.remove('.git')
+
+        for file in files:
+            total_files += 1
+            if total_files > max_files:
+                raise ValidationError(f"Repository exceeds maximum file limit of {max_files}")
+
+            file_path = Path(root) / file
+            try:
+                file_size = file_path.stat().st_size
+                total_size += file_size
+                
+                # Track files over threshold
+                threshold = DATA_USAGE_CONFIG["monitoring"]["track_large_files_threshold_mb"] * 1024 * 1024
+                if file_size > threshold:
+                    large_files.append((str(file_path.relative_to(repo_path)), file_size / (1024*1024)))
+                
+                if total_size > max_size_mb * 1024 * 1024:
+                    raise ValidationError(f"Repository exceeds maximum size limit of {max_size_mb}MB")
+            except OSError:
+                # Skip files we can't stat
+                continue
+    
+    # Log data usage for monitoring
+    size_mb = total_size / (1024 * 1024)
+    logger.info(f"Repository size: {size_mb:.2f}MB, {total_files} files")
+    if large_files:
+        logger.warning(f"Large files detected: {large_files}")
+    
+    # Additional check for automated processes
+    if DATA_USAGE_CONFIG["monitoring"]["ci_stricter_limits"]:
+        is_ci = os.getenv('CI') == 'true' or os.getenv('GITHUB_ACTIONS') == 'true'
+        if is_ci:
+            ci_limits = DATA_USAGE_CONFIG["limits"]["automated_scans"]
+            if size_mb > ci_limits["max_size_mb"]:
+                raise ValidationError(f"Repository too large for automated scanning: {size_mb:.2f}MB (limit: {ci_limits['max_size_mb']}MB)")
+            if total_files > ci_limits["max_files"]:
+                raise ValidationError(f"Repository has too many files for automated scanning: {total_files} (limit: {ci_limits['max_files']})")
 
 # Configure logging
 logging.basicConfig(
@@ -107,11 +199,23 @@ async def get_alerts():
     alert_manager = get_alert_manager()
     return {"active_alerts": [alert.__dict__ for alert in alert_manager.get_active_alerts()]}
 
-@app.get("/alerts/history")
-async def get_alert_history(hours: int = 24):
-    """Get alert history for the last N hours."""
-    alert_manager = get_alert_manager()
-    return {"alert_history": [alert.__dict__ for alert in alert_manager.get_alert_history(hours)]}
+@app.get("/data-usage")
+async def get_data_usage():
+    """Get data usage statistics and limits for monitoring."""
+    return {
+        "current_limits": DATA_USAGE_CONFIG["limits"],
+        "recommendations": {
+            "typical_repo_size": "1-50MB",
+            "large_repo_threshold": f"{DATA_USAGE_CONFIG['monitoring']['track_large_files_threshold_mb']}MB+ files",
+            "automated_scan_limit": f"{DATA_USAGE_CONFIG['limits']['automated_scans']['max_size_mb']}MB",
+            "manual_scan_limit": f"{DATA_USAGE_CONFIG['limits']['manual_scans']['max_size_mb']}MB"
+        },
+        "monitoring": DATA_USAGE_CONFIG["monitoring"],
+        "environment": {
+            "is_ci": os.getenv('CI') == 'true' or os.getenv('GITHUB_ACTIONS') == 'true',
+            "applied_limits": "automated_scans" if (os.getenv('CI') == 'true' or os.getenv('GITHUB_ACTIONS') == 'true') else "manual_scans"
+        }
+    }
 
 @app.post("/scan", response_model=ScanResponse)
 async def start_scan(request: ScanRequest, background_tasks: BackgroundTasks):
@@ -205,20 +309,33 @@ async def process_scan_job(job_id: str):
         request = job["request"]
 
         # Determine repository path
+        temp_dir = None
         if request.get("repository_path"):
             repo_path = Path(request["repository_path"])
         elif request.get("repository_url"):
+            # Validate Git URL
+            if not validate_git_url(request["repository_url"]):
+                raise ValidationError("Invalid or unsafe Git URL")
+
             # Clone repository
-            with tempfile.TemporaryDirectory() as temp_dir:
-                repo_path = Path(temp_dir) / "repo"
-                # TODO: Implement git clone
-                raise NotImplementedError("Git URL scanning not yet implemented")
+            temp_dir = tempfile.mkdtemp()
+            try:
+                repo = git.Repo.clone_from(request["repository_url"], temp_dir, depth=1)
+                repo_path = Path(temp_dir)
+            except Exception as e:
+                if temp_dir:
+                    shutil.rmtree(temp_dir, ignore_errors=True)
+                raise ValidationError(f"Failed to clone repository: {e}")
         else:
             raise ValueError("Either repository_path or repository_url must be provided")
 
         # Validate repository
         if not repo_path.exists():
             raise FileNotFoundError(f"Repository path {repo_path} does not exist")
+
+        # Check repo limits if cloned
+        if temp_dir:
+            check_repo_limits(repo_path)
 
         # Update progress
         job["progress"] = 25.0
@@ -298,6 +415,11 @@ async def process_scan_job(job_id: str):
 
         # Update metrics for failed scan
         await metrics_collector.record_scan_failure({"error": str(e)})
+
+    finally:
+        # Cleanup temp directory if used
+        if temp_dir:
+            shutil.rmtree(temp_dir, ignore_errors=True)
 
 @app.on_event("startup")
 async def startup_event():

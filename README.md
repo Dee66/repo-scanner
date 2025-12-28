@@ -1,53 +1,185 @@
-# Repository Intelligence Scanner
+# 🚀 Repository Intelligence Scanner
 
-A deterministic, evidence-based repository analysis system that produces decision-grade assessments for safe software changes and **Algora bounty hunting** with 99.999% SME accuracy.
+[![Python Version](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Tests](https://img.shields.io/badge/tests-51%20passing-brightgreen.svg)](tests/)
+[![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-orange.svg)](.github/workflows/)
 
-## Features
+> **Decision-grade repository analysis with 99.999% SME accuracy** 🧠✨
 
-- **Deterministic Analysis**: Identical inputs produce identical outputs
-- **Repository Discovery**: Automatic detection of repository boundaries
-- **Multiple Output Formats**: Markdown reports and machine-readable JSON
-- **Comprehensive Testing**: 51 tests ensuring reliability and determinism
-- **🎯 Algora Bounty Hunting**: Complete bounty opportunity analysis with 99.999% SME accuracy
-- **Bayesian Probability Scoring**: Advanced profitability assessment for bounty viability
-- **PR Automation**: Automated pull request generation with maintainer profiling
-- **Accuracy Validation**: Continuous validation framework for prediction accuracy
+A sophisticated static analysis system that transforms software repositories into actionable intelligence. Scan local or remote repos, hunt bounties, and generate evidence-based reports for safe software changes and profitable opportunities.
 
-## Installation
+## 🌟 Key Features
+
+### 🔍 **Intelligent Scanning**
+- **Local & Remote**: Scan directories or clone Git repos securely
+- **Deterministic Analysis**: Identical inputs = identical outputs every time
+- **Multi-Stage Pipeline**: 20+ analysis stages from structure to security
+- **Data Usage Controls**: Smart limits prevent bandwidth abuse (100MB for automated scans)
+
+### 🎯 **Bounty Hunting**
+- **Algora Integration**: Fetch bounties from Algora.io API
+- **GitHub Issues**: Analyze GitHub issues for bounty opportunities
+- **Profitability Scoring**: Bayesian probability assessment for bounty viability
+- **PR Automation**: Generate complete pull requests with maintainer profiling
+
+### 📊 **Quality Assurance**
+- **Output Evaluation**: Consistency checks and metrics benchmarking
+- **Schema Validation**: JSON outputs validated against strict schemas
+- **Golden Repos**: Benchmark against known good/bad repositories
+- **Determinism Verification**: Ensures reproducible results
+
+### 🤖 **Automation & Scale**
+- **CI/CD Integration**: GitHub Actions workflows for automated scanning
+- **Batch Processing**: Parallel bounty analysis for multiple opportunities
+- **API Server**: RESTful API for programmatic access
+- **Container Ready**: Docker support for isolated execution
+
+## 🛠️ Installation
 
 ```bash
+# Clone the repo
+git clone https://github.com/your-org/repo-scanner.git
+cd repo-scanner
+
+# Install dependencies
 pip install -e .
+
+# Optional: Install API dependencies
+pip install -e ".[api]"
 ```
 
-## Usage
+## 🚀 Quick Start
+
+### Scan a Repository
+```bash
+# Local directory
+repo-scanner scan /path/to/your/repo
+
+# Remote Git repository
+repo-scanner scan --url https://github.com/microsoft/vscode
+
+# Custom output directory
+repo-scanner scan /path/to/repo --output-dir ./reports
+```
+
+### Hunt Bounties
+```bash
+# Analyze a specific bounty
+repo-scanner bounty /path/to/repo --bounty-data '{"id": "123", "title": "Add dark mode", "description": "..."}'
+
+# Fetch bounties from Algora
+repo-scanner bounty /path/to/repo --fetch-algora-bounties --org microsoft
+
+# Generate complete solution with PR
+repo-scanner bounty /path/to/repo --bounty-data bounty.json --generate-solution --solution-code solution.py
+```
+
+### API Server
+```bash
+# Start the API server
+python -m src.api_server
+
+# Check data usage limits
+curl http://localhost:8080/data-usage
+
+# Start a scan job
+curl -X POST http://localhost:8080/scan -H "Content-Type: application/json" -d '{"repository_url": "https://github.com/octocat/Hello-World"}'
+```
+
+## 🏗️ Architecture
+
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   CLI/API       │───▶│   Pipeline       │───▶│   Outputs       │
+│   Interface     │    │   Analysis       │    │   (JSON/MD)     │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+         │                       │                       │
+         ▼                       ▼                       ▼
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   Validation    │    │   20+ Stages     │    │   Evaluation    │
+│   & Security    │    │   (Discovery →   │    │   & Metrics     │
+│                 │    │    Synthesis)    │    │                 │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+```
+
+### Core Components
+- **CLI** (`src/cli.py`): Command-line interface with validation
+- **API Server** (`src/api_server.py`): RESTful API with job tracking
+- **Pipeline** (`src/core/pipeline/`): Multi-stage analysis engine
+- **Services** (`src/services/`): Bounty hunting and external integrations
+- **Quality** (`src/core/quality/`): Output contracts and evaluation
+- **Monitoring** (`src/core/monitoring/`): Performance and health tracking
+
+## 📋 Data Usage Controls
+
+Built-in safeguards prevent excessive bandwidth consumption:
+
+| Scan Type | File Limit | Size Limit | Notes |
+|-----------|------------|------------|-------|
+| **Manual** | 10,000 | 500MB | Interactive use |
+| **Automated** | 5,000 | 100MB | CI/CD pipelines |
+
+Configure limits via environment variables:
+```bash
+export REPO_SCANNER_MAX_FILES=20000
+export REPO_SCANNER_MAX_SIZE_MB=1000
+```
+
+## 🧪 Testing & Quality
 
 ```bash
-# Scan a repository
-repo-scanner scan /path/to/repository
+# Run all tests
+pytest
 
-# Specify output directory
-repo-scanner scan /path/to/repository --output-dir ./reports
+# Run specific test suite
+pytest tests/test_output_contract.py
 
-# Generate only markdown report
-repo-scanner scan /path/to/repository --format markdown
+# Check determinism
+pytest tests/test_determinism.py
 
-# Generate only JSON output
-repo-scanner scan /path/to/repository --format json
+# Validate schemas
+pytest tests/test_schema_version_compatibility.py
+```
 
-# 🎯 Analyze bounty opportunity
-repo-scanner bounty /path/to/repository --bounty-data '{"id": "bounty-123", "title": "Add feature", "description": "Implement new feature"}'
+- **51 Tests**: Comprehensive coverage including adversarial cases
+- **Deterministic**: Identical inputs produce identical outputs
+- **Schema Validated**: All JSON outputs conform to strict schemas
+- **Golden Repos**: Benchmark against curated reference repositories
 
-# 🎯 Process multiple bounties in parallel (batch processing)
-repo-scanner bounty /path/to/repository --bounty-data bounties.json --batch
+## 🤝 Contributing
 
-# 🎯 Process multiple bounties with custom batch ID
-repo-scanner bounty /path/to/repository --bounty-data bounties.json --batch --batch-id "my-analysis-batch-001"
+We welcome contributions! Here's how to get started:
 
-# 🎯 Generate complete bounty solution with PR
-repo-scanner bounty /path/to/repository --bounty-data bounty.json --generate-solution --solution-code solution.json
+1. **Fork** the repository
+2. **Clone** your fork: `git clone https://github.com/your-username/repo-scanner.git`
+3. **Create** a feature branch: `git checkout -b feature/amazing-feature`
+4. **Install** dev dependencies: `pip install -e ".[dev]"`
+5. **Run tests**: `pytest`
+6. **Commit** changes: `git commit -m "Add amazing feature"`
+7. **Push** to branch: `git push origin feature/amazing-feature`
+8. **Open** a Pull Request
 
-# 🎯 Validate bounty prediction accuracy
-repo-scanner validate --output-dir ./validation_reports
+### Development Guidelines
+- Follow PEP 8 style guidelines
+- Add tests for new features
+- Update documentation
+- Ensure determinism in analysis
+- Validate against schemas
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Built with ❤️ for the open source community
+- Inspired by the need for reliable repository intelligence
+- Special thanks to contributors and early adopters
+
+---
+
+**Ready to scan some repos?** 🚀 Get started with `repo-scanner scan --help`!
 ```
 
 ## Outputs

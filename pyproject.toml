@@ -21,16 +21,18 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Topic :: Software Development :: Quality Assurance",
 ]
+dependencies = [
+    "psutil>=5.9.0",
+    "GitPython>=3.1.0",
+    "markdown>=3.4.0",
+    "requests>=2.28.0",
+]
 [project.urls]
 Homepage = "https://github.com/example/repo-scanner"
 Repository = "https://github.com/example/repo-scanner"
 Documentation = "https://repo-scanner.readthedocs.io/"
 Issues = "https://github.com/example/repo-scanner/issues"
-dependencies = [
-    "psutil>=5.9.0",
-    "GitPython>=3.1.0",
-    "markdown>=3.4.0",
-]
+
 
 [project.optional-dependencies]
 dev = [

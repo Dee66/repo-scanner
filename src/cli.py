@@ -3,13 +3,91 @@
 import argparse
 import json
 import sys
+from datetime import datetime
 from pathlib import Path
+from urllib.parse import urlparse
+import re
 
 from src.core.exceptions import ScannerError, RepositoryDiscoveryError, AnalysisError, OutputGenerationError, ValidationError
 from src.core.pipeline.analysis import execute_pipeline
 from src.core.quality.output_contract import generate_primary_report, generate_machine_output, generate_executive_verdict
 from src.core.quality import schema_validator
 from src.services.bounty_service import BountyService
+
+
+def validate_git_url(url: str) -> bool:
+    """Validate Git URL for security."""
+    ALLOWED_DOMAINS = ["github.com", "gitlab.com", "bitbucket.org"]
+    try:
+        parsed = urlparse(url)
+        if parsed.scheme not in ["https", "http", "git"]:
+            return False
+        if not any(domain in parsed.netloc for domain in ALLOWED_DOMAINS):
+            return False
+        # Prevent shell injection
+        if re.search(r'[;&|`$]', url):
+            return False
+        return True
+    except Exception:
+        return False
+
+
+def check_repo_limits(repo_path: Path, max_files: int = 10000, max_size_mb: int = 500) -> None:
+    """Check repository size limits to prevent abuse."""
+    from src.core.system_config import DATA_USAGE_CONFIG
+    
+    # Use config values if not specified
+    if max_files == 10000 and max_size_mb == 500:  # Default values, use config
+        is_ci = os.getenv('CI') == 'true' or os.getenv('GITHUB_ACTIONS') == 'true'
+        limits = DATA_USAGE_CONFIG["limits"]["automated_scans" if is_ci else "manual_scans"]
+        max_files = limits["max_files"]
+        max_size_mb = limits["max_size_mb"]
+    
+    total_files = 0
+    total_size = 0
+    large_files = []
+    
+    for root, dirs, files in os.walk(repo_path):
+        # Skip .git directory
+        if '.git' in dirs:
+            dirs.remove('.git')
+
+        for file in files:
+            total_files += 1
+            if total_files > max_files:
+                raise ValidationError(f"Repository exceeds maximum file limit of {max_files}")
+
+            file_path = Path(root) / file
+            try:
+                file_size = file_path.stat().st_size
+                total_size += file_size
+                
+                # Track files over threshold
+                threshold = DATA_USAGE_CONFIG["monitoring"]["track_large_files_threshold_mb"] * 1024 * 1024
+                if file_size > threshold:
+                    large_files.append((str(file_path.relative_to(repo_path)), file_size / (1024*1024)))
+                
+                if total_size > max_size_mb * 1024 * 1024:
+                    raise ValidationError(f"Repository exceeds maximum size limit of {max_size_mb}MB")
+            except OSError:
+                # Skip files we can't stat
+                continue
+    
+    # Log data usage for monitoring
+    size_mb = total_size / (1024 * 1024)
+    print(f"Repository stats: {total_files} files, {size_mb:.2f}MB")
+    if large_files:
+        print(f"Warning: Large files detected: {large_files}")
+    
+    # Additional check for automated processes
+    if DATA_USAGE_CONFIG["monitoring"]["ci_stricter_limits"]:
+        is_ci = os.getenv('CI') == 'true' or os.getenv('GITHUB_ACTIONS') == 'true'
+        if is_ci:
+            ci_limits = DATA_USAGE_CONFIG["limits"]["automated_scans"]
+            if size_mb > ci_limits["max_size_mb"]:
+                raise ValidationError(f"Repository too large for automated scanning: {size_mb:.2f}MB (limit: {ci_limits['max_size_mb']}MB)")
+            if total_files > ci_limits["max_files"]:
+                raise ValidationError(f"Repository has too many files for automated scanning: {total_files} (limit: {ci_limits['max_files']})")
 
 
 def main():
@@ -27,7 +105,13 @@ def main():
         scan_parser.add_argument(
             "repository_path",
             type=str,
-            help="Path to the repository to scan"
+            nargs='?',
+            help="Path to the repository to scan (optional if --url is provided)"
+        )
+        scan_parser.add_argument(
+            "--url",
+            type=str,
+            help="Git URL to clone and scan remotely (e.g., https://github.com/owner/repo)"
         )
         scan_parser.add_argument(
             "--output-dir",
@@ -52,13 +136,13 @@ def main():
         bounty_parser.add_argument(
             "repository_path",
             type=str,
-            help="Path to the repository to analyze"
+            nargs='?',
+            help="Path to the repository to analyze (optional when fetching from Algora)"
         )
         bounty_parser.add_argument(
             "--bounty-data",
             type=str,
-            required=True,
-            help="JSON string or file path containing bounty data"
+            help="JSON string or file path containing bounty data (not required with --fetch-algora-bounties)"
         )
         bounty_parser.add_argument(
             "--output-dir",
@@ -85,6 +169,45 @@ def main():
             "--batch-id",
             type=str,
             help="Custom batch ID for tracking parallel processing (auto-generated if not provided)"
+        )
+        bounty_parser.add_argument(
+            "--fetch-algora-bounties",
+            action="store_true",
+            help="Fetch bounties from Algora.io instead of providing bounty data"
+        )
+        bounty_parser.add_argument(
+            "--org",
+            type=str,
+            help="Algora organization name (required with --fetch-algora-bounties)"
+        )
+        bounty_parser.add_argument(
+            "--fetch-github-issues",
+            action="store_true",
+            help="Fetch bounties from GitHub Issues instead of providing bounty data"
+        )
+        bounty_parser.add_argument(
+            "--repo",
+            type=str,
+            help="GitHub repository in owner/repo format (required with --fetch-github-issues)"
+        )
+        bounty_parser.add_argument(
+            "--labels",
+            type=str,
+            default="bounty",
+            help="Comma-separated labels to filter issues (default: bounty)"
+        )
+        bounty_parser.add_argument(
+            "--limit",
+            type=int,
+            default=10,
+            help="Maximum number of bounties/issues to fetch (default: 10)"
+        )
+        bounty_parser.add_argument(
+            "--status",
+            type=str,
+            default="active",
+            choices=["active", "inactive"],
+            help="Bounty status to fetch (default: active)"
         )
 
         # Bounty validation command
@@ -146,13 +269,32 @@ def main():
 def handle_scan_command(args):
     """Handle repository scanning command."""
     # Validate inputs
-    if not args.repository_path or not args.repository_path.strip():
-        raise ValidationError("Repository path cannot be empty")
+    if args.url:
+        if not validate_git_url(args.url):
+            raise ValidationError("Invalid or unsafe Git URL")
+    elif not args.repository_path or not args.repository_path.strip():
+        raise ValidationError("Repository path cannot be empty (or provide --url)")
     
     if not args.output_dir or not args.output_dir.strip():
         raise ValidationError("Output directory cannot be empty")
 
-    repo_path = Path(args.repository_path)
+    # Determine repo path
+    if args.url:
+        # Clone the repo
+        import tempfile
+        import git
+        temp_dir = tempfile.mkdtemp()
+        try:
+            repo = git.Repo.clone_from(args.url, temp_dir, depth=1)
+            repo_path = Path(temp_dir)
+        except Exception as e:
+            import shutil
+            shutil.rmtree(temp_dir, ignore_errors=True)
+            raise ValidationError(f"Failed to clone repository: {e}")
+    else:
+        repo_path = Path(args.repository_path)
+        temp_dir = None
+
     output_dir = Path(args.output_dir)
 
     # Validate repository path
@@ -162,10 +304,17 @@ def handle_scan_command(args):
     if not repo_path.is_dir():
         raise ValidationError(f"Repository path {repo_path} is not a directory", {"path": str(repo_path)})
 
+    # Check repo limits if cloned
+    if args.url:
+        check_repo_limits(repo_path)
+
     # Create output directory
     try:
         output_dir.mkdir(parents=True, exist_ok=True)
     except OSError as e:
+        if temp_dir:
+            import shutil
+            shutil.rmtree(temp_dir, ignore_errors=True)
         raise OutputGenerationError(f"Cannot create output directory {output_dir}: {e}", {"directory": str(output_dir), "error": str(e)})
 
     # Execute the analysis pipeline
@@ -220,23 +369,137 @@ def handle_scan_command(args):
     except Exception as e:
         raise OutputGenerationError(f"Output generation failed: {e}", {"error": str(e)}) from e
 
+    # Cleanup temp directory if used
+    if temp_dir:
+        import shutil
+        shutil.rmtree(temp_dir, ignore_errors=True)
+
     print("Scan completed successfully")
 
 
 def handle_bounty_command(args):
     """Handle bounty analysis command."""
     # Validate inputs
-    if not args.repository_path or not args.repository_path.strip():
-        raise ValidationError("Repository path cannot be empty")
+    if args.fetch_algora_bounties:
+        if not args.org:
+            raise ValidationError("--org is required when using --fetch-algora-bounties")
+        if args.generate_solution:
+            raise ValidationError("Solution generation not supported when fetching bounties")
+    elif args.fetch_github_issues:
+        if not args.repo:
+            raise ValidationError("--repo is required when using --fetch-github-issues")
+        if args.generate_solution:
+            raise ValidationError("Solution generation not supported when fetching issues")
+    else:
+        if not args.repository_path or not args.repository_path.strip():
+            raise ValidationError("Repository path cannot be empty")
+        if not args.bounty_data or not args.bounty_data.strip():
+            raise ValidationError("Bounty data cannot be empty")
+        if args.generate_solution and (not args.solution_code or not args.solution_code.strip()):
+            raise ValidationError("Solution code is required when generating solution")
 
-    if not args.bounty_data or not args.bounty_data.strip():
-        raise ValidationError("Bounty data cannot be empty")
-
-    if args.generate_solution and (not args.solution_code or not args.solution_code.strip()):
-        raise ValidationError("Solution code is required when generating solution")
-
-    repo_path = Path(args.repository_path)
-    output_dir = Path(args.output_dir)
+    if args.fetch_algora_bounties:
+        bounty_service = BountyService()
+        bounties = bounty_service.fetch_bounties(args.org, args.limit, args.status)
+        
+        results = []
+        for bounty in bounties:
+            repo_name = bounty.get('repo_name')
+            if not repo_name:
+                print(f"Skipping bounty {bounty['id']}: no repo_name")
+                continue
+            repo_path = Path(repo_name)
+            if not repo_path.exists() or not repo_path.is_dir():
+                print(f"Skipping bounty {bounty['id']}: repo {repo_name} not found locally")
+                continue
+            
+            # Execute repository analysis
+            try:
+                analysis_result = execute_pipeline(str(repo_path))
+                if analysis_result is None:
+                    analysis_result = {}
+            except Exception as e:
+                print(f"Analysis failed for {repo_name}: {e}")
+                continue
+            
+            # Analyze bounty
+            repository_url = f"file://{repo_path.absolute()}"
+            try:
+                assessment = bounty_service.analyze_bounty_opportunity(repository_url, bounty, analysis_result)
+                results.append(assessment)
+            except Exception as e:
+                print(f"Bounty analysis failed for {bounty['id']}: {e}")
+                continue
+        
+        # Output results
+        output_dir = Path(args.output_dir)
+        try:
+            output_dir.mkdir(parents=True, exist_ok=True)
+        except OSError as e:
+            raise OutputGenerationError(f"Cannot create output directory {output_dir}: {e}", {"directory": str(output_dir), "error": str(e)})
+        
+        batch_path = output_dir / "algora_bounties_results.json"
+        with open(batch_path, 'w') as f:
+            json.dump({
+                "org": args.org,
+                "fetched_at": datetime.now().isoformat(),
+                "total_bounties": len(bounties),
+                "analyzed_bounties": len(results),
+                "results": results
+            }, f, indent=2, sort_keys=True)
+        print(f"Algora bounties analysis written to {batch_path}")
+        return
+    elif args.fetch_github_issues:
+        bounty_service = BountyService()
+        bounties = bounty_service.fetch_github_issues(args.repo, args.labels, args.limit)
+        
+        results = []
+        for bounty in bounties:
+            repo_name = bounty.get('repo_name')
+            if not repo_name:
+                print(f"Skipping issue {bounty['id']}: no repo_name")
+                continue
+            repo_path = Path(repo_name)
+            if not repo_path.exists() or not repo_path.is_dir():
+                print(f"Skipping issue {bounty['id']}: repo {repo_name} not found locally")
+                continue
+            
+            # Execute repository analysis
+            try:
+                analysis_result = execute_pipeline(str(repo_path))
+                if analysis_result is None:
+                    analysis_result = {}
+            except Exception as e:
+                print(f"Analysis failed for {repo_name}: {e}")
+                continue
+            
+            # Analyze bounty
+            repository_url = f"file://{repo_path.absolute()}"
+            try:
+                assessment = bounty_service.analyze_bounty_opportunity(repository_url, bounty, analysis_result)
+                results.append(assessment)
+            except Exception as e:
+                print(f"Issue analysis failed for {bounty['id']}: {e}")
+                continue
+        
+        # Output results
+        output_dir = Path(args.output_dir)
+        try:
+            output_dir.mkdir(parents=True, exist_ok=True)
+        except OSError as e:
+            raise OutputGenerationError(f"Cannot create output directory {output_dir}: {e}", {"directory": str(output_dir), "error": str(e)})
+        
+        batch_path = output_dir / "github_issues_results.json"
+        with open(batch_path, 'w') as f:
+            json.dump({
+                "repo": args.repo,
+                "fetched_at": datetime.now().isoformat(),
+                "total_issues": len(bounties),
+                "analyzed_issues": len(results),
+                "results": results
+            }, f, indent=2, sort_keys=True)
+        print(f"GitHub issues analysis written to {batch_path}")
+        return
 
     # Validate repository path
     if not repo_path.exists():
