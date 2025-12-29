@@ -170,17 +170,29 @@ class TimeoutManager:
         """Context manager for timeout handling."""
         timeout = seconds or self.default_timeout
 
-        def timeout_handler(signum, frame):
-            raise TimeoutError(f"Operation timed out after {timeout} seconds")
+        # Check if we're in the main thread
+        if threading.current_thread() is threading.main_thread():
+            # Use signal-based timeout for main thread
+            def timeout_handler(signum, frame):
+                raise TimeoutError(f"Operation timed out after {timeout} seconds")
 
-        old_handler = signal.signal(signal.SIGALRM, timeout_handler)
-        signal.alarm(timeout)
+            old_handler = signal.signal(signal.SIGALRM, timeout_handler)
+            signal.alarm(timeout)
 
-        try:
-            yield
-        finally:
-            signal.alarm(0)
-            signal.signal(signal.SIGALRM, old_handler)
+            try:
+                yield
+            finally:
+                signal.alarm(0)
+                signal.signal(signal.SIGALRM, old_handler)
+        else:
+            # For worker threads, use time-based monitoring
+            start_time = time.time()
+            try:
+                yield
+            finally:
+                elapsed = time.time() - start_time
+                if elapsed > timeout:
+                    raise TimeoutError(f"Operation timed out after {elapsed:.1f} seconds (limit: {timeout})")
 
 
 class FileIntegrityChecker:

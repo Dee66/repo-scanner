@@ -10,6 +10,28 @@ SYSTEM_CONFIG = {
     "status": "canonical"
 }
 
+# Explicit non-claims: What this system does NOT do
+EXPLICIT_NON_CLAIMS = {
+    "no_execution": "This system does not execute, run, or interpret any application code",
+    "no_business_correctness": "This system does not assess business logic correctness or validate business requirements",
+    "no_defect_finding": "This system does not find, identify, or report software defects or bugs",
+    "no_human_replacement": "This system does not replace human judgment, review, or decision-making",
+    "no_forced_action": "This system does not force, require, or mandate any specific actions or changes"
+}
+
+# Core promise: What this system DOES guarantee
+CORE_PROMISE = {
+    "auditable_repository_snapshots": "This system provides deterministic, reproducible snapshots of repository structure and content that can be audited and verified"
+}
+
+# Non-promise limitations: What this system does NOT guarantee
+NON_PROMISE_LIMITATIONS = {
+    "no_completeness_guarantees": "This system does not guarantee complete coverage of all repository aspects or comprehensive analysis",
+    "no_intent_coverage": "This system does not assess or guarantee coverage of human intent, requirements, or business objectives",
+    "no_security_coverage": "This system does not provide security analysis, vulnerability assessment, or security guarantees",
+    "no_fitness_guarantees": "This system does not guarantee fitness for any particular purpose or provide suitability assurances"
+}
+
 # Data usage limits and monitoring
 DATA_USAGE_CONFIG = {
     "limits": {

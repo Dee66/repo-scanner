@@ -77,16 +77,40 @@ def timeout_context(seconds: int, operation_name: str = "operation"):
     def timeout_handler(signum, frame):
         raise TimeoutError(f"{operation_name} timed out after {seconds} seconds")
 
-    # Set up the timeout
-    old_handler = signal.signal(signal.SIGALRM, timeout_handler)
-    signal.alarm(seconds)
+    # Check if we're in the main thread - signals only work there
+    if threading.current_thread() is threading.main_thread():
+        # Use signal-based timeout for main thread
+        old_handler = signal.signal(signal.SIGALRM, timeout_handler)
+        signal.alarm(seconds)
 
-    try:
-        yield
-    finally:
-        # Clean up the timeout
-        signal.alarm(0)
-        signal.signal(signal.SIGALRM, old_handler)
+        try:
+            yield
+        finally:
+            # Clean up the timeout
+            signal.alarm(0)
+            signal.signal(signal.SIGALRM, old_handler)
+    else:
+        # For worker threads, we need a different approach since signals don't work well
+        # Use a flag-based approach with periodic checking
+        timeout_reached = threading.Event()
+        exception_raised = threading.Event()
+
+        def trigger_timeout():
+            timeout_reached.set()
+            # Since we can't interrupt the thread directly, we'll set a flag
+            # The calling code should check this flag periodically
+            # For now, we'll just set the flag and let the context manager handle it
+
+        timer = threading.Timer(seconds, trigger_timeout)
+        timer.start()
+
+        try:
+            yield
+            # After yielding, check if timeout was reached
+            if timeout_reached.is_set():
+                raise TimeoutError(f"{operation_name} timed out after {seconds} seconds")
+        finally:
+            timer.cancel()
 
 def with_timeout(timeout_seconds: int, operation_name: str = "operation"):
     """Decorator to add timeout to functions."""

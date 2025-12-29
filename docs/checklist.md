@@ -48,11 +48,11 @@
 ### Core Identity
 - [x] SYS-001: Implement system configuration with name, version, classification, authority level, and status
 - [x] SYS-002: Define public description explaining deterministic assessment capabilities
-- [ ] SYS-003: Document explicit non-claims (no execution, no business correctness, no defect finding, no human replacement, no forced action)
+- [x] SYS-003: Document explicit non-claims (no execution, no business correctness, no defect finding, no human replacement, no forced action)
 
 ### Core Purpose
-- [ ] SYS-004: Implement core promise of auditable repository snapshots
-- [ ] SYS-005: Define non-promise limitations (no completeness guarantees, no intent coverage, no security coverage, no fitness guarantees)
+- [x] SYS-004: Implement core promise of auditable repository snapshots
+- [x] SYS-005: Define non-promise limitations (no completeness guarantees, no intent coverage, no security coverage, no fitness guarantees)
 
 ---
 
@@ -69,14 +69,14 @@
 - [x] PRN-002: Implement evidence separation from judgment
 - [x] PRN-003: Implement uncertainty visibility requirement
 - [x] PRN-004: Implement confidence justification requirement
-- [ ] PRN-005: Implement silence preference over false precision
+- [x] PRN-005: Implement silence preference over false precision
 
 ### Behavioral Rules
 - [x] PRN-006: Implement refusal check for never_guess_intent
 - [x] PRN-007: Implement refusal check for never_optimize_for_output_volume
 - [x] PRN-008: Implement refusal check for never_mask_unknowns
 - [x] PRN-009: Implement refusal check for never_force_action
-- [ ] PRN-010: Implement refusal check for never_require_manual_intervention
+- [x] PRN-010: Implement refusal check for never_require_manual_intervention
 
 ### Trust Guarantees
 - [x] PRN-011: Implement determinism_is_mandatory guarantee
@@ -99,7 +99,7 @@
 - [x] CON-002: Implement network_access forbidden constraint
 - [x] CON-003: Implement external_services forbidden constraint
 - [x] CON-004: Implement repository_modification forbidden constraint
-- [ ] CON-005: Implement execute_application_code forbidden constraint
+- [x] CON-005: Implement execute_application_code forbidden constraint
 
 ### Determinism Requirements
 - [x] CON-006: Implement required determinism guarantee
@@ -108,7 +108,7 @@
 - [x] CON-009: Implement canonical_sorting_of_all_outputs guarantee
 - [x] CON-010: Implement no_timestamps guarantee
 - [x] CON-011: Implement no_random_values guarantee
-- [ ] CON-012: Implement stable_hashes_required guarantee
+- [x] CON-012: Implement stable_hashes_required guarantee
 
 ### Failure Handling
 - [x] CON-013: Implement repeated_runs verification (2 runs)
@@ -144,7 +144,7 @@
 ### Authority Definition
 - [x] AUT-001: Implement authority ceiling definition (maximum complexity beyond which system refuses guidance)
 - [x] AUT-002: Implement triggers (unbounded_blast_radius, contradictory_governance_signals, missing_ownership_artifacts, excessive_polyglot_sprawl, critical_paths_unverifiable)
-- [ ] AUT-003: Implement behavior_on_trigger actions (emit_refusal_artifact, suppress_recommendations, downgrade_all_confidence_levels)
+- [x] AUT-003: Implement behavior_on_trigger actions (emit_refusal_artifact, suppress_recommendations, downgrade_all_confidence_levels)
 
 ### Intent Classification
 - [x] AUT-004: Implement intent_posture_classification purpose (classify observable posture, not human intent)

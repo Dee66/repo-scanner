@@ -60,6 +60,12 @@ htmlcov/
 .dmypy.json
 dmypy.json
 
+# Large validation data files
+validation_data/repositories/*/.git/
+validation_data/security/*.json
+validation_data/repositories/*_report.json
+validation_data/repositories/validation_results/*.json
+
 # Temporary files
 tmp/
 temp/
