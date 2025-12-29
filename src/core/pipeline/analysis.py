@@ -26,6 +26,7 @@ except ImportError:
 
 # Timeout and resource limit imports
 from ..timeouts_and_limits import analysis_timeout, analysis_limits
+from ..resource_manager import get_resource_manager
 
 logger = logging.getLogger(__name__)
 
@@ -113,6 +114,11 @@ def execute_pipeline(repository_path: str) -> dict:
     start_time = time.time()
     performance_optimizer = get_performance_optimizer()
     performance_monitor = get_performance_monitor()
+    resource_manager = get_resource_manager()
+
+    # Get initial degradation config
+    degradation_config = resource_manager.get_degradation_config()
+    logger.info(f"Starting analysis with degradation config: {degradation_config}")
 
     # Start distributed tracing span if enabled
     span = None
@@ -238,7 +244,7 @@ def execute_pipeline(repository_path: str) -> dict:
 
         # Standard pipeline for smaller repositories
         logger.info(f"Standard repository ({len(file_list)} files), using standard pipeline")
-        result = _execute_standard_pipeline(repository_path, repo_root, file_list, start_time, initial_memory)
+        result = _execute_standard_pipeline(repository_path, repo_root, file_list, start_time, initial_memory, degradation_config)
 
         # Complete performance tracking
         execution_time = time.time() - start_time
@@ -415,10 +421,13 @@ def _estimate_enterprise_complexity(file_list: List[str], repo_path: str) -> flo
     return base_complexity + enterprise_factors
 
 def _execute_standard_pipeline(repository_path: str, repo_root: str, file_list: List[str],
-                             start_time: float, initial_memory: Dict[str, Any]) -> dict:
+                             start_time: float, initial_memory: Dict[str, Any], degradation_config: Dict[str, Any]) -> dict:
     """Execute the standard analysis pipeline for smaller repositories."""
     performance_optimizer = get_performance_optimizer()
     performance_stage_stats: Dict[str, Dict[str, float]] = {}
+
+    skip_optional = degradation_config.get("skip_optional_stages", False)
+    logger.info(f"Executing standard pipeline with optional stages {'skipped' if skip_optional else 'enabled'}")
 
     def _run_stage(name: str, func, *a, **k):
         """Run a pipeline stage and record time + memory usage."""
@@ -472,17 +481,27 @@ def _execute_standard_pipeline(repository_path: str, repo_root: str, file_list: 
     # Dependency analysis (depends on semantic)
     dependency_analysis = _run_stage('dependency_analysis', analyze_dependencies, file_list, semantic)
 
-    # Code duplication analysis (depends on semantic)
-    code_duplication_analysis = _run_stage('code_duplication_analysis', analyze_code_duplication, file_list, semantic)
+    # Code duplication analysis (optional - skip if degradation active)
+    code_duplication_analysis = {}
+    if not skip_optional:
+        code_duplication_analysis = _run_stage('code_duplication_analysis', analyze_code_duplication, file_list, semantic)
+    else:
+        logger.info("Skipping code duplication analysis due to resource degradation")
+        code_duplication_analysis = {"status": "skipped_due_to_degradation"}
 
-    # API analysis (depends on semantic)
-    api_analysis = _run_stage('api_analysis', analyze_api_definitions, file_list, semantic)
+    # API analysis (optional - skip if degradation active)
+    api_analysis = {}
+    if not skip_optional:
+        api_analysis = _run_stage('api_analysis', analyze_api_definitions, file_list, semantic)
+    else:
+        logger.info("Skipping API analysis due to resource degradation")
+        api_analysis = {"status": "skipped_due_to_degradation"}
 
     # Test signal analysis (run first as others depend on it)
     test_signals = _run_stage('test_signal_analysis', analyze_test_signals, file_list, structure, semantic)
 
     # Parallel execution for independent analysis stages
-    thread_pool = OptimizedThreadPool(max_workers=4)
+    thread_pool = OptimizedThreadPool(max_workers=degradation_config.get("max_threads", 4))
     try:
         # Submit parallel tasks that depend on test_signals
         governance_future = thread_pool.submit(analyze_governance_signals, file_list, structure, semantic, test_signals)
@@ -542,7 +561,8 @@ def _execute_standard_pipeline(repository_path: str, repo_root: str, file_list: 
             "final_memory_mb": final_memory['rss_mb'],
             "memory_delta_mb": memory_delta,
             "thread_pool_stats": thread_pool_stats,
-            "stages": performance_stage_stats
+            "stages": performance_stage_stats,
+            "degradation_config": degradation_config
         },
         "status": "standard_pipeline_complete"
     }

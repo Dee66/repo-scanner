@@ -6,9 +6,9 @@
 **Implementation Target:** SME-led engineering transformation  
 **Risk Level:** HIGH (ambitious metrics, complex interdependent changes)
 
-<div role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="46" style="width:94%; background:#e6eef0; border-radius:8px; padding:6px; box-shadow: inset 0 1px 2px rgba(0,0,0,0.04);">
-    <div style="width:94%; background:linear-gradient(90deg,#84cc16,#22c55e,#10b981); color:#fff; padding:10px 12px; text-align:right; border-radius:6px; font-weight:700; transition:width 0.5s ease;">
-    <span style="display:inline-block; background:rgba(0,0,0,0.12); padding:4px 8px; border-radius:999px; font-size:0.95em;">95% · 88/93</span>
+<div role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="96" style="width:96%; background:#e6eef0; border-radius:8px; padding:6px; box-shadow: inset 0 1px 2px rgba(0,0,0,0.04);">
+    <div style="width:96%; background:linear-gradient(90deg,#84cc16,#22c55e,#10b981); color:#fff; padding:10px 12px; text-align:right; border-radius:6px; font-weight:700; transition:width 0.5s ease;">
+    <span style="display:inline-block; background:rgba(0,0,0,0.12); padding:4px 8px; border-radius:999px; font-size:0.95em;">96% · 89/93</span>
   </div>
 </div>
 
@@ -155,7 +155,7 @@
 
 ### Adapter and Resource Enhancements
 - [x] EFF-026: Upgrade Python Adapter for Enhanced Analysis (sub-steps: audit implementation, integrate libraries like astroid/mypy, add Python 3.10+ features, implement fallbacks, update tests; tools: astroid v2.15+, mypy v1.0+; criteria: 95%+ accuracy, <5% false positives)
-- [ ] EFF-027: Implement Resource Limits and Optimization (sub-steps: add configurable limits, integrate psutil monitoring, implement graceful degradation, add logging, test with stress scenarios; tools: psutil v5.9+; criteria: no exceeds 2GB/60s, 90%+ efficiency)
+- [x] EFF-027: Implement Resource Limits and Optimization (sub-steps: add configurable limits, integrate psutil monitoring, implement graceful degradation, add logging, test with stress scenarios; tools: psutil v5.9+; criteria: no exceeds 2GB/60s, 90%+ efficiency)
 - [ ] EFF-028: Automate SME Placeholder Filling in Reports (sub-steps: identify placeholders, integrate SME API, add auto-fill logic, implement fallbacks, update process; tools: Jinja2; criteria: 100% filled, no manual intervention)
 - [ ] EFF-029: Enhance Effectiveness Metrics Calculation (sub-steps: expand metrics with precision/recall, add weighted scoring, integrate collection, update reports, add CI; tools: NumPy; criteria: >95% accuracy, alerts on <90%)
 - [ ] EFF-030: Update Language Adapters for New Types (sub-steps: assess gaps, extend base adapter, implement parsers, add validation tests, update docs; tools: tree-sitter v0.20+; criteria: 12+ languages, 90%+ detection)

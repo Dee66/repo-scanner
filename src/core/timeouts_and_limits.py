@@ -4,10 +4,15 @@ import os
 import signal
 import time
 import threading
+import logging
 from contextlib import contextmanager
 from typing import Optional, Callable, Any
 import psutil
 import resource
+
+from .resource_manager import get_resource_manager, start_global_resource_monitoring, stop_global_resource_monitoring
+
+logger = logging.getLogger(__name__)
 
 # Timeout and resource limit configuration
 TIMEOUT_CONFIG = {
@@ -122,41 +127,40 @@ def with_timeout(timeout_seconds: int, operation_name: str = "operation"):
     return decorator
 
 def with_resource_limits(operation_name: str = "operation"):
-    """Decorator to enforce resource limits during execution."""
+    """Decorator to enforce resource limits during execution with graceful degradation."""
     def decorator(func):
         def wrapper(*args, **kwargs):
             # Set process limits
             set_process_limits()
 
-            # Monitor resources in background
-            stop_monitoring = threading.Event()
-            resource_violations = []
-
-            def monitor_resources():
-                while not stop_monitoring.is_set():
-                    usage = check_resource_usage()
-                    if usage["memory_limit_exceeded"]:
-                        resource_violations.append(f"Memory limit exceeded: {usage['memory_mb']:.1f}MB > {RESOURCE_LIMITS['max_memory_mb']}MB")
-                    if usage["cpu_limit_exceeded"]:
-                        resource_violations.append(f"CPU limit exceeded: {usage['cpu_percent']:.1f}% > {RESOURCE_LIMITS['max_cpu_percent']}%")
-
-                    time.sleep(5)  # Check every 5 seconds
-
-            monitor_thread = threading.Thread(target=monitor_resources, daemon=True)
-            monitor_thread.start()
+            # Start resource monitoring
+            resource_manager = get_resource_manager()
+            start_global_resource_monitoring()
 
             try:
+                # Execute the function
                 result = func(*args, **kwargs)
 
-                # Check for resource violations
-                if resource_violations:
-                    raise ResourceLimitError(f"{operation_name} exceeded resource limits: {'; '.join(resource_violations)}")
+                # Check final resource usage
+                final_usage = resource_manager.get_resource_usage()
+
+                # Log completion with resource stats
+                logger.info(f"{operation_name} completed - "
+                          f"Peak memory: {final_usage['memory_mb']:.1f}MB, "
+                          f"Peak CPU: {final_usage['cpu_percent']:.1f}%, "
+                          f"Final degradation level: {final_usage['degradation_level']}")
+
+                # If limits were exceeded, log warning but don't fail (graceful degradation)
+                if final_usage["memory_limit_exceeded"] or final_usage["cpu_limit_exceeded"]:
+                    logger.warning(f"{operation_name} exceeded resource limits but completed via graceful degradation - "
+                                 f"Memory: {final_usage['memory_limit_percent']:.1f}%, "
+                                 f"CPU: {final_usage['cpu_limit_percent']:.1f}%")
 
                 return result
 
             finally:
-                stop_monitoring.set()
-                monitor_thread.join(timeout=1.0)  # Wait up to 1 second for monitor to stop
+                # Stop resource monitoring
+                stop_global_resource_monitoring()
 
         return wrapper
     return decorator

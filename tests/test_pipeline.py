@@ -121,3 +121,67 @@ def test_execute_pipeline_subdirectory_start(tmp_path):
     assert result["repository_root"] == str(sub_dir)
     assert len(result["files"]) == 1
     assert any("sub_file.txt" in f for f in result["files"])
+
+
+def test_execute_pipeline_resource_limits_and_degradation(tmp_path, monkeypatch):
+    """Test resource limits and graceful degradation."""
+    from src.core.resource_manager import get_resource_manager, DegradationLevel
+
+    # Create a test repository
+    repo_dir = tmp_path / "resource_test_repo"
+    repo_dir.mkdir()
+    (repo_dir / "test.py").write_text("print('hello world')")
+
+    # Get resource manager and directly set degradation level
+    resource_manager = get_resource_manager()
+    resource_manager.degradation_level = DegradationLevel.LIGHT  # Simulate light degradation
+
+    # Execute pipeline
+    result = execute_pipeline(str(repo_dir))
+
+    # Verify pipeline completed successfully
+    assert result["status"] == "standard_pipeline_complete"
+    assert "performance_metrics" in result
+    assert "degradation_config" in result["performance_metrics"]
+
+    # Check that degradation config reflects light degradation
+    degradation_config = result["performance_metrics"]["degradation_config"]
+    assert degradation_config["max_threads"] == 2  # Reduced from 4
+    assert degradation_config["batch_size"] == 25  # Reduced from 50
+    assert not degradation_config["skip_optional_stages"]  # Not yet skipping
+
+    # Verify optional stages were still executed (light degradation)
+    assert "code_duplication_analysis" in result
+    assert "api_analysis" in result
+    assert result["code_duplication_analysis"] != {"status": "skipped_due_to_degradation"}
+    assert result["api_analysis"] != {"status": "skipped_due_to_degradation"}
+
+
+def test_execute_pipeline_critical_degradation(tmp_path, monkeypatch):
+    """Test critical resource degradation with stage skipping."""
+    from src.core.resource_manager import get_resource_manager, DegradationLevel
+
+    # Create a test repository
+    repo_dir = tmp_path / "critical_test_repo"
+    repo_dir.mkdir()
+    (repo_dir / "test.py").write_text("print('hello world')")
+
+    # Get resource manager and directly set critical degradation level
+    resource_manager = get_resource_manager()
+    resource_manager.degradation_level = DegradationLevel.CRITICAL  # Simulate critical degradation
+
+    # Execute pipeline
+    result = execute_pipeline(str(repo_dir))
+
+    # Verify pipeline completed successfully despite critical resource usage
+    assert result["status"] == "standard_pipeline_complete"
+
+    # Check that degradation config reflects critical degradation
+    degradation_config = result["performance_metrics"]["degradation_config"]
+    assert degradation_config["max_threads"] == 1  # Minimized
+    assert degradation_config["batch_size"] == 5   # Minimized
+    assert degradation_config["skip_optional_stages"]  # Should skip optional stages
+
+    # Verify optional stages were skipped
+    assert result["code_duplication_analysis"] == {"status": "skipped_due_to_degradation"}
+    assert result["api_analysis"] == {"status": "skipped_due_to_degradation"}
