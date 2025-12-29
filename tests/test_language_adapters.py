@@ -16,29 +16,113 @@ from src.adapters.cpp_adapter import CppAdapter
 class TestPythonAdapter:
     """Test Python language adapter functionality."""
 
-    def test_python_adapter_extract_ast_not_implemented(self):
-        """Test that Python AST extraction raises NotImplementedError."""
+    def test_python_adapter_extract_ast_invalid_file(self):
+        """Test Python AST extraction with invalid file path."""
         adapter = PythonAdapter()
-        with pytest.raises(NotImplementedError):
-            adapter.extract_ast("dummy_file.py")
+        result = adapter.extract_ast("")
+        assert "error" in result
+        assert result["imports"] == []
+        assert result["classes"] == []
 
-    def test_python_adapter_build_dependency_graph_not_implemented(self):
-        """Test that Python dependency graph building raises NotImplementedError."""
-        adapter = PythonAdapter()
-        with pytest.raises(NotImplementedError):
-            adapter.build_dependency_graph("/tmp/dummy")
+    def test_python_adapter_extract_ast_valid_file(self, tmp_path):
+        """Test Python AST extraction with valid file."""
+        # Create a test Python file
+        test_file = tmp_path / "test.py"
+        test_content = (
+            "import os\n"
+            "from typing import List\n"
+            "\n"
+            "class TestClass:\n"
+            "    def __init__(self, value):\n"
+            "        self.value = value\n"
+            "\n"
+            "    def method(self):\n"
+            "        return \"value: \" + str(self.value)\n"
+            "\n"
+            "def test_function(x, y):\n"
+            "    return [x]\n"
+            "\n"
+            "variable = \"test\"\n"
+        )
+        test_file.write_text(test_content)
 
-    def test_python_adapter_discover_tests_not_implemented(self):
-        """Test that Python test discovery raises NotImplementedError."""
         adapter = PythonAdapter()
-        with pytest.raises(NotImplementedError):
-            adapter.discover_tests("/tmp/dummy")
+        result = adapter.extract_ast(str(test_file))
 
-    def test_python_adapter_extract_documentation_not_implemented(self):
-        """Test that Python documentation extraction raises NotImplementedError."""
+        assert result["file_path"] == str(test_file)
+        assert len(result["imports"]) == 2  # import os, from typing import List
+        assert len(result["classes"]) == 1
+        assert result["classes"][0]["name"] == "TestClass"
+        assert len(result["functions"]) == 1
+        assert result["functions"][0]["name"] == "test_function"
+        assert len(result["methods"]) == 2  # __init__ and method
+        assert len(result["variables"]) == 1
+        assert result["complexity"] >= 1
+
+    def test_python_adapter_build_dependency_graph_invalid_path(self):
+        """Test Python dependency graph building with invalid path."""
         adapter = PythonAdapter()
-        with pytest.raises(NotImplementedError):
-            adapter.extract_documentation("dummy_file.py")
+        result = adapter.build_dependency_graph("")
+        assert "error" in result
+        assert result["modules"] == {}
+
+    def test_python_adapter_build_dependency_graph_valid_project(self, tmp_path):
+        """Test Python dependency graph building with valid project."""
+        # Create test project structure
+        (tmp_path / "main.py").write_text("import os\nfrom custom_module import func")
+        (tmp_path / "custom_module.py").write_text("def func(): pass")
+
+        adapter = PythonAdapter()
+        result = adapter.build_dependency_graph(str(tmp_path))
+
+        assert "modules" in result
+        assert "dependencies" in result
+        assert len(result["modules"]) >= 1
+
+    def test_python_adapter_discover_tests_valid_project(self, tmp_path):
+        """Test Python test discovery."""
+        # Create test files
+        (tmp_path / "test_main.py").write_text("""
+def test_example():
+    pass
+
+class TestClass:
+    def test_method(self):
+        pass
+""")
+
+        adapter = PythonAdapter()
+        tests = adapter.discover_tests(str(tmp_path))
+
+        assert len(tests) >= 1
+        assert any(t["name"] == "test_example" for t in tests)
+
+    def test_python_adapter_extract_documentation_valid_file(self, tmp_path):
+        """Test Python documentation extraction."""
+        test_file = tmp_path / "doc_test.py"
+        test_file.write_text('''
+"""Module docstring."""
+
+def func():
+    """Function docstring."""
+    pass
+
+class MyClass:
+    """Class docstring."""
+
+    def method(self):
+        """Method docstring."""
+        pass
+''')
+
+        adapter = PythonAdapter()
+        result = adapter.extract_documentation(str(test_file))
+
+        assert "docstrings" in result
+        assert "module" in result["docstrings"]
+        assert "function:func" in result["docstrings"]
+        assert "class:MyClass" in result["docstrings"]
+        assert "method:MyClass.method" in result["docstrings"]
 
 
 class TestJavaAdapter:
