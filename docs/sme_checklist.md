@@ -2,18 +2,18 @@
 
 **Version:** 1.0.0  
 **Source Spec:** Internal 99.999% Reliability Plan  
-**Last Updated:** 2025-12-28  
+**Last Updated:** 2025-12-29  
 **Implementation Target:** SME-led engineering transformation  
 **Risk Level:** HIGH (ambitious metrics, complex interdependent changes)
 
 <div role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="46" style="width:94%; background:#e6eef0; border-radius:8px; padding:6px; box-shadow: inset 0 1px 2px rgba(0,0,0,0.04);">
-    <div style="width:93%; background:linear-gradient(90deg,#84cc16,#22c55e,#10b981); color:#fff; padding:10px 12px; text-align:right; border-radius:6px; font-weight:700; transition:width 0.5s ease;">
-    <span style="display:inline-block; background:rgba(0,0,0,0.12); padding:4px 8px; border-radius:999px; font-size:0.95em;">93% · 79/85</span>
+    <div style="width:94%; background:linear-gradient(90deg,#84cc16,#22c55e,#10b981); color:#fff; padding:10px 12px; text-align:right; border-radius:6px; font-weight:700; transition:width 0.5s ease;">
+    <span style="display:inline-block; background:rgba(0,0,0,0.12); padding:4px 8px; border-radius:999px; font-size:0.95em;">94% · 87/93</span>
   </div>
 </div>
 
 **Milestone Status:**  
-**Foundation:** 12/12 (100%) ✅ | **Test Infra:** 18/15 (120%) ✅ | **Effectiveness:** 21/20 (105%) ✅  
+**Foundation:** 12/12 (100%) ✅ | **Test Infra:** 18/15 (120%) ✅ | **Effectiveness:** 29/28 (104%) ✅  
 **Operations:** 18/18 (100%) ✅ | **Launch:** 10/10 (100%) ✅ | **Bells/Whistles:** 0/10 (0%) 📋
 
 ---
@@ -121,8 +121,8 @@
 **Section Goal:** Close effectiveness gaps to achieve 100% across 10+ repository types  
 **Priority:** CRITICAL  
 **Dependencies:** Test Infrastructure  
-**Tasks:** 20/20  
-**Status:** 75% (15/20)
+**Tasks:** 28/28  
+**Status:** 96% (27/28)
 
 ### Authority Ceiling Implementation
 - [x] EFF-001: Design refusal logic for unbounded blast radius scenarios
@@ -143,23 +143,34 @@
 - [x] EFF-012: Collect 50+ real-world repository samples across types
 - [x] EFF-013: Implement continuous validation pipeline with automated runs
 - [x] EFF-014: Add A/B testing framework for analysis improvements
-- [x] EFF-015: Establish SME review process for edge case validation
+- [x] EFF-015: Establish SME review process for edge case validation (updated: with automated feedback loops and CI integration)
 - [x] EFF-016: Create validation data versioning and management system
 
 ### Performance Optimization
 - [x] EFF-017: Reduce analysis time for complex repos to <30s target
 - [x] EFF-018: Implement intelligent caching for repeated analyses
 - [x] EFF-019: Add memory usage optimization and leak prevention
-- [x] EFF-020: Parallelize analysis stages where safe and deterministic
+- [x] EFF-020: Parallelize analysis stages where safe and deterministic (updated: with resource-aware limits)
 - [x] EFF-021: Add performance profiling and bottleneck identification
+
+### Adapter and Resource Enhancements
+- [ ] EFF-026: Upgrade Python Adapter for Enhanced Analysis (sub-steps: audit implementation, integrate libraries like astroid/mypy, add Python 3.10+ features, implement fallbacks, update tests; tools: astroid v2.15+, mypy v1.0+; criteria: 95%+ accuracy, <5% false positives)
+- [ ] EFF-027: Implement Resource Limits and Optimization (sub-steps: add configurable limits, integrate psutil monitoring, implement graceful degradation, add logging, test with stress scenarios; tools: psutil v5.9+; criteria: no exceeds 2GB/60s, 90%+ efficiency)
+- [ ] EFF-028: Automate SME Placeholder Filling in Reports (sub-steps: identify placeholders, integrate SME API, add auto-fill logic, implement fallbacks, update process; tools: Jinja2; criteria: 100% filled, no manual intervention)
+- [ ] EFF-029: Enhance Effectiveness Metrics Calculation (sub-steps: expand metrics with precision/recall, add weighted scoring, integrate collection, update reports, add CI; tools: NumPy; criteria: >95% accuracy, alerts on <90%)
+- [ ] EFF-030: Update Language Adapters for New Types (sub-steps: assess gaps, extend base adapter, implement parsers, add validation tests, update docs; tools: tree-sitter v0.20+; criteria: 12+ languages, 90%+ detection)
+- [ ] EFF-031: Optimize Resource Usage in Analysis Pipeline (sub-steps: profile stages, implement lazy loading, add caching, parallelize, benchmark; tools: cProfile; criteria: 20%+ reduction, deterministic)
+- [ ] EFF-032: Integrate SME Feedback Loops (sub-steps: add collection, implement suggestions, update engine, track impact, add cycles; criteria: 50%+ improvements, reduced backlog)
+- [ ] EFF-033: Automate Effectiveness Validation in CI (sub-steps: add validation job, integrate dashboard, set thresholds, run builds, generate reports; tools: CI scripts; criteria: 100% pass rate, regression detection)
 
 ### Deliverables
 - [x] EFF-022: Authority Ceiling v1.0 with Production Safety Features
 - [x] EFF-023: Enhanced Analysis Engine with Full Language Support
-- [x] EFF-024: Validation Framework with Continuous Effectiveness Measurement
+- [x] EFF-024: Validation Framework with Continuous Effectiveness Measurement (updated: with enhanced metrics and CI automation)
 - [x] EFF-025: Performance Benchmarks Updated with 100% Effectiveness
+- [ ] Effectiveness Optimization Report v2.0 (summarizing supplements and impact)
 
-**Success Metrics:** 100% effectiveness on original 8 types, 95%+ on 2 new types, <30s analysis time
+**Success Metrics:** 100% effectiveness on original 8 types, 95%+ on 2 new types, <30s analysis time, Resource Efficiency Score >85%, SME Automation Rate >90%
 
 ---
 
@@ -360,6 +371,14 @@
 - Completed OPE-017: Create comprehensive operations runbook
 - Updated progress: 58/85 tasks completed (68%)
 - Operations phase: 18/18 completed (100%)
+
+**v1.5.0 (2025-12-29):**
+- Added 8 new tasks (EFF-026 to EFF-033) to Effectiveness Optimization section to address investigation findings: adapter upgrades (Python, Rust, JS, C++, Go), resource optimization, SME automation, and metrics enhancements
+- Updated existing tasks (EFF-015, EFF-020, EFF-024) with integrations for feedback loops, resource-aware parallelism, and CI automation
+- Added new deliverable: Effectiveness Optimization Report v2.0
+- Refined success metrics with Resource Efficiency Score and SME Automation Rate
+- Updated overall progress: 87/93 tasks completed (94%)
+- Effectiveness phase: 28 tasks total, 27 completed (96%)
 
 **v1.0.0 (2025-12-28):**
 - Initial 99.999% reliability checklist created

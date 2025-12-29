@@ -1,0 +1,59 @@
+{
+  "authority_ceiling_evaluation": {},
+  "decision_artifacts": {},
+  "determinism_verification": {
+    "canonical_data_summary": {
+      "data_components": 11,
+      "has_all_required_components": true,
+      "hash_input_size": 285,
+      "total_files": 0
+    },
+    "consistency_check": {
+      "consistency_issues": [],
+      "consistency_score": 1.0,
+      "issues_found": 0,
+      "overall_consistency": "high"
+    },
+    "determinism_hash": "bcbf3942216c66e3e562736dba6dd54c2068dbf37f7bad43a765cb57efe71535",
+    "determinism_report": {
+      "analysis_hash": "bcbf3942216c66e3e562736dba6dd54c2068dbf37f7bad43a765cb57efe71535",
+      "confidence_level": "high",
+      "consistency_score": 1.0,
+      "description": "Analysis pipeline produces fully deterministic results",
+      "determinism_status": "verified",
+      "hash_algorithm": "SHA-256",
+      "issues_found": 0,
+      "verification_method": "canonical_data_hashing"
+    },
+    "verification_timestamp": "2025-12-23T00:00:00Z",
+    "verification_version": "1.0.0"
+  },
+  "gaps": [],
+  "governance": {
+    "schema_version": "1.0.0"
+  },
+  "intent_posture": {},
+  "metadata": {
+    "deterministic_hash": "bcbf3942216c66e3e562736dba6dd54c2068dbf37f7bad43a765cb57efe71535",
+    "run_timestamp": "2025-01-01T00:00:00Z",
+    "scanner_version": "1.1.0"
+  },
+  "misleading_signals": {},
+  "repository": {
+    "name": "tmpkru5ak4u",
+    "path": "/tmp/tmpkru5ak4u"
+  },
+  "risk_synthesis": {},
+  "run_id": "placeholder-run-id",
+  "safe_change_surface": {},
+  "semantic": {},
+  "structure": {},
+  "summary": {
+    "files_scanned": 0,
+    "gaps_count": 0,
+    "overall_score": 0.0,
+    "tests_discovered": 0
+  },
+  "tasks": {},
+  "test_signals": {}
+}

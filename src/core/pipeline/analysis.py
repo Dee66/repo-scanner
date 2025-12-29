@@ -160,8 +160,8 @@ def execute_pipeline(repository_path: str) -> dict:
                 logger.error(f"Non-string items in file_list: {len(non_strings)} items, first 5: {non_strings[:5]}")
 
         # Auto-select pipeline based on repository complexity
-        complexity_threshold = 1000  # Much higher threshold for enterprise repos
-        if len(file_list) > complexity_threshold or _estimate_enterprise_complexity(file_list, repository_path) > 100:
+        complexity_threshold = 10000  # Much higher threshold for enterprise repos
+        if False:
             logger.info(f"Enterprise-scale repository detected ({len(file_list)} files), using enterprise edge case handler")
 
             # Use enterprise edge case handler for very complex repositories

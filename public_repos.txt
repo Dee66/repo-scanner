@@ -1,0 +1,5 @@
+https://github.com/microsoft/TypeScript
+https://github.com/facebook/react
+https://github.com/python/cpython
+https://github.com/torvalds/linux
+https://github.com/golang/go
