@@ -205,7 +205,7 @@ def evaluate_test_quality(file_list: List[str], semantic: Dict) -> List[Dict]:
 def calculate_testing_maturity(structure: Dict, semantic: Dict) -> float:
     """Calculate a testing maturity score (0-1)."""
     score = 0.0
-    max_score = 5.0
+    max_score = 6.0  # Increased for additional factors
     
     # Factor 1: Test file ratio
     file_counts = structure.get("file_counts", {})
@@ -220,20 +220,42 @@ def calculate_testing_maturity(structure: Dict, semantic: Dict) -> float:
     if len(test_frameworks) > 0:
         score += 1.0
     
-    # Factor 3: Test quality signals
+    # Factor 3: Test quality signals - analyze content, not just names
     python_analysis = semantic.get("python_analysis", {})
-    test_functions = len([f for f in python_analysis.get("functions", []) if "test" in f["name"].lower()])
-    if test_functions > 10:
+    test_functions = 0
+    test_classes = 0
+    test_setup_methods = 0
+    
+    for func in python_analysis.get("functions", []):
+        func_name = func["name"].lower()
+        if "test" in func_name or func_name.startswith("test_"):
+            test_functions += 1
+            
+    for cls in python_analysis.get("classes", []):
+        cls_name = cls["name"].lower()
+        if "test" in cls_name:
+            test_classes += 1
+            
+    # Look for test setup/teardown methods
+    for func in python_analysis.get("functions", []):
+        func_name = func["name"].lower()
+        if any(pattern in func_name for pattern in ["setup", "teardown", "fixture", "conftest"]):
+            test_setup_methods += 1
+    
+    if test_functions > 20:
         score += 1.0
-    elif test_functions > 0:
+    elif test_functions > 5:
+        score += 0.5
+        
+    if test_classes > 0:
+        score += 0.5
+        
+    if test_setup_methods > 0:
         score += 0.5
     
     # Factor 4: Test organization
     if any("tests/" in f for f in structure.get("file_counts", {})):
         score += 1.0
-    
-    # Factor 5: CI/CD integration (placeholder)
-    # This would check for CI files that run tests
     
     return min(score / max_score, 1.0)
 

@@ -2,14 +2,14 @@
 
 ## Executive Summary
 
-Analysis completed for repository: /tmp/tmpuufq0a82
-30 files analyzed
+Analysis completed for repository: /home/dee/workspace/AI/GuardSuite/CostPilot
+7508 files analyzed
 Analysis timestamp: Generated on demand
 
 ## System Characterization
 
-**Repository:** /tmp/tmpuufq0a82
-**Files Analyzed:** 30
+**Repository:** /home/dee/workspace/AI/GuardSuite/CostPilot
+**Files Analyzed:** 7508
 
 ### Repository Structure
 
@@ -24,30 +24,75 @@ Analysis timestamp: Generated on demand
 - **Has Main Entry:** False
 - **Has Package Structure:** False
 
-### Testing Signals
-
-- **Test Files:** 0
-- **Test Frameworks:** None detected
-- **Testing Maturity:** 0.0/10
-
-### Governance Signals
-
-- **Documentation:** 0.0/10
-- **Version Control:** Not detected
-- **CI/CD:** None detected
-
-### Intent Posture
-
-- **Project Type:** Unknown
-- **Development Stage:** concept - Early concept or planning phase
-- **Team Size Indicator:** Unknown
-
 ## Evidence Highlights
 
 ### Key Technical Indicators
 
 - **Testing:** Limited testing infrastructure (maturity score: 0.0/10)
-- **Security:** No security vulnerabilities detected
+
+## Security Analysis
+
+### Vulnerability Summary
+
+**Total Security Findings:** 2263
+**High Severity:** 1
+**Medium Severity:** 0
+**Low Severity:** 0
+**Languages Analyzed:** 2
+
+**Security Posture:** 🔴 **CRITICAL** - High-severity vulnerabilities require immediate attention
+
+### Critical Security Findings
+
+| File | Pattern Type | Severity | Description |
+|------|-------------|----------|-------------|
+| `/home/dee/workspace/AI/GuardSuite/CostPilot/build.rs` | hardcoded_secrets | HIGH | Potential hardcoded secrets or credentials |
+
+### Findings by Language
+
+**RS:** 1109 findings
+
+- ⚪ **sandboxing_mechanisms:** 580 instances
+- ⚪ **deterministic_security:** 234 instances
+- ⚪ **offline_security:** 162 instances
+- ⚪ **multi_layer_validation:** 46 instances
+- ⚪ **zero_network_enforcement:** 20 instances
+- ⚪ **deterministic_security_model:** 18 instances
+- ⚪ **prevention_first_security:** 18 instances
+- ⚪ **cryptographic_lifecycle:** 12 instances
+- ⚪ **prevention_first_validation:** 9 instances
+- ⚪ **cryptographic_boundary:** 4 instances
+- ⚪ **operational_boundaries:** 4 instances
+- 🔴 **hardcoded_secrets:** 1 instances
+- ⚪ **multi_layer_input_validation:** 1 instances
+
+**PY:** 1154 findings
+
+- ⚪ **sandboxing_mechanisms:** 780 instances
+- ⚪ **deterministic_security:** 213 instances
+- ⚪ **multi_layer_validation:** 64 instances
+- ⚪ **prevention_first_security:** 31 instances
+- ⚪ **cryptographic_lifecycle:** 20 instances
+- ⚪ **zero_network_enforcement:** 13 instances
+- ⚪ **multi_layer_input_validation:** 9 instances
+- ⚪ **deterministic_security_model:** 9 instances
+- ⚪ **offline_security:** 8 instances
+- ⚪ **operational_boundaries:** 6 instances
+- ⚪ **prevention_first_validation:** 1 instances
+
+### Security Recommendations
+
+**Immediate Actions:**
+- Review all HIGH severity findings before deployment
+- Address CRITICAL findings immediately
+- Implement input validation for user-controlled data
+- Use parameterized queries for database operations
+
+**Best Practices:**
+- Avoid eval() and similar dynamic code execution
+- Implement proper error handling and logging
+- Use security linters in CI/CD pipelines
+- Regular security code reviews
 
 ## Misleading Signals
 
@@ -61,29 +106,10 @@ Analysis timestamp: Generated on demand
 
 ## Risk Synthesis
 
-**Overall Risk Level:** LOW
-**Risk Description:** Low risk - generally acceptable for most use cases
-
-### Critical Issues
-
-- **Fundamental quality and governance gaps:** critical severity
 
 ## Decision Artifacts
 
-**Executive Verdict:** INSUFFICIENT_EVIDENCE
 
-**Final Authority Ceiling:** Senior Technical Lead
-**Decision Scope:** Major Changes Only
-**Oversight:** Required
-**Applied Constraints:** 1 factor(s) elevated authority
-
-**Authority Rationale:** Authority elevated to senior technical lead due to 1 constraining factor(s) Governance Based: Low governance maturity requires authority elevation Decision scope limited to major changes only with oversight required
-
-**Key Factors:**
-- Low governance maturity requires authority elevation
-
-**Authority Confidence:** HIGH (0.90)
-**Assessment:** Strong confidence in authority ceiling determination
 ## What Not to Fix
 
 ### Low Priority Recommendations
@@ -95,8 +121,6 @@ Analysis timestamp: Generated on demand
 
 ## Confidence and Limits
 
-**Confidence Level:** high
-**Confidence Score:** 0.83
 
 ## Validity and Expiry
 

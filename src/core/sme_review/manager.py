@@ -6,12 +6,16 @@ Manages subject matter expert reviews of complex edge cases
 import json
 import os
 import uuid
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, field, asdict
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
 from typing import Dict, List, Optional, Any, Tuple
 import re
+
+from ..metrics.effectiveness import EffectivenessMetrics, EffectivenessMetricsCalculator
+
+from ..sme_api import get_placeholder_filler
 
 
 class ReviewStatus(Enum):
@@ -116,7 +120,8 @@ class ReviewFeedback:
 
 @dataclass
 class ReviewMetrics:
-    """Metrics for the SME review process"""
+    """Enhanced metrics for the SME review process with effectiveness calculations"""
+    # Basic review process metrics
     total_cases: int
     pending_reviews: int
     completed_reviews: int
@@ -127,6 +132,21 @@ class ReviewMetrics:
     average_confidence: float
     cases_by_category: Dict[str, int]
     cases_by_priority: Dict[str, int]
+
+    # Effectiveness metrics (precision/recall analysis)
+    effectiveness_metrics: Optional[EffectivenessMetrics] = None
+
+    # Weighted scoring
+    weighted_review_score: float = 0.0
+    category_effectiveness: Dict[str, float] = field(default_factory=dict)
+
+    # Quality indicators
+    review_consistency_score: float = 0.0
+    inter_reviewer_agreement: float = 0.0
+
+    # Performance tracking
+    review_velocity_trend: List[Tuple[datetime, float]] = field(default_factory=list)
+    quality_trend: List[Tuple[datetime, float]] = field(default_factory=list)
 
 
 class SMEReviewManager:
@@ -369,6 +389,21 @@ class SMEReviewManager:
             cases_by_category[cat] = cases_by_category.get(cat, 0) + 1
             cases_by_priority[pri] = cases_by_priority.get(pri, 0) + 1
 
+        # Calculate effectiveness metrics
+        effectiveness_metrics = self._calculate_effectiveness_metrics(cases, feedback)
+
+        # Calculate weighted review score
+        weighted_score = self._calculate_weighted_review_score(cases, feedback)
+
+        # Calculate category effectiveness
+        category_effectiveness = self._calculate_category_effectiveness(cases, feedback)
+
+        # Calculate review consistency
+        consistency_score = self._calculate_review_consistency(feedback)
+
+        # Calculate inter-reviewer agreement
+        agreement_score = self._calculate_inter_reviewer_agreement(feedback)
+
         return ReviewMetrics(
             total_cases=total_cases,
             pending_reviews=pending_reviews,
@@ -379,7 +414,12 @@ class SMEReviewManager:
             requires_changes_rate=requires_changes_rate,
             average_confidence=average_confidence,
             cases_by_category=cases_by_category,
-            cases_by_priority=cases_by_priority
+            cases_by_priority=cases_by_priority,
+            effectiveness_metrics=effectiveness_metrics,
+            weighted_review_score=weighted_score,
+            category_effectiveness=category_effectiveness,
+            review_consistency_score=consistency_score,
+            inter_reviewer_agreement=agreement_score
         )
 
     def _load_all_cases(self) -> List[ReviewCase]:
@@ -407,7 +447,7 @@ class SMEReviewManager:
         return feedback
 
     def generate_review_report(self, output_file: Optional[str] = None) -> str:
-        """Generate a comprehensive review report"""
+        """Generate a comprehensive review report with SME data integration"""
         metrics = self.get_review_metrics()
         cases = self._load_all_cases()
         feedback = self._load_all_feedback()
@@ -416,56 +456,82 @@ class SMEReviewManager:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             output_file = self.reviews_dir / "reports" / f"sme_review_report_{timestamp}.md"
 
+        # Prepare template context
+        context = {
+            "generation_time": datetime.now().isoformat(),
+            "metrics": metrics,
+            "recent_cases": self._prepare_recent_cases(cases),
+            "sme_validations": self._load_sme_validations()
+        }
+
+        # Add SME confidence assessment for the review process
+        from ..sme_api import get_sme_client
+        sme_client = get_sme_client()
+        analysis_metrics = {
+            "total_cases": metrics.total_cases,
+            "pending_reviews": metrics.pending_reviews,
+            "completed_reviews": metrics.completed_reviews,
+            "evidence_sources": ["sme_review_cases", "validation_data"]
+        }
+        context["sme_confidence_assessment"] = sme_client.get_confidence_assessment(
+            "sme_review_process", analysis_metrics
+        )
+
+        # Use SME placeholder filler to generate report
+        filler = get_placeholder_filler()
+        report_content = filler.fill_report_template("sme_review_report.md", context)
+
+        # Write the report
         report_path = Path(output_file)
         report_path.parent.mkdir(exist_ok=True)
 
         with open(report_path, 'w') as f:
-            f.write("# SME Review Process Report\n")
-            f.write(f"**Generated:** {datetime.now().isoformat()}\n\n")
-
-            f.write("## Executive Summary\n")
-            f.write(f"- **Total Cases:** {metrics.total_cases}\n")
-            f.write(f"- **Pending Reviews:** {metrics.pending_reviews}\n")
-            f.write(f"- **Completed Reviews:** {metrics.completed_reviews}\n")
-            f.write(".1f")
-            f.write(".1f")
-            f.write(".1f")
-            f.write(".1f")
-            f.write(".1f")
-            f.write("\n")
-
-            f.write("## Cases by Category\n")
-            for category, count in metrics.cases_by_category.items():
-                f.write(f"- **{category.replace('_', ' ').title()}:** {count}\n")
-            f.write("\n")
-
-            f.write("## Cases by Priority\n")
-            for priority, count in metrics.cases_by_priority.items():
-                f.write(f"- **{priority.title()}:** {count}\n")
-            f.write("\n")
-
-            f.write("## Recent Cases\n")
-            recent_cases = sorted(cases, key=lambda c: c.submitted_at or datetime.min, reverse=True)[:10]
-            for case in recent_cases:
-                status_emoji = {
-                    ReviewStatus.PENDING: "⏳",
-                    ReviewStatus.IN_REVIEW: "🔄",
-                    ReviewStatus.APPROVED: "✅",
-                    ReviewStatus.REJECTED: "❌",
-                    ReviewStatus.REQUIRES_CHANGES: "🔧"
-                }.get(case.status, "❓")
-
-                f.write(f"### {status_emoji} {case.title}\n")
-                f.write(f"- **ID:** {case.id}\n")
-                f.write(f"- **Category:** {case.category.value.replace('_', ' ').title()}\n")
-                f.write(f"- **Priority:** {case.priority.value.title()}\n")
-                f.write(f"- **Status:** {case.status.value.replace('_', ' ').title()}\n")
-                if case.assigned_to:
-                    f.write(f"- **Assigned to:** {case.assigned_to}\n")
-                f.write(f"- **Submitted:** {case.submitted_at.isoformat() if case.submitted_at else 'Unknown'}\n")
-                f.write(f"- **Description:** {case.description[:200]}...\n\n")
+            f.write(report_content)
 
         return str(report_path)
+
+    def _prepare_recent_cases(self, cases: List[ReviewCase]) -> List[Dict[str, Any]]:
+        """Prepare recent cases for template rendering"""
+        recent_cases = sorted(cases, key=lambda c: c.submitted_at or datetime.min, reverse=True)[:10]
+
+        prepared_cases = []
+        for case in recent_cases:
+            status_emoji = {
+                ReviewStatus.PENDING: "⏳",
+                ReviewStatus.IN_REVIEW: "🔄",
+                ReviewStatus.APPROVED: "✅",
+                ReviewStatus.REJECTED: "❌",
+                ReviewStatus.REQUIRES_CHANGES: "🔧"
+            }.get(case.status, "❓")
+
+            prepared_case = {
+                "id": case.id,
+                "title": case.title,
+                "category": case.category.value,
+                "priority": case.priority.value,
+                "status": case.status.value,
+                "status_emoji": status_emoji,
+                "assigned_to": case.assigned_to,
+                "submitted_at": case.submitted_at.isoformat() if case.submitted_at else 'Unknown',
+                "description": case.description,
+                "estimated_completion_days": getattr(case, 'estimated_completion_days', None),
+                "reviewer_backup": getattr(case, 'reviewer_backup', [])
+            }
+            prepared_cases.append(prepared_case)
+
+        return prepared_cases
+
+    def _load_sme_validations(self) -> List[Dict[str, Any]]:
+        """Load SME validations for the report"""
+        try:
+            validation_file = Path("validation_data/sme_validations.json")
+            if validation_file.exists():
+                with open(validation_file, 'r') as f:
+                    data = json.load(f)
+                return data.get("sme_validations", [])
+        except Exception:
+            pass
+        return []
 
     def get_overdue_reviews(self) -> List[ReviewCase]:
         """Get cases that are overdue for review"""
@@ -480,3 +546,159 @@ class SMEReviewManager:
                 overdue.append(case)
 
         return overdue
+
+    def _calculate_effectiveness_metrics(self, cases: List[ReviewCase], feedback: List[ReviewFeedback]) -> Optional[EffectivenessMetrics]:
+        """Calculate comprehensive effectiveness metrics for the review process."""
+        try:
+            calculator = EffectivenessMetricsCalculator()
+
+            # Convert cases and feedback to prediction/ground truth format
+            predictions = []
+            ground_truth = []
+
+            for case in cases:
+                pred_item = {
+                    'id': case.id,
+                    'category': case.category.value,
+                    'severity': case.priority.value,
+                    'confidence': 0.8  # Default confidence for review cases
+                }
+                predictions.append(pred_item)
+
+                # For completed cases, use feedback as ground truth
+                case_feedback = [f for f in feedback if f.case_id == case.id]
+                if case_feedback:
+                    fb = case_feedback[0]  # Use first feedback
+                    truth_item = {
+                        'id': case.id,
+                        'category': case.category.value,
+                        'severity': case.priority.value,
+                        'decision': fb.decision.value,
+                        'confidence': fb.confidence_level
+                    }
+                    ground_truth.append(truth_item)
+
+            if not predictions:
+                return None
+
+            return calculator.calculate_comprehensive_metrics(predictions, ground_truth)
+
+        except Exception as e:
+            self.logger.warning(f"Failed to calculate effectiveness metrics: {e}")
+            return None
+
+    def _calculate_weighted_review_score(self, cases: List[ReviewCase], feedback: List[ReviewFeedback]) -> float:
+        """Calculate weighted review score based on case complexity and outcomes."""
+        if not feedback:
+            return 0.0
+
+        total_weight = 0.0
+        weighted_score = 0.0
+
+        priority_weights = {
+            ReviewPriority.CRITICAL: 1.0,
+            ReviewPriority.HIGH: 0.8,
+            ReviewPriority.MEDIUM: 0.6,
+            ReviewPriority.LOW: 0.4
+        }
+
+        for fb in feedback:
+            case = next((c for c in cases if c.id == fb.case_id), None)
+            if not case:
+                continue
+
+            # Weight by priority and complexity
+            weight = priority_weights.get(case.priority, 0.5)
+
+            # Score based on decision quality and confidence
+            decision_score = 1.0 if fb.decision in [ReviewStatus.APPROVED, ReviewStatus.REJECTED] else 0.7
+            confidence_bonus = fb.confidence_level * 0.2
+
+            score = (decision_score + confidence_bonus) * weight
+
+            total_weight += weight
+            weighted_score += score
+
+        return weighted_score / total_weight if total_weight > 0 else 0.0
+
+    def _calculate_category_effectiveness(self, cases: List[ReviewCase], feedback: List[ReviewFeedback]) -> Dict[str, float]:
+        """Calculate effectiveness scores by category."""
+        category_scores = {}
+        category_counts = {}
+
+        for fb in feedback:
+            case = next((c for c in cases if c.id == fb.case_id), None)
+            if not case:
+                continue
+
+            category = case.category.value
+
+            # Effectiveness based on confidence and decision clarity
+            effectiveness = fb.confidence_level * (1.0 if fb.decision != ReviewStatus.REQUIRES_CHANGES else 0.8)
+
+            if category not in category_scores:
+                category_scores[category] = 0.0
+                category_counts[category] = 0
+
+            category_scores[category] += effectiveness
+            category_counts[category] += 1
+
+        # Calculate averages
+        return {
+            cat: category_scores[cat] / category_counts[cat]
+            for cat in category_scores
+        }
+
+    def _calculate_review_consistency(self, feedback: List[ReviewFeedback]) -> float:
+        """Calculate review consistency score based on confidence variance."""
+        if len(feedback) < 2:
+            return 1.0  # Perfect consistency with minimal data
+
+        confidences = [fb.confidence_level for fb in feedback]
+
+        # Consistency is inverse of coefficient of variation
+        mean_confidence = sum(confidences) / len(confidences)
+        if mean_confidence == 0:
+            return 0.0
+
+        variance = sum((c - mean_confidence) ** 2 for c in confidences) / len(confidences)
+        std_dev = variance ** 0.5
+        cv = std_dev / mean_confidence  # Coefficient of variation
+
+        # Convert to consistency score (1.0 = perfectly consistent, 0.0 = highly variable)
+        return max(0.0, 1.0 - cv)
+
+    def _calculate_inter_reviewer_agreement(self, feedback: List[ReviewFeedback]) -> float:
+        """Calculate inter-reviewer agreement score."""
+        if len(feedback) < 2:
+            return 1.0
+
+        # Group feedback by case
+        case_feedback = {}
+        for fb in feedback:
+            if fb.case_id not in case_feedback:
+                case_feedback[fb.case_id] = []
+            case_feedback[fb.case_id].append(fb)
+
+        agreements = 0
+        total_comparisons = 0
+
+        for case_fbs in case_feedback.values():
+            if len(case_fbs) < 2:
+                continue
+
+            # Compare all pairs of feedback for this case
+            for i in range(len(case_fbs)):
+                for j in range(i + 1, len(case_fbs)):
+                    fb1, fb2 = case_fbs[i], case_fbs[j]
+
+                    # Agreement based on decision and confidence similarity
+                    decision_agree = 1.0 if fb1.decision == fb2.decision else 0.0
+                    confidence_diff = abs(fb1.confidence_level - fb2.confidence_level)
+                    confidence_agree = max(0.0, 1.0 - confidence_diff)  # 1.0 if identical, 0.0 if completely different
+
+                    agreement = (decision_agree + confidence_agree) / 2.0
+                    agreements += agreement
+                    total_comparisons += 1
+
+        return agreements / total_comparisons if total_comparisons > 0 else 1.0

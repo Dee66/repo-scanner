@@ -1,0 +1,1 @@
+import os; key = "secret"

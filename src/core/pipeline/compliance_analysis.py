@@ -202,6 +202,7 @@ class ComplianceAnalyzer:
 
         total_rules = 0
         passed_rules = 0
+        seen_violations = set()  # Track unique violations to prevent duplicates
 
         # Analyze each file against all applicable rules
         for file_path in file_list:
@@ -217,16 +218,20 @@ class ComplianceAnalyzer:
                         if rule.check_function:
                             result = rule.check_function(content, file_path, semantic_data)
                             if result:
-                                compliance_results["violations"].append({
-                                    "rule_id": rule.rule_id,
-                                    "rule_name": rule.name,
-                                    "severity": rule.severity,
-                                    "framework": rule.framework,
-                                    "file": file_path,
-                                    "description": rule.description,
-                                    "details": result
-                                })
-                                compliance_results["compliance_by_severity"][rule.severity] += 1
+                                # Create unique key for deduplication
+                                violation_key = (rule.rule_id, file_path)
+                                if violation_key not in seen_violations:
+                                    seen_violations.add(violation_key)
+                                    compliance_results["violations"].append({
+                                        "rule_id": rule.rule_id,
+                                        "rule_name": rule.name,
+                                        "severity": rule.severity,
+                                        "framework": rule.framework,
+                                        "file": file_path,
+                                        "description": rule.description,
+                                        "details": result
+                                    })
+                                    compliance_results["compliance_by_severity"][rule.severity] += 1
                             else:
                                 passed_rules += 1
                                 compliance_results["passed_rules"].append({
@@ -281,13 +286,29 @@ class ComplianceAnalyzer:
 
     def _check_sql_injection(self, content: str, file_path: str, semantic_data: Dict) -> Optional[str]:
         """Check for SQL injection vulnerabilities."""
-        # Look for dangerous SQL patterns
+        # Look for dangerous SQL patterns, but exclude common benign patterns
         dangerous_patterns = [
-            r'execute\s*\(\s*["\'].*?\+\s*.*?\s*["\']',  # String concatenation in SQL
-            r'cursor\.execute\s*\(\s*["\'].*?\%.*?\s*["\']',  # Old-style string formatting
-            r'["\'].*?\s*SELECT.*?\s*["\'].*?\+\s*',  # Dynamic SQL construction
+            r'execute\s*\(\s*["\'].*?\+\s*.*?\+\s*.*?\s*["\']',  # Multiple string concatenations in SQL (more suspicious)
+            r'cursor\.execute\s*\(\s*["\'].*?\%\s*\(\s*.*?\s*\)\s*["\']',  # Old-style string formatting with tuple
+            r'["\'].*?\s*(SELECT|INSERT|UPDATE|DELETE).*?\s*["\'].*?\+\s*.*?\+\s*',  # Dynamic SQL with multiple concatenations
         ]
 
+        # Exclude common benign patterns
+        benign_patterns = [
+            r'import\s+.*',  # Import statements
+            r'print\s*\(\s*.*?\+\s*.*?\)',  # Print statements with concatenation
+            r'log.*?\+\s*.*?',  # Logging with concatenation
+            r'path\s*=.*?\+\s*.*?',  # Path construction
+            r'url\s*=.*?\+\s*.*?',  # URL construction
+            r'message\s*=.*?\+\s*.*?',  # Message construction
+        ]
+
+        # First check if any benign patterns match - if so, skip SQL injection check
+        for benign in benign_patterns:
+            if re.search(benign, content, re.IGNORECASE):
+                return None
+
+        # Then check for dangerous patterns
         for pattern in dangerous_patterns:
             if re.search(pattern, content, re.IGNORECASE):
                 return "Potential SQL injection vulnerability detected"

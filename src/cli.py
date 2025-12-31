@@ -229,6 +229,17 @@ def main():
             help="Output format (default: both)"
         )
         scan_parser.add_argument(
+            "--parallel",
+            action="store_true",
+            help="Enable parallel processing for improved performance"
+        )
+        scan_parser.add_argument(
+            "--workers",
+            type=int,
+            default=None,
+            help="Number of worker threads for parallel processing (default: auto-detect based on CPU cores)"
+        )
+        scan_parser.add_argument(
             "--report-type",
             choices=["comprehensive", "verdict", "both"],
             help="Type of report to generate (comprehensive: full analysis, verdict: executive verdict, both: both reports). Takes precedence over --format if both are specified."
@@ -836,7 +847,7 @@ def handle_api_command(args):
                 governance = analysis_result.get("governance", {})
 
                 # Generate ADR analysis for the repository
-                from src.core.bounty.adr_engine import ADREngine
+                from src.optional.bounty.adr_engine import ADREngine
                 adr_engine = ADREngine()
                 adr_analysis = adr_engine.analyze_repository_adrs(str(repo_path))
 

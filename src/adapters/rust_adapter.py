@@ -6,9 +6,15 @@ from pathlib import Path
 from typing import Dict, List, Any, Optional
 import tomllib  # Python 3.11+ for TOML parsing
 
+from .base_adapter import BaseLanguageAdapter
 
-class RustAdapter:
+
+class RustAdapter(BaseLanguageAdapter):
     """Adapter for analyzing Rust repositories."""
+
+    def __init__(self):
+        super().__init__("rust")
+        self.file_extensions = ['.rs']
 
     def extract_ast(self, file_path: str) -> dict:
         """Extract AST-like information from Rust file using regex parsing."""

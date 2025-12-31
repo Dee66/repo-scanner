@@ -9,13 +9,13 @@ from datetime import datetime, timedelta, timezone
 import logging
 import requests
 
-from src.core.bounty.maintainer_profile_engine import MaintainerProfileEngine, generate_maintainer_profile
-from src.core.bounty.profitability_triage import ProfitabilityTriageEngine, triage_bounty_profitability
-from src.core.bounty.api_integration_engine import APIIntegrationEngine, analyze_api_integration_points
-from src.core.bounty.pr_automation import PRAutomationEngine, generate_pr_for_bounty
-from src.core.bounty.accuracy_validator import BountyAccuracyValidator, validate_bounty_accuracy
-from src.core.bounty.reputation_monitor import ReputationMonitor
-from src.core.bounty.bounty_performance_optimizer import ParallelBountyAnalyzer, BountyAnalysisBatch
+from .maintainer_profile_engine import MaintainerProfileEngine, generate_maintainer_profile
+from .profitability_triage import ProfitabilityTriageEngine, triage_bounty_profitability
+from .api_integration_engine import APIIntegrationEngine, analyze_api_integration_points
+from .pr_automation import PRAutomationEngine, generate_pr_for_bounty
+from .accuracy_validator import BountyAccuracyValidator, validate_bounty_accuracy
+from .reputation_monitor import ReputationMonitor
+from .bounty_performance_optimizer import ParallelBountyAnalyzer, BountyAnalysisBatch
 from ..circuit_breaker import circuit_breaker, API_CALLS_CONFIG, HTTP_REQUESTS_CONFIG
 from ..error_handling import with_error_handling, async_with_error_handling, API_RETRY_CONFIG, NETWORK_RETRY_CONFIG
 from ..recovery_strategies import register_all_recovery_strategies

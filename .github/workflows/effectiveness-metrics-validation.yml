@@ -1,0 +1,196 @@
+name: Effectiveness Metrics Validation
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  validate-effectiveness:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/python-setup@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run effectiveness metrics validation
+      id: validate
+      run: |
+        python scripts/validate_effectiveness_metrics.py \
+          --check-trends \
+          --output-format json > validation_results.json
+
+    - name: Parse validation results
+      id: results
+      run: |
+        PASSED=$(jq -r '.passed' validation_results.json)
+        BLOCKED=$(jq -r '.blocked' validation_results.json)
+        WARNINGS_COUNT=$(jq -r '.warnings | length' validation_results.json)
+        ERRORS_COUNT=$(jq -r '.errors | length' validation_results.json)
+
+        echo "passed=$PASSED" >> $GITHUB_OUTPUT
+        echo "blocked=$BLOCKED" >> $GITHUB_OUTPUT
+        echo "warnings_count=$WARNINGS_COUNT" >> $GITHUB_OUTPUT
+        echo "errors_count=$ERRORS_COUNT" >> $GITHUB_OUTPUT
+
+        # Extract key metrics
+        WEIGHTED_ACCURACY=$(jq -r '.metrics.weighted_accuracy // 0' validation_results.json)
+        PRECISION=$(jq -r '.metrics.precision // 0' validation_results.json)
+        RECALL=$(jq -r '.metrics.recall // 0' validation_results.json)
+        F1_SCORE=$(jq -r '.metrics.f1_score // 0' validation_results.json)
+
+        echo "weighted_accuracy=$WEIGHTED_ACCURACY" >> $GITHUB_OUTPUT
+        echo "precision=$PRECISION" >> $GITHUB_OUTPUT
+        echo "recall=$RECALL" >> $GITHUB_OUTPUT
+        echo "f1_score=$F1_SCORE" >> $GITHUB_OUTPUT
+
+    - name: Display validation results
+      run: |
+        echo "## Effectiveness Metrics Validation Results" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        if [ "${{ steps.results.outputs.passed }}" = "true" ]; then
+          echo "✅ **PASSED**: All accuracy thresholds met" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ **FAILED**: Accuracy requirements not met" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.results.outputs.blocked }}" = "true" ]; then
+            echo "🚫 **BLOCKED**: Critical issues prevent deployment" >> $GITHUB_STEP_SUMMARY
+          fi
+        fi
+
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Key Metrics" >> $GITHUB_STEP_SUMMARY
+        echo "- **Weighted Accuracy**: ${{ steps.results.outputs.weighted_accuracy }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Precision**: ${{ steps.results.outputs.precision }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Recall**: ${{ steps.results.outputs.recall }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **F1 Score**: ${{ steps.results.outputs.f1_score }}" >> $GITHUB_STEP_SUMMARY
+
+        # Show warnings and errors
+        WARNINGS=$(jq -r '.warnings[]' validation_results.json 2>/dev/null || echo "")
+        if [ -n "$WARNINGS" ]; then
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Warnings" >> $GITHUB_STEP_SUMMARY
+          echo "$WARNINGS" | while read -r warning; do
+            echo "- $warning" >> $GITHUB_STEP_SUMMARY
+          done
+        fi
+
+        ERRORS=$(jq -r '.errors[]' validation_results.json 2>/dev/null || echo "")
+        if [ -n "$ERRORS" ]; then
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Errors" >> $GITHUB_STEP_SUMMARY
+          echo "$ERRORS" | while read -r error; do
+            echo "- $error" >> $GITHUB_STEP_SUMMARY
+          done
+        fi
+
+        # Show recommendations
+        RECOMMENDATIONS=$(jq -r '.recommendations[]' validation_results.json 2>/dev/null || echo "")
+        if [ -n "$RECOMMENDATIONS" ]; then
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Recommendations" >> $GITHUB_STEP_SUMMARY
+          echo "$RECOMMENDATIONS" | while read -r rec; do
+            echo "- $rec" >> $GITHUB_STEP_SUMMARY
+          done
+        fi
+
+    - name: Upload validation results
+      uses: actions/upload-artifact@v4
+      with:
+        name: effectiveness-validation-results
+        path: validation_results.json
+
+    - name: Fail on validation failure
+      if: steps.results.outputs.passed != 'true'
+      run: |
+        echo "Effectiveness metrics validation failed!"
+        exit 1
+
+    - name: Alert on low accuracy (<90%)
+      if: steps.results.outputs.warnings_count > 0 && steps.results.outputs.weighted_accuracy < 0.90
+      uses: actions/github-script@v7
+      with:
+        script: |
+          github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: `🚨 Effectiveness Metrics Alert: Accuracy below 90%`,
+            body: `
+          ## Effectiveness Metrics Alert
+
+          The current weighted accuracy (${{ steps.results.outputs.weighted_accuracy }}) is below the 90% alert threshold.
+
+          ### Current Metrics:
+          - **Weighted Accuracy**: ${{ steps.results.outputs.weighted_accuracy }}
+          - **Precision**: ${{ steps.results.outputs.precision }}
+          - **Recall**: ${{ steps.results.outputs.recall }}
+          - **F1 Score**: ${{ steps.results.outputs.f1_score }}
+
+          ### Validation Results:
+          ${fs.readFileSync('validation_results.json', 'utf8')}
+
+          This issue was automatically created by the CI pipeline. Please review and address the accuracy concerns.
+          `,
+            labels: ['effectiveness-alert', 'accuracy-issue', 'automated']
+          })
+
+  collect-metrics:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/python-setup@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Collect effectiveness metrics
+      run: |
+        # Run SME review process to generate fresh metrics
+        python scripts/auto_fill_sme_placeholders.py
+
+        # Save metrics snapshot
+        python -c "
+        from src.core.metrics.effectiveness import save_metrics_snapshot
+        from src.core.sme_review.manager import SMEReviewManager
+        from pathlib import Path
+        import datetime
+
+        manager = SMEReviewManager()
+        metrics = manager.get_review_metrics()
+        if metrics.effectiveness_metrics:
+            output_dir = Path('metrics')
+            save_metrics_snapshot(metrics.effectiveness_metrics, output_dir)
+            print(f'Metrics snapshot saved to {output_dir}')
+        else:
+            print('No effectiveness metrics available to save')
+        "
+
+    - name: Upload metrics snapshot
+      uses: actions/upload-artifact@v4
+      with:
+        name: metrics-snapshot-${{ github.run_number }}
+        path: metrics/

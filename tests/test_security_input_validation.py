@@ -9,7 +9,7 @@ import pytest
 
 from src.core.pipeline.analysis import execute_pipeline
 from src.core.exceptions import AnalysisError, ValidationError
-from src.api_server import app
+from src.optional.api_server import app
 from fastapi.testclient import TestClient
 
 

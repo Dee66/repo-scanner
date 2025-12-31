@@ -2,6 +2,8 @@
 
 from typing import Dict, List
 
+from ..sme_api import get_sme_client
+
 
 def generate_decision_artifacts(file_list: List[str], structure: Dict, semantic: Dict,
                                test_signals: Dict, governance: Dict, intent_posture: Dict,
@@ -51,13 +53,32 @@ def generate_decision_artifacts(file_list: List[str], structure: Dict, semantic:
         bounty_artifacts = _generate_bounty_artifacts(risk_synthesis, intent_posture,
                                                     governance, bounty_context)
 
+    # Generate required decision artifacts per RDF-004
+    executive_verdict = _generate_executive_verdict(risk_synthesis, safe_change_surface)
+    safe_to_change_surface = _extract_safe_to_change_surface(safe_change_surface)
+    no_touch_zones = _generate_no_touch_zones(risk_synthesis, safe_change_surface)
+    misleading_signals = _extract_misleading_signals(misleading_signals)
+    what_not_to_fix = _generate_what_not_to_fix(risk_synthesis)
+    refusal_artifact = _generate_refusal_artifact(risk_synthesis, safe_change_surface)
+    confidence_and_limits = _generate_confidence_and_limits(risk_synthesis, confidence_assessment)
+    validity_window = _generate_validity_window()
+
     result = {
+        "executive_verdict": executive_verdict,
+        "safe_to_change_surface": safe_to_change_surface,
+        "no_touch_zones": no_touch_zones,
+        "misleading_signals": misleading_signals,
+        "what_not_to_fix": what_not_to_fix,
+        "refusal_artifact_if_applicable": refusal_artifact,
+        "confidence_and_limits": confidence_and_limits,
+        "validity_window": validity_window,
+        # Keep existing fields for backward compatibility
         "decision_framework": decision_framework,
         "action_plan": action_plan,
         "authority_ceiling": authority_ceiling,
         "confidence_assessment": confidence_assessment,
         "next_steps": next_steps,
-        "decision_timestamp": "2025-01-01T00:00:00Z",  # Fixed timestamp for determinism
+        "decision_timestamp": "2025-12-23T00:00:00Z",  # Fixed timestamp for determinism
         "decision_version": "1.0.0"
     }
 
@@ -195,7 +216,7 @@ def _determine_authority_ceiling(risk_synthesis: Dict, intent_posture: Dict) -> 
 
 
 def _generate_confidence_assessment(risk_synthesis: Dict) -> Dict:
-    """Generate confidence assessment for the analysis."""
+    """Generate confidence assessment for the analysis with SME integration."""
     risk_confidence = risk_synthesis.get("risk_confidence", 0.5)
     overall_risk = risk_synthesis.get("overall_risk_assessment", {})
     component_risks = risk_synthesis.get("component_risks", {})
@@ -216,6 +237,17 @@ def _generate_confidence_assessment(risk_synthesis: Dict) -> Dict:
         confidence_level = "low"
         description = "Limited confidence - additional investigation recommended"
 
+    # Get SME confidence assessment
+    sme_client = get_sme_client()
+    analysis_metrics = {
+        "risk_confidence": risk_confidence,
+        "data_completeness": data_completeness,
+        "analysis_consistency": analysis_consistency,
+        "evidence_sources": list(component_risks.keys()) if component_risks else []
+    }
+
+    sme_assessment = sme_client.get_confidence_assessment("repository_analysis", analysis_metrics)
+
     return {
         "confidence_level": confidence_level,
         "confidence_score": overall_confidence,
@@ -224,7 +256,8 @@ def _generate_confidence_assessment(risk_synthesis: Dict) -> Dict:
             "risk_assessment_confidence": risk_confidence,
             "data_completeness": data_completeness,
             "analysis_consistency": analysis_consistency
-        }
+        },
+        "sme_assessment": sme_assessment
     }
 
 
@@ -489,3 +522,183 @@ def _generate_bounty_recommendations(profitability_score: float, merge_confidenc
         })
 
     return recommendations
+
+
+def _generate_executive_verdict(risk_synthesis: Dict, safe_change_surface: Dict) -> Dict:
+    """Generate executive verdict artifact per output contract v2."""
+    overall_risk = risk_synthesis.get("overall_risk_assessment", {})
+    risk_level = overall_risk.get("overall_risk_level", "unknown")
+
+    # Determine verdict based on risk level and safe changes
+    safe_changes = safe_change_surface.get("safe_changes", [])
+    unsafe_changes = safe_change_surface.get("unsafe_changes", [])
+
+    if risk_level == "high" or not safe_changes:
+        verdict = "UNSAFE"
+        confidence = 0.8
+        safe_action_summary = "Do not make changes until critical issues are addressed"
+        unsafe_action_summary = "Any changes carry significant risk"
+    elif risk_level == "medium":
+        verdict = "CAUTION"
+        confidence = 0.7
+        safe_action_summary = "Limited safe changes available - proceed with caution"
+        unsafe_action_summary = "Avoid changes to core functionality and dependencies"
+    else:  # low
+        verdict = "SAFE"
+        confidence = 0.9
+        safe_action_summary = "Safe to proceed with recommended changes"
+        unsafe_action_summary = "Avoid changes that would introduce new dependencies or complexity"
+
+    return {
+        "verdict": verdict,
+        "confidence": confidence,
+        "scope_of_assessment": "Full repository analysis including structure, security, testing, and governance",
+        "blocking_risks": unsafe_changes[:3],  # Top 3 blocking risks
+        "safe_action_summary": safe_action_summary,
+        "unsafe_action_summary": unsafe_action_summary,
+        "evidence_index_refs": ["risk_synthesis", "safe_change_surface", "security_analysis"]
+    }
+
+
+def _extract_safe_to_change_surface(safe_change_surface: Dict) -> Dict:
+    """Extract safe-to-change surface artifact."""
+    return {
+        "safe_changes": safe_change_surface.get("safe_changes", []),
+        "change_safety_level": safe_change_surface.get("overall_change_safety", {}).get("overall_safety_level", "unknown"),
+        "safety_factors": safe_change_surface.get("safety_factors", {}),
+        "evidence_refs": ["test_coverage_safety", "complexity_safety", "dependency_safety"]
+    }
+
+
+def _generate_no_touch_zones(risk_synthesis: Dict, safe_change_surface: Dict) -> List[Dict]:
+    """Generate no-touch zones based on high-risk areas."""
+    no_touch_zones = []
+
+    # Extract high-risk components
+    component_risks = risk_synthesis.get("component_risks", {})
+
+    for risk_name, risk_data in component_risks.items():
+        risk_level = risk_data.get("risk_level", "low")
+        risk_score = risk_data.get("risk_score", 0)
+
+        if risk_level in ["high", "very_high"] or risk_score > 5:
+            zone = {
+                "zone_type": _map_risk_to_zone_type(risk_name),
+                "reason": risk_data.get("description", f"High {risk_name} risk"),
+                "blast_radius": _calculate_blast_radius(risk_level),
+                "evidence_refs": risk_data.get("risk_factors", [])
+            }
+            no_touch_zones.append(zone)
+
+    return no_touch_zones
+
+
+def _extract_misleading_signals(misleading_signals: Dict) -> Dict:
+    """Extract misleading signals artifact."""
+    return {
+        "total_misleading_signals": misleading_signals.get("total_misleading_signals", 0),
+        "signal_types": misleading_signals.get("signal_types", []),
+        "confidence_impact": misleading_signals.get("confidence_impact", "low"),
+        "evidence_refs": ["misleading_signal_detection"]
+    }
+
+
+def _generate_what_not_to_fix(risk_synthesis: Dict) -> List[Dict]:
+    """Generate what not to fix based on negative ROI optimizations."""
+    negative_roi_opts = risk_synthesis.get("negative_roi_optimizations", [])
+
+    what_not_to_fix = []
+    for opt in negative_roi_opts:
+        item = {
+            "issue_type": opt.get("optimization_type", "unknown"),
+            "why_not_to_fix": opt.get("why_negative_roi", ""),
+            "potential_harm": opt.get("potential_risk", ""),
+            "recommended_alternative": opt.get("recommended_alternative", ""),
+            "evidence_refs": ["negative_roi_analysis"]
+        }
+        what_not_to_fix.append(item)
+
+    return what_not_to_fix
+
+
+def _generate_refusal_artifact(risk_synthesis: Dict, safe_change_surface: Dict) -> Dict:
+    """Generate refusal artifact if applicable."""
+    overall_risk = risk_synthesis.get("overall_risk_assessment", {})
+    risk_level = overall_risk.get("overall_risk_level", "low")
+
+    # Generate refusal if risk is too high or no safe changes available
+    safe_changes = safe_change_surface.get("safe_changes", [])
+
+    if risk_level == "high" or (risk_level == "medium" and not safe_changes):
+        return {
+            "reason_for_refusal": f"Repository exhibits {risk_level} risk level with insufficient safe change surface",
+            "missing_or_unknowable_information": ["Security vulnerabilities", "Test coverage gaps", "Dependency issues"],
+            "blast_radius_unbounded_statement": "Changes could affect critical business functionality",
+            "responsible_human_role_required": "Senior technical lead or security officer",
+            "evidence_refs": ["risk_synthesis", "safe_change_surface"]
+        }
+
+    return None  # No refusal needed
+
+
+def _generate_confidence_and_limits(risk_synthesis: Dict, confidence_assessment: Dict) -> Dict:
+    """Generate confidence and limits artifact."""
+    risk_confidence = risk_synthesis.get("risk_confidence", 0.8)
+
+    return {
+        "overall_confidence": risk_confidence,
+        "confidence_factors": confidence_assessment.get("confidence_factors", {}),
+        "limitations": [
+            "Analysis based on available code and configuration",
+            "External dependencies not fully analyzed",
+            "Runtime behavior not observed",
+            "Business context not available"
+        ],
+        "confidence_thresholds": {
+            "high_confidence_threshold": 0.8,
+            "medium_confidence_threshold": 0.6,
+            "low_confidence_threshold": 0.4
+        },
+        "evidence_refs": ["risk_synthesis", "confidence_assessment"]
+    }
+
+
+def _generate_validity_window() -> Dict:
+    """Generate validity window for the assessment."""
+    # Fixed validity window for determinism
+    return {
+        "assessment_timestamp": "2025-12-23T00:00:00Z",
+        "valid_from": "2025-12-23T00:00:00Z",
+        "valid_until": "2025-12-30T00:00:00Z",  # 7 days validity
+        "expiry_reason": "Code and dependencies may change requiring re-assessment",
+        "reassessment_triggers": [
+            "New code commits",
+            "Dependency updates",
+            "Security incidents",
+            "Configuration changes"
+        ]
+    }
+
+
+def _map_risk_to_zone_type(risk_name: str) -> str:
+    """Map risk component to zone type."""
+    mapping = {
+        "security_risk": "security_critical",
+        "dependency_risk": "dependency_critical",
+        "testing_risk": "testing_critical",
+        "governance_risk": "governance_critical",
+        "intent_risk": "business_critical",
+        "change_risk": "stability_critical"
+    }
+    return mapping.get(risk_name, "high_risk")
+
+
+def _calculate_blast_radius(risk_level: str) -> str:
+    """Calculate blast radius based on risk level."""
+    radii = {
+        "very_high": "system_wide",
+        "high": "module_wide",
+        "medium": "component_wide",
+        "low": "localized"
+    }
+    return radii.get(risk_level, "unknown")

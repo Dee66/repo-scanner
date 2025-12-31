@@ -63,7 +63,7 @@ class ResourceManager:
         try:
             memory_info = self.process.memory_info()
             memory_mb = memory_info.rss / 1024 / 1024
-            cpu_percent = self.process.cpu_percent(interval=0.1)
+            cpu_percent = psutil.cpu_percent(interval=1.0)  # Increased interval for more stable readings
 
             memory_limit_percent = (memory_mb / self.resource_limits["max_memory_mb"]) * 100
             cpu_limit_percent = (cpu_percent / self.resource_limits["max_cpu_percent"]) * 100

@@ -5,13 +5,15 @@ import re
 from pathlib import Path
 from typing import Dict, List, Any, Optional, Set
 
+from .base_adapter import BaseLanguageAdapter
 
-class CppAdapter:
+
+class CppAdapter(BaseLanguageAdapter):
     """Adapter for analyzing C++ repositories."""
 
     def __init__(self):
-        # Common C++ file extensions
-        self.cpp_extensions = {'.cpp', '.cc', '.cxx', '.c++', '.h', '.hpp', '.hxx', '.h++'}
+        super().__init__("cpp")
+        self.file_extensions = ['.cpp', '.cc', '.cxx', '.c++', '.h', '.hpp', '.hxx', '.h++']
         # Test file patterns
         self.test_patterns = ['test', 'Test', 'TEST', '_test', '_Test']
 

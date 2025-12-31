@@ -16,6 +16,7 @@ A sophisticated static analysis system that transforms software repositories int
 - **Deterministic Analysis**: Identical inputs = identical outputs every time
 - **Multi-Stage Pipeline**: 20+ analysis stages from structure to security
 - **Data Usage Controls**: Smart limits prevent bandwidth abuse (100MB for automated scans)
+- **Multi-Language Support**: 10+ programming languages with tree-sitter powered parsing
 
 ### 🎯 **Bounty Hunting**
 - **Algora Integration**: Fetch bounties from Algora.io API
@@ -348,7 +349,7 @@ python -m src.api_server
 - ✅ **72.7% Validated Effectiveness** across 8 repository types
 - ✅ **Deterministic Results** - identical inputs produce identical outputs
 - ✅ **Offline Operation** - no external API dependencies
-- ✅ **Multi-Language Support** - Python, JavaScript/TypeScript, Java
+- ✅ **Multi-Language Support** - Python, JavaScript/TypeScript, Java, C#, PHP, Ruby, Go, Rust, and more
 - ✅ **Enterprise Security** - containerized, non-root execution
 - ✅ **REST API** - asynchronous job processing with FastAPI
 - ✅ **Production Monitoring** - comprehensive observability and alerting

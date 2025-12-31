@@ -39,6 +39,11 @@ def analyze_safe_change_surface(file_list: List[str], structure: Dict, semantic:
     safe_changes = _generate_safe_changes(overall_safety, file_list, structure)
     unsafe_changes = _generate_unsafe_changes(overall_safety, misleading_signals)
 
+    # Apply AUT-010 rules for safe change surface
+    safe_changes, unsafe_changes = _apply_safe_change_surface_rules(
+        safe_changes, unsafe_changes, overall_safety
+    )
+
     return {
         "overall_change_safety": overall_safety,
         "safety_factors": {
@@ -50,7 +55,12 @@ def analyze_safe_change_surface(file_list: List[str], structure: Dict, semantic:
         },
         "safe_changes": safe_changes,
         "unsafe_changes": unsafe_changes,
-        "change_confidence": _calculate_change_confidence(overall_safety)
+        "change_confidence": _calculate_change_confidence(overall_safety),
+        "rules_applied": {
+            "absence_is_valid_outcome": True,  # Absence of safe changes is valid
+            "safe_surface_may_be_empty": True,  # Safe surface can be empty
+            "first_action_may_be_explicit_non_action": True  # First action can be "do nothing"
+        }
     }
 
 
@@ -301,9 +311,8 @@ def _generate_safe_changes(overall_safety: Dict, file_list: List[str], structure
             safe_changes.append("Add new features with comprehensive tests")
             safe_changes.append("Refactor simple functions")
 
-    if not safe_changes:
-        safe_changes.append("No safe changes identified - proceed with extreme caution")
-
+    # AUT-010 Rule: absence_is_valid_outcome - Don't add default message
+    # If no safe changes are identified, return empty list (absence is valid)
     return sorted(safe_changes)
 
 
@@ -331,6 +340,36 @@ def _generate_unsafe_changes(overall_safety: Dict, misleading_signals: Dict) -> 
         unsafe_changes.append("No specific unsafe changes identified")
 
     return sorted(unsafe_changes)
+
+
+def _apply_safe_change_surface_rules(safe_changes: List[str], unsafe_changes: List[str], 
+                                   overall_safety: Dict) -> tuple[List[str], List[str]]:
+    """Apply AUT-010 rules for safe change surface behavior.
+    
+    Rules:
+    - absence_is_valid_outcome: Absence of safe changes is a valid outcome
+    - safe_surface_may_be_empty: Safe surface can legitimately be empty
+    - first_action_may_be_explicit_non_action: First action can be explicit non-action
+    """
+    overall_safety_level = overall_safety.get("overall_safety_level", "low")
+    
+    # Rule 1: absence_is_valid_outcome - If no safe changes identified, that's valid
+    if not safe_changes or safe_changes == ["No safe changes identified - proceed with extreme caution"]:
+        # This is acceptable - absence is a valid outcome
+        safe_changes = []
+    
+    # Rule 2: safe_surface_may_be_empty - Safe surface can be empty
+    # (Already handled by allowing empty safe_changes list)
+    
+    # Rule 3: first_action_may_be_explicit_non_action - First action can be "do nothing"
+    if overall_safety_level in ["very_low", "low"]:
+        # For low safety repositories, first action should be explicit non-action
+        if not safe_changes:
+            safe_changes = ["EXPLICIT NON-ACTION: Do not make changes until safety issues are addressed"]
+        elif safe_changes[0] != "EXPLICIT NON-ACTION: Do not make changes until safety issues are addressed":
+            safe_changes.insert(0, "EXPLICIT NON-ACTION: Do not make changes until safety issues are addressed")
+    
+    return safe_changes, unsafe_changes
 
 
 def _calculate_change_confidence(overall_safety: Dict) -> float:

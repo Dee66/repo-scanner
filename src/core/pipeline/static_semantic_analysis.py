@@ -315,6 +315,9 @@ def analyze_javascript_file(content: str, file_path: str) -> Dict:
     for pattern in function_patterns:
         matches = re.findall(pattern, content)
         for match in matches:
+            # Handle both string and tuple results from re.findall
+            if isinstance(match, tuple):
+                match = match[0] if match else ''
             if match and not match.startswith(('if', 'for', 'while', 'catch')):
                 analysis["functions"].append({
                     "name": match,

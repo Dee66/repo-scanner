@@ -20,7 +20,7 @@ class CodeDuplicationAnalyzer:
     """Analyzes code for duplication and clone detection."""
 
     def __init__(self):
-        self.min_block_size = 6  # Minimum lines for a code block
+        self.min_block_size = 12  # Minimum lines for a code block (increased from 6)
         self.min_clone_length = 10  # Minimum characters for clone detection
         self.similarity_threshold = 0.8  # Similarity threshold for clone detection
 
@@ -155,12 +155,16 @@ class CodeDuplicationAnalyzer:
         if len(code_lines) < self.min_block_size:
             return []
 
-        # Extract sliding windows of code blocks
+        # Extract sliding windows of code blocks, excluding common patterns
         blocks = []
         for i in range(len(code_lines) - self.min_block_size + 1):
-            block = '\n'.join(code_lines[i:i + self.min_block_size])
-            if len(block) >= self.min_clone_length:
-                blocks.append(block)
+            block_lines = code_lines[i:i + self.min_block_size]
+            block = '\n'.join(block_lines)
+            
+            # Skip blocks that are common patterns (semantic filtering)
+            if not self._is_common_pattern(block):
+                if len(block) >= self.min_clone_length:
+                    blocks.append(block)
 
         return blocks
 
@@ -174,6 +178,47 @@ class CodeDuplicationAnalyzer:
             return line.startswith('#')
         elif file_path.endswith(('.html', '.xml')):
             return line.strip().startswith('<!--')
+        return False
+
+    def _is_common_pattern(self, block: str) -> bool:
+        """Check if block contains common patterns that should be excluded from duplication analysis."""
+        block_lower = block.lower()
+        
+        # Common error handling patterns
+        if any(pattern in block_lower for pattern in [
+            'try:', 'except:', 'catch', 'throw', 'raise',
+            'error handling', 'exception handling'
+        ]):
+            return True
+            
+        # Common logging patterns
+        if any(pattern in block_lower for pattern in [
+            'log.', 'logger.', 'logging.', 'console.log',
+            'print(', 'println(', 'log.info', 'log.debug'
+        ]):
+            return True
+            
+        # Common validation/initialization patterns
+        if any(pattern in block_lower for pattern in [
+            'if not ', 'if !', 'null check', 'none check',
+            'initialize', 'init(', '__init__'
+        ]):
+            return True
+            
+        # Common getter/setter patterns
+        if any(pattern in block_lower for pattern in [
+            'get ', 'set ', 'def get_', 'def set_',
+            'public get', 'public set'
+        ]):
+            return True
+            
+        # Common import/include patterns
+        if any(pattern in block_lower for pattern in [
+            'import ', 'from ', '#include', 'using ',
+            'require(', 'include '
+        ]):
+            return True
+            
         return False
 
     def _find_duplicate_blocks(self, file_blocks: Dict[str, List[str]]) -> List[Dict]:

@@ -6,7 +6,7 @@ from typing import Dict, List
 def synthesize_risks(file_list: List[str], structure: Dict, semantic: Dict,
                     test_signals: Dict, governance: Dict, intent_posture: Dict,
                     misleading_signals: Dict, safe_change_surface: Dict, security_analysis: Dict = None,
-                    code_comprehension: Dict = None, compliance_analysis: Dict = None, dependency_analysis: Dict = None, code_duplication_analysis: Dict = None, api_analysis: Dict = None, advanced_code_analysis: Dict = None) -> Dict:
+                    code_comprehension: Dict = None, compliance_analysis: Dict = None, dependency_analysis: Dict = None, code_duplication_analysis: Dict = None, api_analysis: Dict = None, advanced_code_analysis: Dict = None, cryptographic_analysis: Dict = None, supply_chain_analysis: Dict = None, security_testing_analysis: Dict = None) -> Dict:
     """Synthesize all analysis data into comprehensive risk assessment."""
     # Safety checks
     if not isinstance(file_list, list):
@@ -53,6 +53,18 @@ def synthesize_risks(file_list: List[str], structure: Dict, semantic: Dict,
         advanced_code_analysis = {}
     if not isinstance(advanced_code_analysis, dict):
         advanced_code_analysis = {}
+    if cryptographic_analysis is None:
+        cryptographic_analysis = {}
+    if not isinstance(cryptographic_analysis, dict):
+        cryptographic_analysis = {}
+    if supply_chain_analysis is None:
+        supply_chain_analysis = {}
+    if not isinstance(supply_chain_analysis, dict):
+        supply_chain_analysis = {}
+    if security_testing_analysis is None:
+        security_testing_analysis = {}
+    if not isinstance(security_testing_analysis, dict):
+        security_testing_analysis = {}
 
     # Calculate component risk scores
     structural_risk = _calculate_structural_risk(structure)
@@ -64,6 +76,9 @@ def synthesize_risks(file_list: List[str], structure: Dict, semantic: Dict,
     duplication_risk = _calculate_duplication_risk(code_duplication_analysis)
     api_risk = _calculate_api_risk(api_analysis)
     advanced_code_risk = _calculate_advanced_code_risk(advanced_code_analysis)
+    cryptographic_risk = _calculate_cryptographic_risk(cryptographic_analysis)
+    supply_chain_risk = _calculate_supply_chain_risk(supply_chain_analysis)
+    security_testing_risk = _calculate_security_testing_risk(security_testing_analysis)
     testing_risk = _calculate_testing_risk(test_signals)
     governance_risk = _calculate_governance_risk(governance)
     intent_risk = _calculate_intent_risk(intent_posture)
@@ -71,38 +86,50 @@ def synthesize_risks(file_list: List[str], structure: Dict, semantic: Dict,
     change_risk = _calculate_change_risk(safe_change_surface)
 
     # Synthesize overall risk
-    overall_risk = _synthesize_overall_risk(structural_risk, semantic_risk, security_risk, comprehension_risk, compliance_risk, dependency_risk, duplication_risk, api_risk, advanced_code_risk, testing_risk,
+    overall_risk = _synthesize_overall_risk(structural_risk, semantic_risk, security_risk, comprehension_risk, compliance_risk, dependency_risk, duplication_risk, api_risk, advanced_code_risk, cryptographic_risk, supply_chain_risk, security_testing_risk, testing_risk,
                                            governance_risk, intent_risk, misleading_risk, change_risk)
 
     # Generate risk-based recommendations
     recommendations = _generate_risk_recommendations(overall_risk, structural_risk, semantic_risk, security_risk,
-                                                    comprehension_risk, compliance_risk, dependency_risk, duplication_risk, api_risk, advanced_code_risk, testing_risk, governance_risk, intent_risk,
+                                                    comprehension_risk, compliance_risk, dependency_risk, duplication_risk, api_risk, advanced_code_risk, cryptographic_risk, supply_chain_risk, security_testing_risk, testing_risk, governance_risk, intent_risk,
                                                     misleading_risk, change_risk)
 
     # Identify critical issues
-    critical_issues = _identify_critical_issues(structural_risk, semantic_risk, security_risk, comprehension_risk, compliance_risk, dependency_risk, duplication_risk, api_risk, advanced_code_risk, testing_risk,
+    critical_issues = _identify_critical_issues(structural_risk, semantic_risk, security_risk, comprehension_risk, compliance_risk, dependency_risk, duplication_risk, api_risk, advanced_code_risk, cryptographic_risk, supply_chain_risk, security_testing_risk, testing_risk,
                                               governance_risk, intent_risk, misleading_risk, change_risk)
+
+    # Create component risks dictionary for gap analysis
+    component_risks = {
+        "structural_risk": structural_risk,
+        "semantic_risk": semantic_risk,
+        "security_risk": security_risk,
+        "comprehension_risk": comprehension_risk,
+        "compliance_risk": compliance_risk,
+        "dependency_risk": dependency_risk,
+        "duplication_risk": duplication_risk,
+        "api_risk": api_risk,
+        "advanced_code_risk": advanced_code_risk,
+        "cryptographic_risk": cryptographic_risk,
+        "supply_chain_risk": supply_chain_risk,
+        "security_testing_risk": security_testing_risk,
+        "testing_risk": testing_risk,
+        "governance_risk": governance_risk,
+        "intent_risk": intent_risk,
+        "misleading_risk": misleading_risk,
+        "change_risk": change_risk
+    }
+
+    # Generate prioritized gap list and negative ROI optimizations
+    prioritized_gap_list = _generate_prioritized_gap_list(component_risks, recommendations)
+    negative_roi_optimizations = _generate_negative_roi_optimizations(component_risks, overall_risk)
 
     return {
         "overall_risk_assessment": overall_risk,
-        "component_risks": {
-            "structural_risk": structural_risk,
-            "semantic_risk": semantic_risk,
-            "security_risk": security_risk,
-            "comprehension_risk": comprehension_risk,
-            "compliance_risk": compliance_risk,
-            "dependency_risk": dependency_risk,
-            "duplication_risk": duplication_risk,
-            "api_risk": api_risk,
-            "advanced_code_risk": advanced_code_risk,
-            "testing_risk": testing_risk,
-            "governance_risk": governance_risk,
-            "intent_risk": intent_risk,
-            "misleading_risk": misleading_risk,
-            "change_risk": change_risk
-        },
+        "component_risks": component_risks,
         "recommendations": recommendations,
         "critical_issues": critical_issues,
+        "prioritized_gap_list": prioritized_gap_list,
+        "negative_roi_optimizations": negative_roi_optimizations,
         "risk_confidence": _calculate_risk_confidence(overall_risk)
     }
 
@@ -475,7 +502,136 @@ def _calculate_change_risk(safe_change_surface: Dict) -> Dict:
     }
 
 
-def _synthesize_overall_risk(structural_risk: Dict, semantic_risk: Dict, security_risk: Dict, comprehension_risk: Dict, compliance_risk: Dict, dependency_risk: Dict, duplication_risk: Dict, api_risk: Dict, advanced_code_risk: Dict, testing_risk: Dict,
+def _calculate_cryptographic_risk(cryptographic_analysis: Dict) -> Dict:
+    """Calculate risk based on cryptographic analysis."""
+    findings = cryptographic_analysis.get("findings", [])
+    
+    risk_score = 0
+    risk_factors = []
+    
+    for finding in findings:
+        severity = finding.get("severity", "low")
+        if severity == "critical":
+            risk_score += 5
+            risk_factors.append("critical_crypto_vulnerability")
+        elif severity == "high":
+            risk_score += 3
+            risk_factors.append("high_crypto_vulnerability")
+        elif severity == "medium":
+            risk_score += 1
+            risk_factors.append("medium_crypto_vulnerability")
+    
+    # Check if analysis was disabled
+    if cryptographic_analysis.get("status") == "disabled_by_feature_flag":
+        risk_score += 1
+        risk_factors.append("crypto_analysis_disabled")
+    
+    # Determine risk level
+    if risk_score >= 5:
+        risk_level = "high"
+    elif risk_score >= 2:
+        risk_level = "medium"
+    else:
+        risk_level = "low"
+    
+    return {
+        "risk_level": risk_level,
+        "risk_score": min(risk_score, 10),
+        "risk_factors": risk_factors,
+        "description": f"Cryptographic risk: {risk_level} ({risk_score} points)"
+    }
+
+
+def _calculate_supply_chain_risk(supply_chain_analysis: Dict) -> Dict:
+    """Calculate risk based on supply chain analysis."""
+    findings = supply_chain_analysis.get("findings", [])
+    
+    risk_score = 0
+    risk_factors = []
+    
+    for finding in findings:
+        severity = finding.get("severity", "low")
+        if severity == "critical":
+            risk_score += 5
+            risk_factors.append("critical_supply_chain_vulnerability")
+        elif severity == "high":
+            risk_score += 3
+            risk_factors.append("high_supply_chain_vulnerability")
+        elif severity == "medium":
+            risk_score += 1
+            risk_factors.append("medium_supply_chain_vulnerability")
+    
+    # Check for missing SBOM or provenance
+    if supply_chain_analysis.get("sbom") is None:
+        risk_score += 2
+        risk_factors.append("missing_sbom")
+    
+    # Check if analysis was disabled
+    if supply_chain_analysis.get("status") == "disabled_by_feature_flag":
+        risk_score += 1
+        risk_factors.append("supply_chain_analysis_disabled")
+    
+    # Determine risk level
+    if risk_score >= 5:
+        risk_level = "high"
+    elif risk_score >= 2:
+        risk_level = "medium"
+    else:
+        risk_level = "low"
+    
+    return {
+        "risk_level": risk_level,
+        "risk_score": min(risk_score, 10),
+        "risk_factors": risk_factors,
+        "description": f"Supply chain risk: {risk_level} ({risk_score} points)"
+    }
+
+
+def _calculate_security_testing_risk(security_testing_analysis: Dict) -> Dict:
+    """Calculate risk based on security testing analysis."""
+    findings = security_testing_analysis.get("findings", [])
+    
+    risk_score = 0
+    risk_factors = []
+    
+    for finding in findings:
+        severity = finding.get("severity", "low")
+        if severity == "high":
+            risk_score += 3
+            risk_factors.append("insufficient_security_testing")
+        elif severity == "medium":
+            risk_score += 1
+            risk_factors.append("limited_security_testing")
+    
+    # Check test coverage
+    coverage = security_testing_analysis.get("coverage", {})
+    avg_coverage = sum(coverage.values()) / len(coverage) if coverage else 0
+    if avg_coverage < 30:
+        risk_score += 2
+        risk_factors.append("low_security_test_coverage")
+    
+    # Check if analysis was disabled
+    if security_testing_analysis.get("status") == "disabled_by_feature_flag":
+        risk_score += 1
+        risk_factors.append("security_testing_analysis_disabled")
+    
+    # Determine risk level
+    if risk_score >= 4:
+        risk_level = "high"
+    elif risk_score >= 2:
+        risk_level = "medium"
+    else:
+        risk_level = "low"
+    
+    return {
+        "risk_level": risk_level,
+        "risk_score": min(risk_score, 10),
+        "risk_factors": risk_factors,
+        "description": f"Security testing risk: {risk_level} ({risk_score} points)"
+    }
+
+
+def _synthesize_overall_risk(structural_risk: Dict, semantic_risk: Dict, security_risk: Dict, comprehension_risk: Dict, compliance_risk: Dict, dependency_risk: Dict, duplication_risk: Dict, api_risk: Dict, advanced_code_risk: Dict, cryptographic_risk: Dict, supply_chain_risk: Dict, security_testing_risk: Dict, testing_risk: Dict,
                            governance_risk: Dict, intent_risk: Dict, misleading_risk: Dict,
                            change_risk: Dict) -> Dict:
     """Synthesize overall risk from component risks."""
@@ -485,7 +641,7 @@ def _synthesize_overall_risk(structural_risk: Dict, semantic_risk: Dict, securit
         "high": 3
     }
 
-    component_risks = [structural_risk, semantic_risk, security_risk, comprehension_risk, compliance_risk, dependency_risk, duplication_risk, api_risk, advanced_code_risk, testing_risk, governance_risk,
+    component_risks = [structural_risk, semantic_risk, security_risk, comprehension_risk, compliance_risk, dependency_risk, duplication_risk, api_risk, advanced_code_risk, cryptographic_risk, supply_chain_risk, security_testing_risk, testing_risk, governance_risk,
                       intent_risk, misleading_risk, change_risk]
 
     # Weight the risks (security and testing are most critical)
@@ -499,6 +655,9 @@ def _synthesize_overall_risk(structural_risk: Dict, semantic_risk: Dict, securit
         "duplication_risk": 1,  # Code duplication affects maintainability
         "api_risk": 2,  # API design and security issues have significant impact
         "advanced_code_risk": 2,  # Advanced code analysis reveals complex issues
+        "cryptographic_risk": 3,  # Cryptographic issues are critical security concerns
+        "supply_chain_risk": 3,  # Supply chain attacks are increasingly common
+        "security_testing_risk": 2,  # Security testing gaps affect vulnerability detection
         "testing_risk": 2,
         "governance_risk": 2,
         "intent_risk": 1,
@@ -537,7 +696,7 @@ def _synthesize_overall_risk(structural_risk: Dict, semantic_risk: Dict, securit
 
 
 def _generate_risk_recommendations(overall_risk: Dict, structural_risk: Dict, semantic_risk: Dict,
-                                 security_risk: Dict, comprehension_risk: Dict, compliance_risk: Dict, dependency_risk: Dict, duplication_risk: Dict, api_risk: Dict, advanced_code_risk: Dict, testing_risk: Dict, governance_risk: Dict, intent_risk: Dict,
+                                 security_risk: Dict, comprehension_risk: Dict, compliance_risk: Dict, dependency_risk: Dict, duplication_risk: Dict, api_risk: Dict, advanced_code_risk: Dict, cryptographic_risk: Dict, supply_chain_risk: Dict, security_testing_risk: Dict, testing_risk: Dict, governance_risk: Dict, intent_risk: Dict,
                                  misleading_risk: Dict, change_risk: Dict) -> List[Dict]:
     """Generate prioritized risk-based recommendations."""
     recommendations = []
@@ -668,7 +827,7 @@ def _generate_risk_recommendations(overall_risk: Dict, structural_risk: Dict, se
     return recommendations
 
 
-def _identify_critical_issues(structural_risk: Dict, semantic_risk: Dict, security_risk: Dict, comprehension_risk: Dict, compliance_risk: Dict, dependency_risk: Dict, duplication_risk: Dict, api_risk: Dict, advanced_code_risk: Dict, testing_risk: Dict,
+def _identify_critical_issues(structural_risk: Dict, semantic_risk: Dict, security_risk: Dict, comprehension_risk: Dict, compliance_risk: Dict, dependency_risk: Dict, duplication_risk: Dict, api_risk: Dict, advanced_code_risk: Dict, cryptographic_risk: Dict, supply_chain_risk: Dict, security_testing_risk: Dict, testing_risk: Dict,
                             governance_risk: Dict, intent_risk: Dict, misleading_risk: Dict,
                             change_risk: Dict) -> List[Dict]:
     """Identify critical issues that require immediate attention."""
@@ -716,6 +875,33 @@ def _identify_critical_issues(structural_risk: Dict, semantic_risk: Dict, securi
             "severity": "critical",
             "issue": "Fundamental quality and governance gaps",
             "impact": "Repository unsuitable for production use",
+            "immediate_action_required": True
+        })
+
+    # Cryptographic critical issues
+    if cryptographic_risk["risk_level"] == "critical":
+        critical_issues.append({
+            "severity": "critical",
+            "issue": "Critical cryptographic vulnerabilities detected",
+            "impact": "Immediate security risk from weak cryptography",
+            "immediate_action_required": True
+        })
+
+    # Supply chain critical issues
+    if supply_chain_risk["risk_level"] == "critical":
+        critical_issues.append({
+            "severity": "critical",
+            "issue": "Critical supply chain vulnerabilities detected",
+            "impact": "Immediate security risk from compromised dependencies",
+            "immediate_action_required": True
+        })
+
+    # Security testing critical issues
+    if security_testing_risk["risk_level"] == "critical":
+        critical_issues.append({
+            "severity": "critical",
+            "issue": "Critical gaps in security testing detected",
+            "impact": "Unable to detect security vulnerabilities - immediate testing required",
             "immediate_action_required": True
         })
 
@@ -1142,3 +1328,206 @@ def _calculate_risk_confidence(overall_risk: Dict) -> float:
     """Calculate confidence in the risk assessment."""
     # Base confidence on data completeness and consistency
     return 0.85  # Placeholder - could be more sophisticated
+
+
+def _generate_prioritized_gap_list(component_risks: Dict, recommendations: List[str]) -> List[Dict]:
+    """Generate a prioritized list of gaps that need to be addressed.
+    
+    Returns gaps sorted by priority (P0_SECURITY > P0_INTEGRATION > P0 > P1 > P2).
+    Each gap includes: gap_id, gap_type, priority, description, affected_artifacts,
+    evidence_refs, why_this_matters, recommended_next_action, estimated_effort_range.
+    """
+    gaps = []
+    gap_counter = 1
+    
+    # Priority mapping for sorting
+    priority_order = {
+        "P0_SECURITY": 0,
+        "P0_INTEGRATION": 1, 
+        "P0": 2,
+        "P1": 3,
+        "P2": 4
+    }
+    
+    # Analyze each risk component for gaps
+    for risk_name, risk_data in component_risks.items():
+        risk_level = risk_data.get("risk_level", "low")
+        risk_score = risk_data.get("risk_score", 0)
+        risk_factors = risk_data.get("risk_factors", [])
+        
+        # Determine priority based on risk level and type
+        if risk_name == "security_risk" and risk_level in ["high", "medium"]:
+            priority = "P0_SECURITY"
+        elif risk_name in ["dependency_risk", "compliance_risk"] and risk_level in ["high", "medium"]:
+            priority = "P0_INTEGRATION"
+        elif risk_level == "high":
+            priority = "P0"
+        elif risk_level == "medium":
+            priority = "P1"
+        else:
+            priority = "P2"
+            
+        # Create gaps for significant risks
+        if risk_score > 0:
+            gap = {
+                "gap_id": f"GAP-{gap_counter:03d}",
+                "gap_type": _map_risk_to_gap_type(risk_name),
+                "priority": priority,
+                "description": risk_data.get("description", f"{risk_name} risk identified"),
+                "affected_artifacts": [],  # Would be populated with specific files/modules
+                "evidence_refs": risk_factors,
+                "why_this_matters": _generate_why_this_matters(risk_name, risk_level),
+                "recommended_next_action": _generate_next_action(risk_name, risk_level),
+                "estimated_effort_range": _estimate_effort(risk_name, risk_level)
+            }
+            gaps.append(gap)
+            gap_counter += 1
+    
+    # Sort by priority order
+    gaps.sort(key=lambda x: priority_order.get(x["priority"], 999))
+    
+    return gaps
+
+
+def _generate_negative_roi_optimizations(component_risks: Dict, overall_risk: Dict) -> List[Dict]:
+    """Generate list of optimizations that would have negative ROI.
+    
+    These are improvements that would cost more than they're worth,
+    or optimizations that could introduce new risks.
+    """
+    negative_roi_opts = []
+    
+    overall_level = overall_risk.get("overall_risk_level", "low")
+    
+    # For very low risk repositories, many "optimizations" have negative ROI
+    if overall_level == "very_low":
+        negative_roi_opts.extend([
+            {
+                "optimization_type": "premature_optimization",
+                "description": "Code performance micro-optimizations",
+                "why_negative_roi": "Working code is already fast enough for current scale",
+                "potential_risk": "Introduces complexity and bugs for minimal performance gain",
+                "recommended_alternative": "Focus on feature development and testing"
+            },
+            {
+                "optimization_type": "over_engineering",
+                "description": "Complex architectural patterns for simple problems",
+                "why_negative_roi": "Adds maintenance burden without proportional benefits",
+                "potential_risk": "Increases technical debt and slows development",
+                "recommended_alternative": "Keep simple solutions for simple problems"
+            }
+        ])
+    
+    # For high-risk repositories, some "quick fixes" have negative ROI
+    security_risk = component_risks.get("security_risk", {})
+    if security_risk.get("risk_level") == "high":
+        negative_roi_opts.append({
+            "optimization_type": "bandaid_security_fixes",
+            "description": "Quick security patches without root cause analysis",
+            "why_negative_roi": "May hide symptoms without fixing underlying issues",
+            "potential_risk": "Creates false sense of security, leaves system vulnerable",
+            "recommended_alternative": "Conduct thorough security audit and fix root causes"
+        })
+    
+    # For repositories with poor test coverage, some testing "optimizations" have negative ROI
+    testing_risk = component_risks.get("testing_risk", {})
+    if testing_risk.get("risk_level") == "high":
+        negative_roi_opts.append({
+            "optimization_type": "shallow_test_coverage",
+            "description": "Adding tests just to hit coverage metrics",
+            "why_negative_roi": "Low-value tests that don't catch real bugs",
+            "potential_risk": "False confidence in code quality, wasted maintenance effort",
+            "recommended_alternative": "Focus on high-value integration and edge case tests"
+        })
+    
+    # For legacy systems, some modernization efforts have negative ROI
+    intent_risk = component_risks.get("intent_risk", {})
+    if intent_risk.get("risk_level") == "high":
+        negative_roi_opts.append({
+            "optimization_type": "full_system_rewrite",
+            "description": "Complete rewrite of legacy system",
+            "why_negative_roi": "High risk of introducing new bugs, long development time",
+            "potential_risk": "Business disruption, loss of existing functionality",
+            "recommended_alternative": "Incremental refactoring and modernization"
+        })
+    
+    return negative_roi_opts
+
+
+def _map_risk_to_gap_type(risk_name: str) -> str:
+    """Map risk component name to gap type."""
+    mapping = {
+        "structural_risk": "STRUCTURAL",
+        "semantic_risk": "STRUCTURAL", 
+        "security_risk": "SECURITY",
+        "comprehension_risk": "TEST",
+        "compliance_risk": "GOVERNANCE",
+        "dependency_risk": "INTEGRATION",
+        "duplication_risk": "STRUCTURAL",
+        "api_risk": "INTEGRATION",
+        "advanced_code_risk": "STRUCTURAL",
+        "testing_risk": "TEST",
+        "governance_risk": "GOVERNANCE",
+        "intent_risk": "SPEC_MISMATCH",
+        "misleading_risk": "UNKNOWN",
+        "change_risk": "STRUCTURAL"
+    }
+    return mapping.get(risk_name, "UNKNOWN")
+
+
+def _generate_why_this_matters(risk_name: str, risk_level: str) -> str:
+    """Generate explanation of why a particular risk matters."""
+    explanations = {
+        "security_risk": {
+            "high": "Security vulnerabilities can lead to data breaches, financial loss, and reputational damage",
+            "medium": "Security issues increase attack surface and compliance risk",
+            "low": "Minor security concerns that should be addressed proactively"
+        },
+        "testing_risk": {
+            "high": "Poor test coverage increases bug rates and deployment risk",
+            "medium": "Limited testing reduces confidence in code changes",
+            "low": "Testing gaps may allow bugs to reach production"
+        },
+        "dependency_risk": {
+            "high": "Vulnerable or outdated dependencies create security and compatibility risks",
+            "medium": "Dependency issues can cause runtime failures and maintenance problems",
+            "low": "Dependency management needs attention to prevent future issues"
+        }
+    }
+    
+    risk_explanations = explanations.get(risk_name, {})
+    return risk_explanations.get(risk_level, f"{risk_name} at {risk_level} level needs attention")
+
+
+def _generate_next_action(risk_name: str, risk_level: str) -> str:
+    """Generate recommended next action for a risk."""
+    actions = {
+        "security_risk": {
+            "high": "Conduct immediate security audit and apply critical patches",
+            "medium": "Review security posture and implement security best practices",
+            "low": "Address security findings in next development cycle"
+        },
+        "testing_risk": {
+            "high": "Implement comprehensive test suite before further development",
+            "medium": "Add tests for critical paths and edge cases",
+            "low": "Gradually improve test coverage over time"
+        },
+        "dependency_risk": {
+            "high": "Audit all dependencies and update vulnerable packages immediately",
+            "medium": "Review dependency usage and update outdated packages",
+            "low": "Establish dependency management process"
+        }
+    }
+    
+    risk_actions = actions.get(risk_name, {})
+    return risk_actions.get(risk_level, f"Address {risk_name} issues")
+
+
+def _estimate_effort(risk_name: str, risk_level: str) -> str:
+    """Estimate effort range for addressing a risk."""
+    effort_estimates = {
+        "high": "4-8 weeks",
+        "medium": "1-3 weeks", 
+        "low": "3-7 days"
+    }
+    return effort_estimates.get(risk_level, "1-2 weeks")

@@ -20,7 +20,7 @@ import requests
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from src.core.pipeline.analysis import execute_pipeline
-from src.services.bounty_service import BountyService
+from src.optional.bounty.bounty_service import BountyService
 
 logger = logging.getLogger(__name__)
 

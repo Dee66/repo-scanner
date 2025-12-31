@@ -297,9 +297,47 @@ class OptimizedAnalysisPipeline:
             final_memory = performance_optimizer.get_memory_usage()
             memory_delta = final_memory['rss_mb'] - initial_memory['rss_mb']
 
+            # Calculate file statistics
+            code_extensions = {'.py', '.js', '.ts', '.java', '.cpp', '.c', '.php', '.rb', '.go', '.rs'}
+            code_files = [f for f in file_list if any(f.endswith(ext) for ext in code_extensions)]
+            file_stats = {
+                "total_files_discovered": len(file_list),
+                "code_files_analyzed": len(code_files),
+                "language_breakdown": {}
+            }
+            
+            # Count files by language
+            for f in code_files:
+                for ext in code_extensions:
+                    if f.endswith(ext):
+                        lang = ext[1:]  # Remove the dot
+                        if ext == '.py':
+                            lang = 'python'
+                        elif ext == '.js':
+                            lang = 'javascript'
+                        elif ext == '.ts':
+                            lang = 'typescript'
+                        elif ext == '.rs':
+                            lang = 'rust'
+                        elif ext == '.java':
+                            lang = 'java'
+                        elif ext == '.cpp':
+                            lang = 'cpp'
+                        elif ext == '.c':
+                            lang = 'c'
+                        elif ext == '.php':
+                            lang = 'php'
+                        elif ext == '.rb':
+                            lang = 'ruby'
+                        elif ext == '.go':
+                            lang = 'go'
+                        file_stats["language_breakdown"][lang] = file_stats["language_breakdown"].get(lang, 0) + 1
+                        break
+
             result = {
                 "repository_root": self.repo_root,
                 "files": file_list,
+                "file_statistics": file_stats,
                 "structure": structure,
                 "semantic": semantic,
                 **advanced_results,
@@ -471,7 +509,8 @@ class OptimizedAnalysisPipeline:
             'risk_synthesis': risk_synthesis,
             'decision_artifacts': decision_artifacts,
             'authority_ceiling_evaluation': authority_evaluation,
-            'determinism_verification': determinism
+            'determinism_verification': determinism,
+            'security_analysis': advanced_results.get('security', {})
         }
 
     def _execute_standard_pipeline(self, repository_path: str) -> Dict[str, Any]:

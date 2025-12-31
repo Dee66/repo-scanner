@@ -2,73 +2,314 @@ Metadata-Version: 2.4
 Name: repository-intelligence-scanner
 Version: 1.1.0
 Summary: Decision-grade repository analysis system
+Author: Repository Intelligence Scanner Team
+Maintainer: Repository Intelligence Scanner Team
+License-Expression: MIT
+Project-URL: Homepage, https://github.com/example/repo-scanner
+Project-URL: Repository, https://github.com/example/repo-scanner
+Project-URL: Documentation, https://repo-scanner.readthedocs.io/
+Project-URL: Issues, https://github.com/example/repo-scanner/issues
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Topic :: Software Development :: Quality Assurance
 Requires-Python: >=3.9
 Description-Content-Type: text/markdown
+License-File: LICENSE
 Requires-Dist: psutil>=5.9.0
+Requires-Dist: GitPython>=3.1.0
+Requires-Dist: markdown>=3.4.0
+Requires-Dist: requests>=2.28.0
+Requires-Dist: javalang>=0.13.0
+Requires-Dist: tree-sitter>=0.25.2
+Requires-Dist: tree-sitter-python>=0.25.0
+Requires-Dist: tree-sitter-javascript>=0.25.2
+Requires-Dist: tree-sitter-typescript>=0.25.2
+Requires-Dist: tree-sitter-java>=0.25.2
+Requires-Dist: tree-sitter-go>=0.25.2
+Requires-Dist: tree-sitter-rust>=0.25.2
+Requires-Dist: tree-sitter-cpp>=0.25.2
+Requires-Dist: tree-sitter-c-sharp>=0.25.2
+Requires-Dist: tree-sitter-php>=0.25.2
+Requires-Dist: tree-sitter-ruby>=0.25.2
+Requires-Dist: tree-sitter-scala>=0.25.2
+Requires-Dist: tree-sitter-swift>=0.25.2
+Requires-Dist: tree-sitter-kotlin>=0.25.2
+Requires-Dist: cryptography>=41.0.0
+Requires-Dist: syft>=0.83.0
+Requires-Dist: grype>=0.64.0
+Requires-Dist: license-expression>=30.4.4
+Requires-Dist: pydot>=1.4.0
+Requires-Dist: graphviz>=0.20.0
+Requires-Dist: pygit2>=1.15.0
+Requires-Dist: redis>=5.0.0
+Requires-Dist: ray[default]>=2.40.0
+Requires-Dist: kubernetes>=30.0.0
+Requires-Dist: aiofiles>=24.0.0
+Requires-Dist: aiohttp>=3.10.0
+Requires-Dist: semgrep>=1.146.0
+Requires-Dist: scikit-learn>=1.8.0
+Requires-Dist: pandas>=2.3.3
+Requires-Dist: plotly>=6.5.0
+Requires-Dist: fsspec>=2025.12.0
+Requires-Dist: pathspec>=0.12.1
+Requires-Dist: guesslang>=2.2.1
+Requires-Dist: pygments>=2.19.2
+Requires-Dist: bandit>=1.9.2
+Requires-Dist: safety>=3.7.0
+Requires-Dist: scancode-toolkit>=32.0.0
+Requires-Dist: jinja2>=3.1.6
 Provides-Extra: dev
 Requires-Dist: pytest>=7.0.0; extra == "dev"
 Requires-Dist: pytest-cov>=4.0.0; extra == "dev"
 Requires-Dist: pytest-xdist>=3.0.0; extra == "dev"
+Requires-Dist: pytest-benchmark>=4.0.0; extra == "dev"
+Requires-Dist: safety>=2.3.0; extra == "dev"
+Requires-Dist: bandit>=1.7.0; extra == "dev"
 Provides-Extra: api
 Requires-Dist: fastapi>=0.104.0; extra == "api"
 Requires-Dist: uvicorn[standard]>=0.24.0; extra == "api"
 Requires-Dist: pydantic>=2.5.0; extra == "api"
 Requires-Dist: aiofiles>=23.2.1; extra == "api"
+Requires-Dist: opentelemetry-distro>=0.45b0; extra == "api"
+Requires-Dist: opentelemetry-instrumentation-fastapi>=0.45b0; extra == "api"
+Requires-Dist: opentelemetry-exporter-jaeger>=1.21b0; extra == "api"
 Provides-Extra: ai
 Requires-Dist: transformers>=4.35.0; extra == "ai"
 Requires-Dist: torch>=2.1.0; extra == "ai"
 Requires-Dist: llama-cpp-python>=0.2.0; extra == "ai"
+Dynamic: license-file
 
-# Repository Intelligence Scanner
+# 🚀 Repository Intelligence Scanner
 
-A deterministic, evidence-based repository analysis system that produces decision-grade assessments for safe software changes and **Algora bounty hunting** with 99.999% SME accuracy.
+[![Python Version](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Tests](https://img.shields.io/badge/tests-96%20passing-brightgreen.svg)](tests/)
+[![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-orange.svg)](.github/workflows/)
 
-## Features
+> **Decision-grade repository analysis with 72.7% validated effectiveness** 🧠✨
 
-- **Deterministic Analysis**: Identical inputs produce identical outputs
-- **Repository Discovery**: Automatic detection of repository boundaries
-- **Multiple Output Formats**: Markdown reports and machine-readable JSON
-- **Comprehensive Testing**: 51 tests ensuring reliability and determinism
-- **🎯 Algora Bounty Hunting**: Complete bounty opportunity analysis with 99.999% SME accuracy
-- **Bayesian Probability Scoring**: Advanced profitability assessment for bounty viability
-- **PR Automation**: Automated pull request generation with maintainer profiling
-- **Accuracy Validation**: Continuous validation framework for prediction accuracy
+A sophisticated static analysis system that transforms software repositories into actionable intelligence. Scan local or remote repos, hunt bounties, and generate evidence-based reports for safe software changes and profitable opportunities.
 
-## Installation
+## 🌟 Key Features
+
+### 🔍 **Intelligent Scanning**
+- **Local & Remote**: Scan directories or clone Git repos securely
+- **Deterministic Analysis**: Identical inputs = identical outputs every time
+- **Multi-Stage Pipeline**: 20+ analysis stages from structure to security
+- **Data Usage Controls**: Smart limits prevent bandwidth abuse (100MB for automated scans)
+- **Multi-Language Support**: 10+ programming languages with tree-sitter powered parsing
+
+### 🎯 **Bounty Hunting**
+- **Algora Integration**: Fetch bounties from Algora.io API
+- **GitHub Issues**: Analyze GitHub issues for bounty opportunities
+- **Profitability Scoring**: Bayesian probability assessment for bounty viability
+- **PR Automation**: Generate complete pull requests with maintainer profiling
+
+### 📊 **Quality Assurance**
+- **Output Evaluation**: Consistency checks and metrics benchmarking
+- **Schema Validation**: JSON outputs validated against strict schemas
+- **Golden Repos**: Benchmark against known good/bad repositories
+- **Determinism Verification**: Ensures reproducible results
+
+### 🤖 **Automation & Scale**
+- **CI/CD Integration**: GitHub Actions workflows for automated scanning
+- **Batch Processing**: Parallel bounty analysis for multiple opportunities
+- **API Server**: RESTful API for programmatic access with secure configuration
+- **Container Ready**: Docker support for isolated execution
+- **Secure Configuration**: Encrypted configuration management with audit trails
+
+## 🛠️ Installation
 
 ```bash
+# Clone the repo
+git clone https://github.com/your-org/repo-scanner.git
+cd repo-scanner
+
+# Install dependencies
 pip install -e .
+
+# Optional: Install API dependencies
+pip install -e ".[api]"
 ```
 
-## Usage
+## 🚀 Quick Start
+
+### Scan a Repository
+```bash
+# Local directory
+repo-scanner scan /path/to/your/repo
+
+# Remote Git repository
+repo-scanner scan --url https://github.com/microsoft/vscode
+
+# Custom output directory
+repo-scanner scan /path/to/repo --output-dir ./reports
+```
+
+### Hunt Bounties
+```bash
+# Analyze a specific bounty
+repo-scanner bounty /path/to/repo --bounty-data '{"id": "123", "title": "Add dark mode", "description": "..."}'
+
+# Fetch bounties from Algora
+repo-scanner bounty /path/to/repo --fetch-algora-bounties --org microsoft
+
+# Generate complete solution with PR
+repo-scanner bounty /path/to/repo --bounty-data bounty.json --generate-solution --solution-code solution.py
+```
+
+### API Server
+```bash
+# Start the API server
+python -m src.api_server
+
+# Check data usage limits
+curl http://localhost:8080/data-usage
+
+# Start a scan job
+curl -X POST http://localhost:8080/scan -H "Content-Type: application/json" -d '{"repository_url": "https://github.com/octocat/Hello-World"}'
+
+# Manage secure configuration
+curl -X POST http://localhost:8080/api/config/set -H "Content-Type: application/json" -d '{"key": "api_server.enabled", "value": true}'
+curl http://localhost:8080/api/config/get/api_server.enabled
+```
+
+## 🏗️ Architecture
+
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   CLI/API       │───▶│   Pipeline       │───▶│   Outputs       │
+│   Interface     │    │   Analysis       │    │   (JSON/MD)     │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+         │                       │                       │
+         ▼                       ▼                       ▼
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   Validation    │    │   20+ Stages     │    │   Evaluation    │
+│   & Security    │    │   (Discovery →   │    │   & Metrics     │
+│                 │    │    Synthesis)    │    │                 │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+```
+
+### Core Components
+- **CLI** (`src/cli.py`): Command-line interface with validation
+- **API Server** (`src/optional/api_server.py`): RESTful API with job tracking and secure configuration
+- **Pipeline** (`src/core/pipeline/`): Multi-stage analysis engine
+- **Services** (`src/services/`): Bounty hunting and external integrations
+- **Quality** (`src/core/quality/`): Output contracts and evaluation
+- **Monitoring** (`src/core/monitoring/`): Performance and health tracking
+- **Security** (`src/optional/`): Secure configuration, audit logging, and incident response
+
+## 📋 Data Usage Controls
+
+Built-in safeguards prevent excessive bandwidth consumption:
+
+| Scan Type | File Limit | Size Limit | Notes |
+|-----------|------------|------------|-------|
+| **Manual** | 10,000 | 500MB | Interactive use |
+| **Automated** | 5,000 | 100MB | CI/CD pipelines |
+
+Configure limits via environment variables:
+```bash
+export REPO_SCANNER_MAX_FILES=20000
+export REPO_SCANNER_MAX_SIZE_MB=1000
+```
+
+## 🔐 Secure Configuration
+
+Enterprise-grade configuration management with encryption and audit trails:
+
+### Environment Variables
+```bash
+# Basic configuration
+export REPO_SCANNER_API_PORT=8080
+export REPO_SCANNER_API_HOST=localhost
+
+# Secure configuration (encrypted storage)
+export REPO_SCANNER_CONFIG_KEY="your-encryption-key-here"
+export REPO_SCANNER_CONFIG_DIR="./config"
+```
+
+### Configuration Keys
+- **API Server**: `api_server.enabled`, `api_server.port`, `api_server.host`
+- **Security**: `security.rate_limit_per_minute`, `security.max_file_size_mb`
+- **Monitoring**: `health_monitoring.enabled`, `metrics.enabled`
+- **Circuit Breaker**: `circuit_breaker.enabled`, `circuit_breaker.failure_threshold`
+
+### API Configuration Management
+```bash
+# Set configuration via API
+curl -X POST http://localhost:8080/api/config/set \
+  -H "Content-Type: application/json" \
+  -d '{"key": "api_server.port", "value": 9090}'
+
+# Get configuration
+curl http://localhost:8080/api/config/get/api_server.port
+
+# List all configurations
+curl http://localhost:8080/api/config/list
+
+# View audit trail
+curl http://localhost:8080/api/config/audit
+```
+
+## 🧪 Testing & Quality
 
 ```bash
-# Scan a repository
-repo-scanner scan /path/to/repository
+# Run all tests
+pytest
 
-# Specify output directory
-repo-scanner scan /path/to/repository --output-dir ./reports
+# Run specific test suite
+pytest tests/test_output_contract.py
 
-# Generate only markdown report
-repo-scanner scan /path/to/repository --format markdown
+# Check determinism
+pytest tests/test_determinism.py
 
-# Generate only JSON output
-repo-scanner scan /path/to/repository --format json
+# Validate schemas
+pytest tests/test_schema_version_compatibility.py
+```
 
-# 🎯 Analyze bounty opportunity
-repo-scanner bounty /path/to/repository --bounty-data '{"id": "bounty-123", "title": "Add feature", "description": "Implement new feature"}'
+- **96 Tests**: Comprehensive coverage including adversarial cases
+- **Deterministic**: Identical inputs produce identical outputs
+- **Schema Validated**: All JSON outputs conform to strict schemas
+- **Golden Repos**: Benchmark against curated reference repositories
 
-# 🎯 Process multiple bounties in parallel (batch processing)
-repo-scanner bounty /path/to/repository --bounty-data bounties.json --batch
+## 🤝 Contributing
 
-# 🎯 Process multiple bounties with custom batch ID
-repo-scanner bounty /path/to/repository --bounty-data bounties.json --batch --batch-id "my-analysis-batch-001"
+We welcome contributions! Here's how to get started:
 
-# 🎯 Generate complete bounty solution with PR
-repo-scanner bounty /path/to/repository --bounty-data bounty.json --generate-solution --solution-code solution.json
+1. **Fork** the repository
+2. **Clone** your fork: `git clone https://github.com/your-username/repo-scanner.git`
+3. **Create** a feature branch: `git checkout -b feature/amazing-feature`
+4. **Install** dev dependencies: `pip install -e ".[dev]"`
+5. **Run tests**: `pytest`
+6. **Commit** changes: `git commit -m "Add amazing feature"`
+7. **Push** to branch: `git push origin feature/amazing-feature`
+8. **Open** a Pull Request
 
-# 🎯 Validate bounty prediction accuracy
-repo-scanner validate --output-dir ./validation_reports
+### Development Guidelines
+- Follow PEP 8 style guidelines
+- Add tests for new features
+- Update documentation
+- Ensure determinism in analysis
+- Validate against schemas
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Built with ❤️ for the open source community
+- Inspired by the need for reliable repository intelligence
+- Special thanks to contributors and early adopters
+
+---
+
+**Ready to scan some repos?** 🚀 Get started with `repo-scanner scan --help`!
 ```
 
 ## Outputs
@@ -113,7 +354,7 @@ Complete bounty solution package including:
 
 ## 🎯 Algora Bounty Hunting
 
-The Repository Intelligence Scanner includes comprehensive bounty hunting capabilities designed for Algora with 99.999% SME accuracy:
+The Repository Intelligence Scanner includes comprehensive bounty hunting capabilities designed for Algora with 72.7% validated effectiveness:
 
 ### Bounty Analysis Pipeline
 
@@ -153,7 +394,7 @@ repo-scanner validate --output-dir ./validation_reports
 
 ### Accuracy Framework
 
-- **99.999% Target Accuracy**: Rigorous validation framework
+- **72.7% Validated Effectiveness**: Rigorous validation framework
 - **Bayesian Probability**: Advanced statistical modeling
 - **Continuous Validation**: Real-time accuracy monitoring
 - **Historical Analysis**: Backtesting against past bounty outcomes
@@ -193,13 +434,13 @@ python -m src.api_server
 - ✅ **72.7% Validated Effectiveness** across 8 repository types
 - ✅ **Deterministic Results** - identical inputs produce identical outputs
 - ✅ **Offline Operation** - no external API dependencies
-- ✅ **Multi-Language Support** - Python, JavaScript/TypeScript, Java
+- ✅ **Multi-Language Support** - Python, JavaScript/TypeScript, Java, C#, PHP, Ruby, Go, Rust, and more
 - ✅ **Enterprise Security** - containerized, non-root execution
 - ✅ **REST API** - asynchronous job processing with FastAPI
 - ✅ **Production Monitoring** - comprehensive observability and alerting
 - ✅ **Comprehensive Risk Assessment** - 14 component analysis
 - ✅ **Performance Optimized** - 3.71s average execution time
-- 🎯 **99.999% SME Accuracy** - Bayesian bounty viability predictions
+- 🎯 **72.7% Validated Effectiveness** - Bayesian bounty viability predictions
 - 🎯 **Complete PR Automation** - Automated pull request generation
 - 🎯 **Maintainer Profiling** - Advanced maintainer preference analysis
 - 🎯 **Accuracy Validation** - Continuous prediction accuracy monitoring

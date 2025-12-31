@@ -176,7 +176,9 @@ def get_file_counts(file_list: List[str]) -> Dict[str, int]:
 
         if ext in code_exts:
             counts['code'] += 1
-        if 'test' in lower:
+        # Improved test file detection: only count files in test directories or with test-specific naming
+        if (('test' in lower and ('/test' in lower or '/tests' in lower or lower.startswith('test') or '_test.' in lower or '.test.' in lower)) or
+            ('spec' in lower and ('/spec' in lower or '/specs' in lower or lower.startswith('spec') or '_spec.' in lower or '.spec.' in lower))):
             counts['test'] += 1
         if ext in config_exts:
             counts['config'] += 1

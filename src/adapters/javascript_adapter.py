@@ -6,13 +6,16 @@ import json
 from pathlib import Path
 from typing import Dict, List, Any, Optional, Set
 
+from .base_adapter import BaseLanguageAdapter
 
-class JavaScriptAdapter:
+
+class JavaScriptAdapter(BaseLanguageAdapter):
     """Adapter for analyzing JavaScript and TypeScript repositories."""
 
     def __init__(self):
+        super().__init__("javascript")
         # Common JavaScript/TypeScript file extensions
-        self.js_extensions = {'.js', '.jsx', '.ts', '.tsx', '.mjs', '.cjs'}
+        self.file_extensions = ['.js', '.jsx', '.ts', '.tsx', '.mjs', '.cjs']
         # Test file patterns
         self.test_patterns = [
             r'\.test\.',

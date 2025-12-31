@@ -293,7 +293,7 @@ def test_main(capsys):
 
     def test_fetch_bounties_method(self, monkeypatch):
         """Test the fetch_bounties method with mocked API."""
-        from src.services.bounty_service import BountyService
+        from src.optional.bounty.bounty_service import BountyService
 
         # Mock the requests.post call
         mock_response = {
@@ -341,7 +341,7 @@ def test_main(capsys):
 
     def test_fetch_github_issues_method(self, monkeypatch):
         """Test the fetch_github_issues method with mocked API."""
-        from src.services.bounty_service import BountyService
+        from src.optional.bounty.bounty_service import BountyService
 
         # Mock the requests.get call
         mock_response = [

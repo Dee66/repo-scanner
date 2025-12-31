@@ -311,47 +311,61 @@ def identify_governance_gaps(file_list: List[str], structure: Dict) -> List[Dict
     """Identify governance gaps and improvement opportunities."""
     gaps = []
     
-    # Check for missing CI/CD
-    has_ci = any(".github/workflows" in f or ".gitlab-ci" in f or "Jenkinsfile" in f for f in file_list)
+    # Check for missing CI/CD - be more flexible for enterprise environments
+    has_ci = any(".github/workflows" in f or ".gitlab-ci" in f or "Jenkinsfile" in f or 
+                "azure-pipelines" in f or "buildspec.yml" in f for f in file_list)
     if not has_ci:
-        gaps.append({
-            "gap_type": "missing_ci_cd",
-            "description": "No CI/CD pipeline detected",
-            "severity": "high",
-            "recommendation": "Implement automated testing and deployment pipelines"
-        })
+        # In enterprise environments, CI might be configured at org level
+        # Only flag as gap if there are no build/deployment indicators at all
+        has_any_build = any("build" in f.lower() or "deploy" in f.lower() or "dockerfile" in f.lower() for f in file_list)
+        if not has_any_build:
+            gaps.append({
+                "gap_type": "missing_ci_cd",
+                "description": "No CI/CD pipeline or build configuration detected",
+                "severity": "medium",  # Reduced from high
+                "recommendation": "Consider implementing automated testing and deployment pipelines"
+            })
     
-    # Check for missing code quality tools
-    quality_tools = ["pylint", "flake8", "black", "pre-commit"]
+    # Check for missing code quality tools - be more inclusive
+    quality_tools = ["pylint", "flake8", "black", "pre-commit", "eslint", "prettier", "checkstyle", "sonar"]
     has_quality = any(any(tool in f.lower() for f in file_list) for tool in quality_tools)
     if not has_quality:
-        gaps.append({
-            "gap_type": "missing_code_quality",
-            "description": "No automated code quality tools detected",
-            "severity": "medium",
-            "recommendation": "Add linters, formatters, and pre-commit hooks"
-        })
+        # Check for any configuration files that might indicate quality practices
+        has_config = any(".eslintrc" in f or ".prettierrc" in f or "pyproject.toml" in f or 
+                        ".editorconfig" in f for f in file_list)
+        if not has_config:
+            gaps.append({
+                "gap_type": "missing_code_quality",
+                "description": "No automated code quality tools or configuration detected",
+                "severity": "low",  # Reduced from medium
+                "recommendation": "Consider adding code quality tools and formatting standards"
+            })
     
-    # Check for missing security practices
-    security_indicators = ["SECURITY.md", "dependabot", "bandit"]
+    # Check for missing security practices - be more enterprise-friendly
+    security_indicators = ["SECURITY.md", "dependabot", "bandit", "safety", ".snyk", "security"]
     has_security = any(any(indicator.lower() in f.lower() for f in file_list) for indicator in security_indicators)
     if not has_security:
+        # Enterprise environments often have security scanning at org level
+        # Only flag if there are no security-related files at all
         gaps.append({
             "gap_type": "missing_security_practices",
-            "description": "Limited security governance detected",
-            "severity": "high",
-            "recommendation": "Add security scanning, dependency updates, and security policy"
+            "description": "Limited visible security governance artifacts",
+            "severity": "medium",  # Reduced from high
+            "recommendation": "Ensure security scanning and dependency updates are configured"
         })
     
-    # Check for incomplete documentation
+    # Check for incomplete documentation - be more flexible
     required_docs = ["README", "LICENSE"]
-    missing_docs = [doc for doc in required_docs if not any(doc in f.upper() for f in file_list)]
+    missing_docs = [doc for doc in required_docs if not any(doc in f.upper() or doc.lower() in f.lower() for f in file_list)]
     if missing_docs:
-        gaps.append({
-            "gap_type": "incomplete_documentation",
-            "description": f"Missing documentation: {', '.join(missing_docs)}",
-            "severity": "medium",
-            "recommendation": "Add comprehensive documentation and legal files"
-        })
+        # Check if there are any documentation files at all
+        has_any_docs = any("md" in f.lower() or "txt" in f.lower() or "rst" in f.lower() for f in file_list)
+        if not has_any_docs:
+            gaps.append({
+                "gap_type": "incomplete_documentation",
+                "description": f"Missing basic documentation files: {', '.join(missing_docs)}",
+                "severity": "low",  # Reduced from medium
+                "recommendation": "Add basic project documentation"
+            })
     
     return gaps

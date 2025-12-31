@@ -8,7 +8,8 @@ import logging
 from pathlib import Path
 from typing import Dict, List, Optional, Any, Tuple
 
-from .manager import SMEReviewManager, EdgeCaseCategory, ReviewPriority
+from .manager import SMEReviewManager, EdgeCaseCategory, ReviewPriority, ReviewStatus
+from ..sme_api import get_sme_client
 
 
 class ReviewWorkflowIntegration:
@@ -224,43 +225,66 @@ class ReviewWorkflowIntegration:
             'overdue_cases': [case.id for case in overdue]
         }
 
-    def auto_assign_reviews(self, available_reviewers: List[str]) -> Dict[str, List[str]]:
+    def auto_assign_reviews(self, available_reviewers: List[str] = None) -> Dict[str, List[str]]:
         """
-        Automatically assign pending reviews to available reviewers
+        Automatically assign pending reviews to available SMEs.
 
         Args:
             available_reviewers: List of available reviewer names
 
         Returns:
-            Dictionary mapping reviewer to list of assigned case IDs
+            Dict mapping reviewer names to lists of assigned case IDs
         """
+        if available_reviewers is None:
+            available_reviewers = [
+                "Dr. Sarah Chen", "Prof. Michael Rodriguez", "Dr. Alex Thompson",
+                "Ms. Lisa Park", "Dr. James Wilson", "Prof. Maria Garcia",
+                "Dr. Emily Watson", "Dr. David Kim"
+            ]
+
+        sme_client = get_sme_client()
         assignments = {reviewer: [] for reviewer in available_reviewers}
 
         # Get pending cases ordered by priority
         pending_cases = self._get_pending_cases_by_priority()
 
-        reviewer_index = 0
         for case in pending_cases:
-            reviewer = available_reviewers[reviewer_index % len(available_reviewers)]
+            if not case.assigned_to:
+                # Get SME assignment recommendation
+                assignment = sme_client.get_reviewer_assignment(
+                    case.category.value,
+                    case.priority.value
+                )
 
-            if self.review_manager.assign_reviewer(case.id, reviewer):
-                assignments[reviewer].append(case.id)
+                preferred_reviewer = assignment["assigned_reviewer"]
 
-            reviewer_index += 1
+                # Assign if reviewer is available
+                if preferred_reviewer in available_reviewers:
+                    try:
+                        success = self.review_manager.assign_reviewer(
+                            case.id,
+                            preferred_reviewer,
+                            assignment["estimated_completion_days"]
+                        )
+                        if success:
+                            assignments[preferred_reviewer].append(case.id)
+                            self.logger.info(f"Auto-assigned {preferred_reviewer} to case {case.id}")
+                    except Exception as e:
+                        self.logger.error(f"Failed to assign reviewer to case {case.id}: {e}")
 
         return assignments
 
     def _get_pending_cases_by_priority(self) -> List:
         """Get pending cases ordered by priority"""
         cases = self.review_manager._load_all_cases()
-        pending_cases = [c for c in cases if c.status == self.review_manager.ReviewStatus.PENDING]
+        pending_cases = [c for c in cases if c.status == ReviewStatus.PENDING]
 
         # Sort by priority (CRITICAL > HIGH > MEDIUM > LOW)
         priority_order = {
-            self.review_manager.ReviewPriority.CRITICAL: 4,
-            self.review_manager.ReviewPriority.HIGH: 3,
-            self.review_manager.ReviewPriority.MEDIUM: 2,
-            self.review_manager.ReviewPriority.LOW: 1
+            ReviewPriority.CRITICAL: 4,
+            ReviewPriority.HIGH: 3,
+            ReviewPriority.MEDIUM: 2,
+            ReviewPriority.LOW: 1
         }
 
         return sorted(pending_cases,

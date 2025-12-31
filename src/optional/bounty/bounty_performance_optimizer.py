@@ -18,7 +18,7 @@ from typing import Dict, List, Optional, Any, Tuple
 from dataclasses import dataclass, field
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-from ..performance_optimizer import OptimizedThreadPool, get_performance_optimizer
+from ...core.performance_optimizer import OptimizedThreadPool, get_performance_optimizer
 from .maintainer_profile_engine import MaintainerProfileEngine
 from .profitability_triage import triage_bounty_profitability
 from .api_integration_engine import analyze_api_integration_points

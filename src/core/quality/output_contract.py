@@ -13,6 +13,7 @@ PRIMARY_REPORT = {
         "executive_summary",
         "system_characterization",
         "evidence_highlights",
+        "security_analysis",
         "misleading_signals",
         "safe_to_change_surface",
         "risk_synthesis",
@@ -188,6 +189,151 @@ def _generate_evidence_highlights(analysis: dict) -> str:
     return "\n".join(highlights)
 
 
+def _generate_security_analysis(analysis: dict) -> str:
+    """Generate the security analysis section."""
+    security_analysis = analysis.get("security_analysis", {})
+    unsafe_patterns = analysis.get("unsafe_patterns", {})
+
+    security_lines = [
+        "## Security Analysis",
+        "",
+        "### Vulnerability Summary",
+        ""
+    ]
+
+    # Overall security summary
+    summary = unsafe_patterns.get("summary", {})
+    if summary:
+        total_patterns = summary.get("total_patterns", 0)
+        high_severity = summary.get("high_severity", 0)
+        medium_severity = summary.get("medium_severity", 0)
+        low_severity = summary.get("low_severity", 0)
+        languages_covered = summary.get("languages_covered", 0)
+
+        security_lines.extend([
+            f"**Total Security Findings:** {total_patterns}",
+            f"**High Severity:** {high_severity}",
+            f"**Medium Severity:** {medium_severity}",
+            f"**Low Severity:** {low_severity}",
+            f"**Languages Analyzed:** {languages_covered}",
+            ""
+        ])
+
+        # Security posture assessment
+        if total_patterns == 0:
+            security_lines.extend([
+                "**Security Posture:** 🟢 **EXCELLENT** - No security vulnerabilities detected",
+                ""
+            ])
+        elif high_severity > 0:
+            security_lines.extend([
+                "**Security Posture:** 🔴 **CRITICAL** - High-severity vulnerabilities require immediate attention",
+                ""
+            ])
+        elif medium_severity > 5:
+            security_lines.extend([
+                "**Security Posture:** 🟡 **MODERATE RISK** - Multiple medium-severity findings need review",
+                ""
+            ])
+        else:
+            security_lines.extend([
+                "**Security Posture:** 🟡 **LOW RISK** - Minor security considerations identified",
+                ""
+            ])
+    else:
+        security_lines.extend([
+            "**Security Analysis:** Not performed or no data available",
+            ""
+        ])
+
+    # Critical findings
+    critical_findings = unsafe_patterns.get("critical_findings", [])
+    if critical_findings:
+        security_lines.extend([
+            "### Critical Security Findings",
+            "",
+            "| File | Pattern Type | Severity | Description |",
+            "|------|-------------|----------|-------------|",
+        ])
+
+        for finding in critical_findings[:10]:  # Limit to top 10
+            file_path = finding.get("file_path", "Unknown")
+            pattern_type = finding.get("pattern_type", "Unknown")
+            severity = finding.get("severity", "Unknown")
+            description = finding.get("description", "No description")
+
+            # Truncate long descriptions
+            if len(description) > 80:
+                description = description[:77] + "..."
+
+            security_lines.append(f"| `{file_path}` | {pattern_type} | {severity.upper()} | {description} |")
+
+        if len(critical_findings) > 10:
+            security_lines.append(f"| ... | ... | ... | {len(critical_findings) - 10} more findings |")
+
+        security_lines.append("")
+
+    # Patterns by language
+    patterns_by_language = unsafe_patterns.get("patterns_by_language", {})
+    if patterns_by_language:
+        security_lines.extend([
+            "### Findings by Language",
+            ""
+        ])
+
+        for language, files in patterns_by_language.items():
+            if files:
+                total_lang_patterns = sum(len(file_data.get("patterns", [])) for file_data in files)
+                security_lines.extend([
+                    f"**{language.upper()}:** {total_lang_patterns} findings",
+                    ""
+                ])
+
+                # Show top patterns for this language
+                lang_patterns = []
+                for file_data in files:
+                    for pattern in file_data.get("patterns", []):
+                        lang_patterns.append({
+                            "type": pattern.get("type", "Unknown"),
+                            "severity": pattern.get("severity", "low"),
+                            "file": file_data.get("file_path", "Unknown")
+                        })
+
+                # Group by type and count
+                pattern_counts = {}
+                for pattern in lang_patterns:
+                    key = pattern["type"]
+                    if key not in pattern_counts:
+                        pattern_counts[key] = {"count": 0, "severity": pattern["severity"]}
+                    pattern_counts[key]["count"] += 1
+
+                for pattern_type, data in sorted(pattern_counts.items(), key=lambda x: x[1]["count"], reverse=True):
+                    severity_icon = {"high": "🔴", "medium": "🟡", "low": "🟢"}.get(data["severity"], "⚪")
+                    security_lines.append(f"- {severity_icon} **{pattern_type}:** {data['count']} instances")
+
+                security_lines.append("")
+
+    # Security recommendations
+    security_lines.extend([
+        "### Security Recommendations",
+        "",
+        "**Immediate Actions:**",
+        "- Review all HIGH severity findings before deployment",
+        "- Address CRITICAL findings immediately",
+        "- Implement input validation for user-controlled data",
+        "- Use parameterized queries for database operations",
+        "",
+        "**Best Practices:**",
+        "- Avoid eval() and similar dynamic code execution",
+        "- Implement proper error handling and logging",
+        "- Use security linters in CI/CD pipelines",
+        "- Regular security code reviews",
+        ""
+    ])
+
+    return "\n".join(security_lines)
+
+
 def generate_primary_report(analysis: dict, repository_path: str) -> str:
     """Generate comprehensive primary analysis report."""
     repo_root = analysis.get("repository_root", repository_path)
@@ -210,6 +356,9 @@ def generate_primary_report(analysis: dict, repository_path: str) -> str:
     
     # Evidence highlights
     sections.append(_generate_evidence_highlights(analysis))
+    
+    # Security analysis
+    sections.append(_generate_security_analysis(analysis))
     
     # Misleading signals (always include section)
     sections.extend([
@@ -611,6 +760,7 @@ def generate_machine_output(analysis: dict, repository_path: str) -> dict:
     repo_root = analysis.get("repository_root", repository_path)
     files = analysis.get("files", [])
     structure = analysis.get("structure", {})
+    ast_analysis = analysis.get("ast_analysis", {})
     semantic = analysis.get("semantic", {})
     test_signals = analysis.get("test_signals", {})
     governance = analysis.get("governance", {})
@@ -634,6 +784,7 @@ def generate_machine_output(analysis: dict, repository_path: str) -> dict:
             "gaps_count": 0
         },
         "structure": structure,
+        "ast_analysis": ast_analysis,
         "semantic": semantic,
         "test_signals": test_signals,
         "governance": governance,
@@ -646,6 +797,11 @@ def generate_machine_output(analysis: dict, repository_path: str) -> dict:
         "determinism_verification": determinism_verification,
         "tasks": {},
         "gaps": [],
+        "unsafe_patterns": analysis.get("security_analysis", {}).get("unsafe_patterns", {
+            "summary": {"total_patterns": 0, "high_severity": 0, "medium_severity": 0, "low_severity": 0, "languages_covered": 0},
+            "patterns_by_language": {},
+            "critical_findings": []
+        }),
         "metadata": {
             "scanner_version": "1.1.0",
             "run_timestamp": "2025-01-01T00:00:00Z",  # Fixed timestamp for determinism

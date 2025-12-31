@@ -1,5 +1,5 @@
 import pytest
-from src.core.bounty.pr_automation import SurgicalMinimalistFilter, CommitFragmenter
+from src.optional.bounty.pr_automation import SurgicalMinimalistFilter, CommitFragmenter
 
 
 def test_surgical_minimalist_filter_handles_none_persona_and_returns_structure():

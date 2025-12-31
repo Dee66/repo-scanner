@@ -7,9 +7,15 @@ from typing import Dict, List, Set, Optional, Any
 import astroid
 from astroid import nodes
 
+from .base_adapter import BaseLanguageAdapter
 
-class PythonAdapter:
+
+class PythonAdapter(BaseLanguageAdapter):
     """Adapter for analyzing Python repositories."""
+
+    def __init__(self):
+        super().__init__("python")
+        self.file_extensions = ['.py']
 
     def extract_ast(self, file_path: str) -> dict:
         """Extract AST from Python file using astroid parser."""
@@ -41,7 +47,8 @@ class PythonAdapter:
                 "methods": self._extract_methods(module),
                 "variables": self._extract_variables(module),
                 "complexity": self._calculate_complexity(module),
-                "dependencies": self._extract_dependencies(module)
+                "dependencies": self._extract_dependencies(module),
+                "unsafe_patterns": self._detect_unsafe_patterns(module, content)
             }
 
             return ast_info
@@ -56,7 +63,8 @@ class PythonAdapter:
                 "methods": [],
                 "variables": [],
                 "complexity": 0,
-                "dependencies": []
+                "dependencies": [],
+                "unsafe_patterns": []
             }
 
     def build_dependency_graph(self, root_path: str) -> dict:
@@ -330,3 +338,70 @@ class PythonAdapter:
             return str(relative.with_suffix("")).replace(os.sep, ".")
         except ValueError:
             return str(file_path.with_suffix("")).replace(os.sep, ".")
+
+    def _detect_unsafe_patterns(self, module: nodes.Module, content: str) -> List[Dict[str, Any]]:
+        """Detect potentially unsafe patterns in Python code."""
+        unsafe_patterns = []
+
+        try:
+            for node in self._walk_tree(module):
+                # Detect exec() usage
+                if isinstance(node, nodes.Call) and isinstance(node.func, nodes.Name) and node.func.name == "exec":
+                    unsafe_patterns.append({
+                        "type": "code_execution",
+                        "severity": "high",
+                        "description": "Use of exec() allows arbitrary code execution",
+                        "line": node.lineno,
+                        "code": content.split('\n')[node.lineno - 1].strip() if node.lineno <= len(content.split('\n')) else ""
+                    })
+
+                # Detect eval() usage
+                elif isinstance(node, nodes.Call) and isinstance(node.func, nodes.Name) and node.func.name == "eval":
+                    unsafe_patterns.append({
+                        "type": "code_injection",
+                        "severity": "high",
+                        "description": "Use of eval() allows code injection",
+                        "line": node.lineno,
+                        "code": content.split('\n')[node.lineno - 1].strip() if node.lineno <= len(content.split('\n')) else ""
+                    })
+
+                # Detect subprocess with shell=True
+                elif isinstance(node, nodes.Call) and isinstance(node.func, nodes.Attribute) and node.func.attrname == "call":
+                    if isinstance(node.func.expr, nodes.Name) and node.func.expr.name == "subprocess":
+                        # Check for shell=True argument
+                        for arg in node.args:
+                            if isinstance(arg, nodes.Keyword) and arg.arg == "shell" and isinstance(arg.value, nodes.Const) and arg.value.value is True:
+                                unsafe_patterns.append({
+                                    "type": "shell_injection",
+                                    "severity": "high",
+                                    "description": "subprocess.call() with shell=True allows shell injection",
+                                    "line": node.lineno,
+                                    "code": content.split('\n')[node.lineno - 1].strip() if node.lineno <= len(content.split('\n')) else ""
+                                })
+
+                # Detect pickle.loads
+                elif isinstance(node, nodes.Call) and isinstance(node.func, nodes.Attribute) and node.func.attrname == "loads":
+                    if isinstance(node.func.expr, nodes.Name) and node.func.expr.name == "pickle":
+                        unsafe_patterns.append({
+                            "type": "deserialization",
+                            "severity": "high",
+                            "description": "pickle.loads() can execute arbitrary code during deserialization",
+                            "line": node.lineno,
+                            "code": content.split('\n')[node.lineno - 1].strip() if node.lineno <= len(content.split('\n')) else ""
+                        })
+
+                # Detect input() usage (Python 2 style, but still risky)
+                elif isinstance(node, nodes.Call) and isinstance(node.func, nodes.Name) and node.func.name == "input":
+                    unsafe_patterns.append({
+                        "type": "input_validation",
+                        "severity": "medium",
+                        "description": "Use of input() without validation can lead to security issues",
+                        "line": node.lineno,
+                        "code": content.split('\n')[node.lineno - 1].strip() if node.lineno <= len(content.split('\n')) else ""
+                    })
+
+        except Exception as e:
+            # Log error but don't fail the entire analysis
+            pass
+
+        return unsafe_patterns

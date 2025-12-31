@@ -3,12 +3,18 @@
 import os
 import re
 from pathlib import Path
-from typing import Dict, List, Set, Optional
+from typing import Dict, List, Set, Optional, Any
 import javalang
 
+from .base_adapter import BaseLanguageAdapter
 
-class JavaAdapter:
+
+class JavaAdapter(BaseLanguageAdapter):
     """Adapter for analyzing Java repositories."""
+
+    def __init__(self):
+        super().__init__("java")
+        self.file_extensions = ['.java']
 
     def extract_ast(self, file_path: str) -> dict:
         """Extract AST from Java file using javalang parser."""
@@ -47,7 +53,8 @@ class JavaAdapter:
                 "fields": [],
                 "annotations": [],
                 "complexity": self._calculate_complexity(tree),
-                "dependencies": self._extract_dependencies(content)
+                "dependencies": self._extract_dependencies(content),
+                "unsafe_patterns": self._detect_unsafe_patterns(content, tree)
             }
 
             # Extract package
@@ -86,7 +93,8 @@ class JavaAdapter:
                 "fields": [],
                 "annotations": [],
                 "complexity": 0,
-                "dependencies": []
+                "dependencies": [],
+                "unsafe_patterns": []
             }
 
     def _extract_class_info(self, class_decl: javalang.tree.ClassDeclaration, file_path: str) -> Dict:
@@ -234,7 +242,118 @@ class JavaAdapter:
 
         return dependencies
 
-        return dependencies
+    def _detect_unsafe_patterns(self, content: str, tree) -> List[Dict[str, Any]]:
+        """Detect unsafe Java patterns that could lead to security vulnerabilities."""
+        unsafe_patterns = []
+
+        # Pattern 1: Reflection usage - can bypass security
+        if 'java.lang.reflect' in content or '.getClass()' in content or 'Class.forName' in content:
+            for match in re.finditer(r'(java\.lang\.reflect|\.getClass\(\)|Class\.forName)', content):
+                unsafe_patterns.append({
+                    "type": "reflection_usage",
+                    "pattern": match.group(1),
+                    "line": content[:match.start()].count('\n') + 1,
+                    "description": "Use of reflection can bypass security controls",
+                    "severity": "medium"
+                })
+
+        # Pattern 2: Serialization vulnerabilities
+        if 'Serializable' in content and 'readObject' in content:
+            for match in re.finditer(r'readObject', content):
+                unsafe_patterns.append({
+                    "type": "deserialization_vulnerability",
+                    "pattern": "readObject",
+                    "line": content[:match.start()].count('\n') + 1,
+                    "description": "Custom readObject method - potential deserialization vulnerability",
+                    "severity": "high"
+                })
+
+        # Pattern 3: SQL injection potential
+        if 'Statement' in content or 'PreparedStatement' in content:
+            for match in re.finditer(r'(Statement|PreparedStatement)', content):
+                unsafe_patterns.append({
+                    "type": "sql_injection",
+                    "pattern": match.group(1),
+                    "line": content[:match.start()].count('\n') + 1,
+                    "description": "Database operations detected - ensure parameterized queries",
+                    "severity": "medium"
+                })
+
+        # Pattern 4: Command injection
+        if 'Runtime.getRuntime().exec' in content or 'ProcessBuilder' in content:
+            for match in re.finditer(r'(Runtime\.getRuntime\(\)\.exec|ProcessBuilder)', content):
+                unsafe_patterns.append({
+                    "type": "command_injection",
+                    "pattern": match.group(1),
+                    "line": content[:match.start()].count('\n') + 1,
+                    "description": "Command execution detected - potential command injection",
+                    "severity": "high"
+                })
+
+        # Pattern 5: Unsafe deserialization
+        if 'ObjectInputStream' in content and 'readObject' in content:
+            for match in re.finditer(r'ObjectInputStream.*readObject', content):
+                unsafe_patterns.append({
+                    "type": "deserialization_vulnerability",
+                    "pattern": "ObjectInputStream.readObject",
+                    "line": content[:match.start()].count('\n') + 1,
+                    "description": "Object deserialization can lead to remote code execution",
+                    "severity": "high"
+                })
+
+        # Pattern 6: XML external entity vulnerability
+        if 'DocumentBuilderFactory' in content or 'SAXParserFactory' in content:
+            for match in re.finditer(r'(DocumentBuilderFactory|SAXParserFactory)', content):
+                unsafe_patterns.append({
+                    "type": "xxe_vulnerability",
+                    "pattern": match.group(1),
+                    "line": content[:match.start()].count('\n') + 1,
+                    "description": "XML parsing detected - ensure XXE protection is enabled",
+                    "severity": "high"
+                })
+
+        # Pattern 7: Insecure random number generation
+        if 'Random' in content and 'java.util.Random' in content:
+            for match in re.finditer(r'java\.util\.Random', content):
+                unsafe_patterns.append({
+                    "type": "weak_random",
+                    "pattern": "java.util.Random",
+                    "line": content[:match.start()].count('\n') + 1,
+                    "description": "Use of insecure random number generator",
+                    "severity": "medium"
+                })
+
+        # Pattern 8: Hardcoded secrets
+        secret_patterns = [
+            r'password\s*=\s*["\'][^"\']+["\']',
+            r'secret\s*=\s*["\'][^"\']+["\']',
+            r'key\s*=\s*["\'][^"\']+["\']',
+            r'token\s*=\s*["\'][^"\']+["\']'
+        ]
+        for pattern in secret_patterns:
+            for match in re.finditer(pattern, content, re.IGNORECASE):
+                unsafe_patterns.append({
+                    "type": "hardcoded_secret",
+                    "pattern": "hardcoded credential",
+                    "line": content[:match.start()].count('\n') + 1,
+                    "description": "Potential hardcoded secret or credential",
+                    "severity": "high"
+                })
+
+        # Pattern 9: Use of deprecated/unsafe APIs
+        deprecated_apis = ['MD5', 'SHA1', 'DES']
+        for api in deprecated_apis:
+            if api in content:
+                for match in re.finditer(re.escape(api), content):
+                    unsafe_patterns.append({
+                        "type": "deprecated_api",
+                        "pattern": api,
+                        "line": content[:match.start()].count('\n') + 1,
+                        "description": f"Use of deprecated/unsafe API: {api}",
+                        "severity": "medium"
+                    })
+
+        return unsafe_patterns
 
     def build_dependency_graph(self, root_path: str) -> dict:
         """Build dependency graph for Java project."""

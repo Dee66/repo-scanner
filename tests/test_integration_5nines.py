@@ -18,7 +18,7 @@ from src.core.validation.backtesting import DifferentialLogicOracle, BacktestRes
 from src.core.validation.style_audit import ContextualGraftingAudit, StyleProfile
 from src.core.validation.build_sandbox import BuildLockIntegritySandbox
 from src.core.validation.transparency_audit import EthicalTransparencyAudit
-from src.core.bounty.reputation_monitor import ReputationMonitor
+from src.optional.bounty.reputation_monitor import ReputationMonitor
 
 
 class TestFiveNinesValidation:

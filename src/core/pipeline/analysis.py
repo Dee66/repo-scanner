@@ -1,5 +1,6 @@
 """Analysis pipeline stages for Repository Intelligence Scanner."""
 
+import asyncio
 import concurrent.futures
 import functools
 import time
@@ -45,6 +46,10 @@ from src.core.pipeline.intent_posture_classification import classify_intent_post
 from src.core.pipeline.misleading_signal_detection import analyze_misleading_signals
 from src.core.pipeline.safe_change_surface_modeling import analyze_safe_change_surface
 from src.core.pipeline.security_analysis import analyze_security_vulnerabilities
+from src.core.pipeline.security_analysis.cryptographic_analysis import CryptographicAnalyzer
+from src.core.pipeline.security_analysis.supply_chain_security import SupplyChainAnalyzer
+from src.core.pipeline.security_analysis.security_testing_depth import SecurityTestingAnalyzer
+from src.core.analysis.ast_analysis import ASTAnalysisEngine
 from src.core.pipeline.risk_synthesis import synthesize_risks
 from src.core.pipeline.decision_artifact_generation import generate_decision_artifacts
 from src.core.pipeline.authority_ceiling_evaluation import evaluate_authority_ceiling
@@ -87,6 +92,9 @@ ANALYSIS_PIPELINE_STAGES = [
     "code_duplication_analysis",
     "api_analysis",
     "security_vulnerability_analysis",
+    "cryptographic_analysis",
+    "supply_chain_security",
+    "security_testing_depth",
     "test_signal_analysis",
     "governance_signal_analysis",
     "intent_posture_classification",
@@ -207,6 +215,98 @@ def execute_pipeline(repository_path: str) -> dict:
                     pass
 
             return enterprise_result
+
+        # Check for very large repositories that need distributed processing first
+        complexity = _estimate_repository_complexity(file_list)
+        print(f"DEBUG: Repository complexity: {complexity}, file count: {len(file_list)}")
+        if len(file_list) > 10000 or complexity > 1000:
+            logger.info(f"Very large repository detected ({len(file_list)} files), using distributed pipeline")
+            try:
+                from .distributed_analysis import DistributedAnalysisPipeline
+                pipeline = DistributedAnalysisPipeline()
+                
+                # Add timeout protection for distributed analysis
+                import signal
+                def timeout_handler(signum, frame):
+                    raise TimeoutError("Distributed analysis timed out")
+                
+                signal.signal(signal.SIGALRM, timeout_handler)
+                signal.alarm(600)  # 10 minute timeout
+                
+                try:
+                    result = pipeline.execute_distributed_analysis(repository_path, file_list)
+                    
+                    # Add standard pipeline components for compatibility
+                    result.update({
+                        "repository_root": repo_root,
+                        "files": file_list,
+                        "structure": {"analysis_type": "distributed"},
+                        "semantic": {"analysis_type": "distributed"},
+                        "status": "distributed_pipeline_complete"
+                    })
+                    
+                    # Clean up resources synchronously
+                    pipeline.cleanup()
+                    
+                    # Complete performance tracking for distributed pipeline
+                    execution_time = time.time() - start_time
+                    performance_monitor.complete_operation("pipeline_execution", {
+                        "execution_time": execution_time,
+                        "file_count": len(file_list),
+                        "pipeline_type": "distributed",
+                        "status": "success"
+                    })
+
+                    # Optional metrics completion for distributed pipeline
+                    if metrics_collector and operation_start:
+                        try:
+                            from src.optional.metrics_collector import record_operation_end
+                            record_operation_end("analysis_pipeline", operation_start, True, None, {
+                                "execution_time": execution_time,
+                                "file_count": len(file_list),
+                                "pipeline_type": "distributed"
+                            })
+                            print(f"DEBUG: Metrics recorded for distributed pipeline")
+                        except ImportError:
+                            pass
+
+                    # Add security analysis for distributed pipeline
+                    try:
+                        security_analysis = analyze_security_vulnerabilities(file_list, {"analysis_type": "distributed"})
+                        result["unsafe_patterns"] = security_analysis.get("unsafe_patterns", {})
+                        result["security_analysis"] = security_analysis
+                        print(f"DEBUG: Added security analysis to distributed pipeline result")
+                    except Exception as e:
+                        print(f"DEBUG: Failed to add security analysis to distributed pipeline: {e}")
+                        result["unsafe_patterns"] = {"summary": {"total_patterns": 0}}
+                        result["security_analysis"] = {"error": str(e)}
+
+                    return result
+                    
+                finally:
+                    signal.alarm(0)  # Cancel timeout
+                
+            except TimeoutError:
+                logger.error("Distributed analysis timed out after 10 minutes")
+                # Ensure cleanup on timeout
+                try:
+                    pipeline.cleanup()
+                except:
+                    pass
+            except ImportError as e:
+                logger.warning(f"Distributed pipeline not available ({e}), trying optimized pipeline")
+            except Exception as e:
+                logger.error(f"Distributed pipeline failed ({e}), trying optimized pipeline")
+                # Ensure cleanup on failure
+                try:
+                    pipeline.cleanup()
+                except:
+                    pass
+                # Ensure cleanup on failure
+                try:
+                    pipeline.cleanup()
+                except:
+                    pass
 
         elif len(file_list) > 200 or _estimate_repository_complexity(file_list) > 50:
             logger.info(f"Complex repository detected ({len(file_list)} files), using optimized pipeline")
@@ -463,6 +563,10 @@ def _execute_standard_pipeline(repository_path: str, repo_root: str, file_list: 
         print(f"DEBUG: file_list types: {[type(f) for f in file_list[:5]]}")
         raise
 
+    # AST analysis (multi-language code parsing)
+    ast_engine = ASTAnalysisEngine()
+    ast_analysis = _run_stage('ast_analysis', ast_engine.analyze, repo_root, max_files=500)
+
     # Static semantic analysis (must be second)
     semantic = _run_stage('static_semantic_analysis', analyze_semantic_structure, file_list, structure)
 
@@ -474,6 +578,30 @@ def _execute_standard_pipeline(repository_path: str, repo_root: str, file_list: 
 
     # Security vulnerability analysis (depends on semantic)
     security_analysis = _run_stage('security_vulnerability_analysis', analyze_security_vulnerabilities, file_list, semantic)
+
+    # Enhanced security analysis (optional based on feature flags)
+    from ..feature_flags import is_feature_enabled, FeatureFlag
+
+    cryptographic_analysis = {}
+    if is_feature_enabled(FeatureFlag.CRYPTOGRAPHIC_ANALYSIS):
+        crypto_analyzer = CryptographicAnalyzer()
+        cryptographic_analysis = _run_stage('cryptographic_analysis', crypto_analyzer.analyze_key_management, file_list)
+    else:
+        cryptographic_analysis = {"status": "disabled_by_feature_flag"}
+
+    supply_chain_analysis = {}
+    if is_feature_enabled(FeatureFlag.SUPPLY_CHAIN_SECURITY):
+        supply_analyzer = SupplyChainAnalyzer()
+        supply_chain_analysis = _run_stage('supply_chain_security', supply_analyzer.analyze_dependencies, repo_root)
+    else:
+        supply_chain_analysis = {"status": "disabled_by_feature_flag"}
+
+    security_testing_analysis = {}
+    if is_feature_enabled(FeatureFlag.SECURITY_TESTING_DEPTH):
+        testing_analyzer = SecurityTestingAnalyzer()
+        security_testing_analysis = _run_stage('security_testing_depth', testing_analyzer.analyze_security_testing, file_list)
+    else:
+        security_testing_analysis = {"status": "disabled_by_feature_flag"}
 
     # Compliance analysis (depends on semantic)
     compliance_analysis = _run_stage('compliance_analysis', analyze_compliance, file_list, semantic)
@@ -521,7 +649,7 @@ def _execute_standard_pipeline(repository_path: str, repo_root: str, file_list: 
     # Sequential execution for dependent stages
     misleading_signals = _run_stage('misleading_signal_detection', analyze_misleading_signals, file_list, structure, semantic, test_signals, governance, intent_posture)
     safe_change_surface = _run_stage('safe_change_surface_modeling', analyze_safe_change_surface, file_list, structure, semantic, test_signals, governance, intent_posture, misleading_signals)
-    risk_synthesis = _run_stage('risk_and_gap_synthesis', synthesize_risks, file_list, structure, semantic, test_signals, governance, intent_posture, misleading_signals, safe_change_surface, security_analysis, code_comprehension, compliance_analysis, dependency_analysis, code_duplication_analysis, api_analysis, advanced_code_analysis)
+    risk_synthesis = _run_stage('risk_and_gap_synthesis', synthesize_risks, file_list, structure, semantic, test_signals, governance, intent_posture, misleading_signals, safe_change_surface, security_analysis, code_comprehension, compliance_analysis, dependency_analysis, code_duplication_analysis, api_analysis, advanced_code_analysis, cryptographic_analysis, supply_chain_analysis, security_testing_analysis)
     decision_artifacts = _run_stage('decision_artifact_generation', generate_decision_artifacts, file_list, structure, semantic, test_signals, governance, intent_posture, misleading_signals, safe_change_surface, risk_synthesis)
     authority_ceiling_evaluation = _run_stage('authority_ceiling_evaluation', evaluate_authority_ceiling, file_list, structure, semantic, test_signals, governance, intent_posture, misleading_signals, safe_change_surface, risk_synthesis, decision_artifacts)
     determinism_verification = _run_stage('determinism_verification', verify_determinism, file_list, structure, semantic, test_signals, governance, intent_posture, misleading_signals, safe_change_surface, risk_synthesis, decision_artifacts, authority_ceiling_evaluation)
@@ -536,10 +664,14 @@ def _execute_standard_pipeline(repository_path: str, repo_root: str, file_list: 
         "repository_root": repo_root,
         "files": file_list,
         "structure": structure,
+        "ast_analysis": ast_analysis,
         "semantic": semantic,
         "advanced_code_analysis": advanced_code_analysis,
         "code_comprehension": code_comprehension,
         "security_analysis": security_analysis,
+        "cryptographic_analysis": cryptographic_analysis,
+        "supply_chain_analysis": supply_chain_analysis,
+        "security_testing_analysis": security_testing_analysis,
         "compliance_analysis": compliance_analysis,
         "dependency_analysis": dependency_analysis,
         "code_duplication_analysis": code_duplication_analysis,

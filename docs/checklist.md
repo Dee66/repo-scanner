@@ -155,7 +155,7 @@
 ### Safe Change Surface
 - [x] AUT-008: Implement safe_change_surface definition (bounded model for acceptable risk changes)
 - [x] AUT-009: Implement properties (explicit_safe_zones, explicit_no_touch_zones, blast_radius_characterization, evidence_references, expiry_conditions)
-- [ ] AUT-010: Implement rules (absence_is_valid_outcome, safe_surface_may_be_empty, first_action_may_be_explicit_non_action)
+- [x] AUT-010: Implement rules (absence_is_valid_outcome, safe_surface_may_be_empty, first_action_may_be_explicit_non_action)
 
 ### Refusal Artifact
 - [x] AUT-011: Implement refusal_artifact definition (first-class output for responsible guidance refusal)
@@ -175,7 +175,7 @@
 ### Risk Synthesis
 - [x] RDF-001: Implement risk_and_gap_synthesis with gap_types (structural, testing, governance, integration, knowledge_risk)
 - [x] RDF-002: Implement prioritization method (impact_over_effort)
-- [ ] RDF-003: Implement outputs (prioritized_gap_list, negative_roi_optimizations)
+- [x] RDF-003: Implement outputs (prioritized_gap_list, negative_roi_optimizations)
 
 ### Decision Artifacts
 - [ ] RDF-004: Implement decision_artifacts with required artifacts (executive_verdict, safe_to_change_surface, no_touch_zones, misleading_signals, what_not_to_fix, refusal_artifact_if_applicable, confidence_and_limits, validity_window)

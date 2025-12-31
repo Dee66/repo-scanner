@@ -5,13 +5,15 @@ import re
 from pathlib import Path
 from typing import Dict, List, Any, Optional, Set
 
+from .base_adapter import BaseLanguageAdapter
 
-class GoAdapter:
+
+class GoAdapter(BaseLanguageAdapter):
     """Adapter for analyzing Go repositories."""
 
     def __init__(self):
-        # Common Go file extensions
-        self.go_extensions = {'.go'}
+        super().__init__("go")
+        self.file_extensions = ['.go']
         # Test file patterns
         self.test_patterns = ['_test.go']
 

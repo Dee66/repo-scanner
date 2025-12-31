@@ -11,7 +11,7 @@ from pathlib import Path
 # Add src to path for imports
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
-from src.core.bounty.bounty_performance_optimizer import ParallelBountyAnalyzer, BountyAnalysisBatch
+from src.optional.bounty.bounty_performance_optimizer import ParallelBountyAnalyzer, BountyAnalysisBatch
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')

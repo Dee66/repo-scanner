@@ -11,6 +11,14 @@ class FeatureFlag(Enum):
     EXPERIMENTAL_ANALYSIS = "experimental_analysis"
     BETA_API_ENDPOINTS = "beta_api_endpoints"
     PERFORMANCE_MONITORING = "performance_monitoring"
+    CRYPTOGRAPHIC_ANALYSIS = "cryptographic_analysis"
+    SUPPLY_CHAIN_SECURITY = "supply_chain_security"
+    SECURITY_TESTING_DEPTH = "security_testing_depth"
+    ARCHITECTURAL_SECURITY = "architectural_security"
+    THREAT_MODELING = "threat_modeling"
+    COMPLIANCE_FRAMEWORKS = "compliance_frameworks"
+    OPERATIONAL_SECURITY = "operational_security"
+    PERFORMANCE_SECURITY_TRADEOFFS = "performance_security_tradeoffs"
 
 class FeatureFlagManager:
     """Manages feature flags for gradual rollout."""
@@ -28,6 +36,14 @@ class FeatureFlagManager:
             FeatureFlag.EXPERIMENTAL_ANALYSIS.value: False,  # Experimental
             FeatureFlag.BETA_API_ENDPOINTS.value: False,  # Beta features
             FeatureFlag.PERFORMANCE_MONITORING.value: True,  # Generally useful
+            FeatureFlag.CRYPTOGRAPHIC_ANALYSIS.value: False,  # New experimental feature
+            FeatureFlag.SUPPLY_CHAIN_SECURITY.value: False,  # New experimental feature
+            FeatureFlag.SECURITY_TESTING_DEPTH.value: False,  # New experimental feature
+            FeatureFlag.ARCHITECTURAL_SECURITY.value: False,  # New experimental feature
+            FeatureFlag.THREAT_MODELING.value: False,  # New experimental feature
+            FeatureFlag.COMPLIANCE_FRAMEWORKS.value: False,  # New experimental feature
+            FeatureFlag.OPERATIONAL_SECURITY.value: False,  # New experimental feature
+            FeatureFlag.PERFORMANCE_SECURITY_TRADEOFFS.value: False,  # New experimental feature
         }
 
         # Load from environment variables
