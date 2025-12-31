@@ -81,3 +81,56 @@ logs/
 
 # CI/CD
 .github/workflows/*.log
+
+# Scan results and outputs
+scan_results*/
+scan_output/
+outputs*/
+tmp_scan_output/
+batch_scan_results/
+reports/
+*.json
+validation_results.json
+phase_5_validation_report.json
+readiness_assessment*.json
+deployment*.json
+performance_results.json
+ci_data_report*.json
+
+# Test data and repositories
+test_data/
+test_repositories/
+test_repo/
+test_scan_output/
+flask_test*/
+requests_test/
+analysis/
+experiments/
+final_test/
+enhanced_scanner/
+monitoring/
+deployment/
+helm/
+k8s/
+tools/
+config/
+
+# SME reviews (generated)
+sme_reviews/reports/
+
+# Temporary and backup files
+*.bak
+test_security.py.bak
+.tmp
+temp/
+tmp/
+
+# Large files
+*.json
+bandit-results.json
+forensic_report.md
+post-deployment-validation-report.md
+production-go-live-announcement.md
+production-monitoring-report-24h.md
+project-final-closure.md
+verdict_report.md
