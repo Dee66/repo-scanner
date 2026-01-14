@@ -5,6 +5,8 @@ import signal
 import time
 import threading
 import logging
+import inspect
+from functools import wraps
 from contextlib import contextmanager
 from typing import Optional, Callable, Any
 import psutil
@@ -120,46 +122,80 @@ def timeout_context(seconds: int, operation_name: str = "operation"):
 def with_timeout(timeout_seconds: int, operation_name: str = "operation"):
     """Decorator to add timeout to functions."""
     def decorator(func):
+        if inspect.iscoroutinefunction(func):
+            @wraps(func)
+            async def async_wrapper(*args, **kwargs):
+                with timeout_context(timeout_seconds, operation_name):
+                    return await func(*args, **kwargs)
+
+            return async_wrapper
+
+        @wraps(func)
         def wrapper(*args, **kwargs):
             with timeout_context(timeout_seconds, operation_name):
                 return func(*args, **kwargs)
+
         return wrapper
     return decorator
 
 def with_resource_limits(operation_name: str = "operation"):
     """Decorator to enforce resource limits during execution with graceful degradation."""
     def decorator(func):
-        def wrapper(*args, **kwargs):
-            # Set process limits
-            set_process_limits()
+        if inspect.iscoroutinefunction(func):
+            @wraps(func)
+            async def async_wrapper(*args, **kwargs):
+                set_process_limits()
+                resource_manager = get_resource_manager()
+                start_global_resource_monitoring()
 
-            # Start resource monitoring
+                try:
+                    result = await func(*args, **kwargs)
+                    final_usage = resource_manager.get_resource_usage()
+                    logger.info(
+                        f"{operation_name} completed - "
+                        f"Peak memory: {final_usage['memory_mb']:.1f}MB, "
+                        f"Peak CPU: {final_usage['cpu_percent']:.1f}%, "
+                        f"Final degradation level: {final_usage['degradation_level']}"
+                    )
+
+                    if final_usage["memory_limit_exceeded"] or final_usage["cpu_limit_exceeded"]:
+                        logger.warning(
+                            f"{operation_name} exceeded resource limits but completed via graceful degradation - "
+                            f"Memory: {final_usage['memory_limit_percent']:.1f}%, "
+                            f"CPU: {final_usage['cpu_limit_percent']:.1f}%"
+                        )
+
+                    return result
+                finally:
+                    stop_global_resource_monitoring()
+
+            return async_wrapper
+
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            set_process_limits()
             resource_manager = get_resource_manager()
             start_global_resource_monitoring()
 
             try:
-                # Execute the function
                 result = func(*args, **kwargs)
-
-                # Check final resource usage
                 final_usage = resource_manager.get_resource_usage()
+                logger.info(
+                    f"{operation_name} completed - "
+                    f"Peak memory: {final_usage['memory_mb']:.1f}MB, "
+                    f"Peak CPU: {final_usage['cpu_percent']:.1f}%, "
+                    f"Final degradation level: {final_usage['degradation_level']}"
+                )
 
-                # Log completion with resource stats
-                logger.info(f"{operation_name} completed - "
-                          f"Peak memory: {final_usage['memory_mb']:.1f}MB, "
-                          f"Peak CPU: {final_usage['cpu_percent']:.1f}%, "
-                          f"Final degradation level: {final_usage['degradation_level']}")
-
-                # If limits were exceeded, log warning but don't fail (graceful degradation)
                 if final_usage["memory_limit_exceeded"] or final_usage["cpu_limit_exceeded"]:
-                    logger.warning(f"{operation_name} exceeded resource limits but completed via graceful degradation - "
-                                 f"Memory: {final_usage['memory_limit_percent']:.1f}%, "
-                                 f"CPU: {final_usage['cpu_limit_percent']:.1f}%")
+                    logger.warning(
+                        f"{operation_name} exceeded resource limits but completed via graceful degradation - "
+                        f"Memory: {final_usage['memory_limit_percent']:.1f}%, "
+                        f"CPU: {final_usage['cpu_limit_percent']:.1f}%"
+                    )
 
                 return result
-
             finally:
-                # Stop resource monitoring
                 stop_global_resource_monitoring()
 
         return wrapper

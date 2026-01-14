@@ -26,23 +26,22 @@ services:
     tmpfs:
       - /tmp
 
-  # Optional: API server for web interface
-  api-server:
-    image: repo-scanner-api:latest
+  # Blue environment (primary)
+  blue-api:
+    image: ${IMAGE_TAG_BLUE:-repo-scanner:latest}
     build:
       context: .
       target: production
-    container_name: repo-scanner-api
+    container_name: repo-scanner-blue
     ports:
-      - "${API_PORT:-8080}:8080"
+      - "8080:8080"  # Active port
     environment:
       - PYTHONPATH=/app
       - REPO_SCANNER_API_HOST=0.0.0.0
       - REPO_SCANNER_API_PORT=8080
+      - DEPLOYMENT_ENV=blue
     command: ["python", "-m", "src.api_server"]
     restart: unless-stopped
-    depends_on:
-      - repo-scanner
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s
@@ -50,7 +49,32 @@ services:
       retries: 3
       start_period: 40s
     profiles:
-      - api
+      - blue
+
+  # Green environment (standby)
+  green-api:
+    image: ${IMAGE_TAG_GREEN:-repo-scanner:latest}
+    build:
+      context: .
+      target: production
+    container_name: repo-scanner-green
+    ports:
+      - "8081:8080"  # Standby port
+    environment:
+      - PYTHONPATH=/app
+      - REPO_SCANNER_API_HOST=0.0.0.0
+      - REPO_SCANNER_API_PORT=8080
+      - DEPLOYMENT_ENV=green
+    command: ["python", "-m", "src.api_server"]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    profiles:
+      - green
 
   # Optional: Background worker for batch processing
   worker:

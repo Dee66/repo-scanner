@@ -180,8 +180,11 @@ jobs:
           if (( $(echo "$AVG_TIME > $PERF_TARGET" | bc -l) )); then
             echo "⚠️  PERFORMANCE WARNING: Average analysis time ${AVG_TIME}s exceeds target ${PERF_TARGET}s"
             echo "   This may indicate performance regression"
-            # Don't fail CI for performance warnings in continuous validation
-            # Only fail for critical effectiveness issues
+            # For main branch and PRs, fail on significant performance regression
+            if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]] || [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
+              echo "❌ Failing CI due to performance regression on protected branch/PR"
+              exit 1
+            fi
           else
             echo "✅ Performance requirements met (${AVG_TIME}s average)"
           fi

@@ -44,6 +44,10 @@ def analyze_safe_change_surface(file_list: List[str], structure: Dict, semantic:
         safe_changes, unsafe_changes, overall_safety
     )
 
+    # Generate explicit safe and no-touch zones
+    explicit_safe_zones = _generate_explicit_safe_zones(file_list, structure, overall_safety)
+    explicit_no_touch_zones = _generate_explicit_no_touch_zones(file_list, structure, overall_safety, misleading_signals)
+
     return {
         "overall_change_safety": overall_safety,
         "safety_factors": {
@@ -55,6 +59,11 @@ def analyze_safe_change_surface(file_list: List[str], structure: Dict, semantic:
         },
         "safe_changes": safe_changes,
         "unsafe_changes": unsafe_changes,
+        "explicit_safe_zones": explicit_safe_zones,
+        "explicit_no_touch_zones": explicit_no_touch_zones,
+        "blast_radius_characterization": _calculate_blast_radius(overall_safety, structure),
+        "evidence_references": _generate_evidence_references(overall_safety),
+        "expiry_conditions": _generate_expiry_conditions(),
         "change_confidence": _calculate_change_confidence(overall_safety),
         "rules_applied": {
             "absence_is_valid_outcome": True,  # Absence of safe changes is valid
@@ -377,3 +386,82 @@ def _calculate_change_confidence(overall_safety: Dict) -> float:
     # Base confidence on the consistency of safety factors
     # Higher confidence when factors are consistent
     return 0.8  # Placeholder - could be more sophisticated
+
+
+def _generate_explicit_safe_zones(file_list: List[str], structure: Dict, overall_safety: Dict) -> List[str]:
+    """Generate explicit safe zones based on analysis."""
+    safe_zones = []
+    safety_level = overall_safety.get("overall_safety_level", "low")
+    
+    if safety_level in ["high", "medium"]:
+        # Safe zones based on file types and structure
+        if any(f.endswith(('.md', '.rst', '.txt', '.yml', '.yaml')) for f in file_list):
+            safe_zones.append("documentation/")
+        
+        if any("test" in f.lower() or f.endswith("_test.py") for f in file_list):
+            safe_zones.append("tests/")
+            
+        config_files = structure.get("configuration", [])
+        if config_files and safety_level == "high":
+            safe_zones.append("config/")
+            
+    return sorted(safe_zones)
+
+
+def _generate_explicit_no_touch_zones(file_list: List[str], structure: Dict, overall_safety: Dict, misleading_signals: Dict) -> List[str]:
+    """Generate explicit no-touch zones based on analysis."""
+    no_touch_zones = []
+    safety_level = overall_safety.get("overall_safety_level", "low")
+    total_misleading = misleading_signals.get("total_misleading_signals", 0)
+    
+    if safety_level in ["very_low", "low"] or total_misleading > 0:
+        # No-touch zones for high-risk areas
+        if any("core" in f.lower() or "main" in f.lower() for f in file_list):
+            no_touch_zones.append("core/")
+            
+        if any(f.endswith(('.sql', '.db')) for f in file_list):
+            no_touch_zones.append("database/")
+            
+        if total_misleading > 5:
+            no_touch_zones.append("production/")
+            
+    return sorted(no_touch_zones)
+
+
+def _calculate_blast_radius(overall_safety: Dict, structure: Dict) -> str:
+    """Calculate the blast radius characterization."""
+    safety_level = overall_safety.get("overall_safety_level", "low")
+    
+    if safety_level == "high":
+        return "contained"
+    elif safety_level == "medium":
+        return "limited"
+    elif safety_level == "low":
+        return "moderate"
+    else:  # very_low
+        return "widespread"
+
+
+def _generate_evidence_references(overall_safety: Dict) -> List[str]:
+    """Generate evidence references for the safe change surface assessment."""
+    evidence = []
+    safety_factors = overall_safety.get("safety_factors", {})
+    
+    for factor_name, factor_data in safety_factors.items():
+        if isinstance(factor_data, dict):
+            safety_level = factor_data.get("safety_level", "unknown")
+            evidence.append(f"{factor_name}: {safety_level}")
+    
+    return evidence
+
+
+def _generate_expiry_conditions() -> Dict:
+    """Generate expiry conditions for the safe change surface."""
+    return {
+        "expires_after": "24_hours",
+        "conditions": [
+            "significant_code_changes",
+            "new_security_findings",
+            "test_coverage_changes"
+        ]
+    }

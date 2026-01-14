@@ -5,17 +5,17 @@ JSON outputs and how schema versions are managed.
 
 Policy summary:
 
-- The authoritative schema files live under `docs/schemas/` and the active
+- The authoritative schema files live under `schemas/output/` and the active
   schema version is recorded in `docs/schemas/VERSION`.
 - Generated outputs MUST include `governance.schema_version` set to the value
   in `docs/schemas/VERSION` when the schema declares that property.
-- CI and local tests will validate outputs against `docs/schemas/scan_report.schema.json`.
+- CI and local tests will validate outputs against `schemas/output/scan_report.json`.
 - When changing a schema in a non-backwards-compatible way, update `docs/schemas/VERSION`
   and follow the release checklist in `RELEASE.md`.
 
 Developer checklist:
 
-1. Update `docs/schemas/scan_report.schema.json` (or other schema files).
+1. Update `schemas/output/scan_report.json` (or other schema files).
 2. Bump `docs/schemas/VERSION` (semantic versioning recommended).
 3. Run `pytest tests/test_schema_version_compatibility.py` to ensure generated
    outputs include the new `governance.schema_version` and validate against the schema.

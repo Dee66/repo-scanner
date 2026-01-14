@@ -146,7 +146,7 @@ class IncrementalAnalyzer:
     """Performs incremental analysis to avoid re-processing unchanged files."""
 
     def __init__(self, cache_dir: Path = None):
-        self.cache_dir = cache_dir or Path("./.scanner_cache")
+        self.cache_dir = cache_dir or Path(os.environ.get("SCANNER_CACHE_DIR", "./.scanner_cache"))
         self.analysis_cache = AnalysisCache(self.cache_dir / "analysis")
         self.file_hashes = self._load_file_hashes()
 
@@ -232,7 +232,7 @@ class OptimizedAnalysisPipeline:
 
     def __init__(self, max_workers: int = 8, cache_dir: Path = None, enable_incremental: bool = True):
         self.max_workers = max_workers
-        self.cache_dir = cache_dir or Path("./.scanner_cache")
+        self.cache_dir = cache_dir or Path(os.environ.get("SCANNER_CACHE_DIR", "./.scanner_cache"))
         self.enable_incremental = enable_incremental
         self.repo_root = None  # Will be set during execution
 
@@ -374,13 +374,13 @@ class OptimizedAnalysisPipeline:
 
     def _get_file_list(self, repo_root: str) -> List[str]:
         """Get canonical file list with caching."""
-        print(f"DEBUG: _get_file_list called with repo_root: {repo_root} (type: {type(repo_root)})")
+            # DEBUG_DISABLED: print(f"DEBUG: _get_file_list called with repo_root: {repo_root} (type: {type(repo_root)})")
         from src.core.pipeline.repository_discovery import get_canonical_file_list
         file_list = get_canonical_file_list(repo_root)
-        print(f"DEBUG: file_list length: {len(file_list) if isinstance(file_list, list) else 'not list'}")
+            # DEBUG_DISABLED: print(f"DEBUG: file_list length: {len(file_list) if isinstance(file_list, list) else 'not list'}")
         if file_list and not all(isinstance(f, str) for f in file_list):
             non_strings = [f for f in file_list if not isinstance(f, str)]
-            print(f"DEBUG: Non-string items in file_list: {non_strings[:5]} (types: {[type(f) for f in non_strings[:5]]})")
+            # DEBUG_DISABLED: print(f"DEBUG: Non-string items in file_list: {non_strings[:5]} (types: {[type(f) for f in non_strings[:5]]})")
         return file_list if isinstance(file_list, list) else []
 
     def _analyze_structure_optimized(self, file_list: List[str]) -> Dict[str, Any]:
@@ -393,9 +393,9 @@ class OptimizedAnalysisPipeline:
         try:
             structure = analyze_repository_structure(file_list)
         except Exception as e:
-            print(f"DEBUG: Error in analyze_repository_structure: {e}")
-            print(f"DEBUG: file_list sample: {file_list[:5]}")
-            print(f"DEBUG: file_list types: {[type(f) for f in file_list[:5]]}")
+            # DEBUG_DISABLED: print(f"DEBUG: Error in analyze_repository_structure: {e}")
+            # DEBUG_DISABLED: print(f"DEBUG: file_list sample: {file_list[:5]}")
+            # DEBUG_DISABLED: print(f"DEBUG: file_list types: {[type(f) for f in file_list[:5]]}")
             raise
 
         logger.info(f"Structure analysis completed in {time.time() - start_time:.2f}s")

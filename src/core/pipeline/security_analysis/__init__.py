@@ -11,6 +11,22 @@ from .compliance_frameworks import ComplianceAnalyzer
 from .architectural_security import AdvancedArchitecturalAnalyzer
 from .confidence_scorer import ConfidenceScorer
 
+# Import zero false positive validators
+try:
+    from core.security.secret_validator import SecretValidator
+    from core.security.sql_injection_validator import SQLInjectionValidator
+    from core.security.command_injection_validator import CommandInjectionValidator
+    from core.security.path_traversal_validator import PathTraversalValidator
+    from core.security.xss_validator import XSSValidator
+    from core.security.ssrf_validator import SSRFValidator
+except ImportError:
+    SecretValidator = None
+    SQLInjectionValidator = None
+    CommandInjectionValidator = None
+    PathTraversalValidator = None
+    XSSValidator = None
+    SSRFValidator = None
+
 # Import adapter manager for AST-based analysis
 try:
     from adapters.language_adapter_manager import LanguageAdapterManager
@@ -33,6 +49,14 @@ class SecurityAnalyzer:
     """Analyzes code for security vulnerabilities using context-aware static analysis."""
 
     def __init__(self):
+        # Initialize zero false positive validators
+        self.secret_validator = SecretValidator() if SecretValidator else None
+        self.sql_injection_validator = SQLInjectionValidator() if SQLInjectionValidator else None
+        self.command_injection_validator = CommandInjectionValidator() if CommandInjectionValidator else None
+        self.path_traversal_validator = PathTraversalValidator() if PathTraversalValidator else None
+        self.xss_validator = XSSValidator() if XSSValidator else None
+        self.ssrf_validator = SSRFValidator() if SSRFValidator else None
+        
         # Common vulnerability patterns with improved context awareness
         self.vulnerability_patterns = {
             'sql_injection': {
@@ -43,6 +67,10 @@ class SecurityAnalyzer:
                     r'\.execute\s*\(\s*["\']?\s*DELETE.*%s.*["\']?\s*\)',
                     r'cursor\.execute\s*\(\s*.*\+.*\)',
                     r'query\s*=.*%.*\s*db\.execute',
+                    r'f["\'].*SELECT.*\{.*\}.*["\']',  # f-string SQL injection
+                    r'f["\'].*INSERT.*\{.*\}.*["\']',  # f-string SQL injection
+                    r'f["\'].*UPDATE.*\{.*\}.*["\']',  # f-string SQL injection
+                    r'f["\'].*DELETE.*\{.*\}.*["\']',  # f-string SQL injection
                 ],
                 'severity': 'high',
                 'description': 'Potential SQL injection vulnerability',
@@ -50,19 +78,24 @@ class SecurityAnalyzer:
                 'owasp_category': 'A03:2021-Injection',
                 'skip_test_files': True
             },
-            'xss_vulnerability': {
+            'xss': {
                 'patterns': [
                     r'innerHTML\s*=.*\+',
                     r'document\.write\s*\(.*\+.*\)',
                     r'eval\s*\(.*\+.*\)',
                     r'setTimeout\s*\(.*\+.*\)',
                     r'setInterval\s*\(.*\+.*\)',
+                    r'\{\{.*\|safe\}\}',  # Template unsafe filter
+                    r'mark_safe\s*\(',  # Django mark_safe
+                    r'dangerouslySetInnerHTML',  # React XSS
+                    r'v-html\s*=',  # Vue v-html
                 ],
                 'severity': 'high',
                 'description': 'Potential Cross-Site Scripting (XSS) vulnerability',
                 'cwe_id': 'CWE-79',
                 'owasp_category': 'A03:2021-Injection',
-                'skip_test_files': True
+                'skip_test_files': True,
+                'context_check': True  # Requires additional validation
             },
             'weak_crypto': {
                 'patterns': [
@@ -126,12 +159,31 @@ class SecurityAnalyzer:
                     r'subprocess\.call\s*\(.*\+.*\)',
                     r'os\.popen\s*\(.*\+.*\)',
                     r'subprocess\.Popen\s*\(.*\+.*\)',
+                    r'subprocess\.run\s*\([^,]+,\s*shell\s*=\s*True',  # subprocess.run with shell=True
+                    r'os\.system\s*\([^)]+\)',  # Any os.system call
+                    r'subprocess\.call\s*\([^)]+\)',  # Any subprocess.call
                 ],
                 'severity': 'critical',
                 'description': 'Potential command injection vulnerability',
                 'cwe_id': 'CWE-78',
                 'owasp_category': 'A03:2021-Injection',
                 'skip_test_files': True
+            },
+            'ssrf': {
+                'patterns': [
+                    r'requests\.get\s*\(.*\+.*\)',
+                    r'requests\.post\s*\(.*\+.*\)',
+                    r'urllib\.request\.urlopen\s*\(.*\+.*\)',
+                    r'httpx\.(get|post)\s*\(.*\+.*\)',
+                    r'fetch\s*\(.*\+.*\)',
+                    r'axios\.(get|post)\s*\(.*\+.*\)',
+                ],
+                'severity': 'high',
+                'description': 'Potential Server-Side Request Forgery (SSRF) vulnerability',
+                'cwe_id': 'CWE-918',
+                'owasp_category': 'A10:2021-Server-Side Request Forgery',
+                'skip_test_files': True,
+                'context_check': True  # Requires additional validation
             },
             'insecure_deserialization': {
                 'patterns': [
@@ -374,6 +426,96 @@ class SecurityAnalyzer:
         # Initialize adapter manager for AST-based analysis
         self.adapter_manager = LanguageAdapterManager() if LanguageAdapterManager else None
 
+    @staticmethod
+    def _normalize_severity(severity: str) -> str:
+        """Normalize severities to schema-allowed values (high|medium|low)."""
+        normalized = (severity or "").strip().lower()
+        if normalized == "critical":
+            return "high"
+        if normalized == "info":
+            return "low"
+        if normalized in {"high", "medium", "low"}:
+            return normalized
+        return "low"
+
+    def _build_unsafe_patterns(self, findings: List[SecurityFinding], analyzed_languages: Set[str]) -> Dict[str, Any]:
+        """Construct schema-aligned unsafe_patterns payload with validation-ready fields."""
+        summary = {
+            "total_patterns": len(findings),
+            "high_severity": len([f for f in findings if f.severity == "high"]),
+            "medium_severity": len([f for f in findings if f.severity == "medium"]),
+            "low_severity": len([f for f in findings if f.severity == "low"]),
+            "languages_covered": len(analyzed_languages)
+        }
+
+        unsafe_patterns: Dict[str, Any] = {
+            "summary": summary,
+            "patterns_by_language": {},
+            "critical_findings": []
+        }
+
+        from collections import defaultdict
+        patterns_by_lang: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
+        for finding in findings:
+            lang = finding.file_path.split('.')[-1] if '.' in finding.file_path else 'unknown'
+            file_entry = {
+                "file_path": finding.file_path,
+                "language": lang,
+                "patterns": [
+                    {
+                        "pattern": finding.vulnerability_type,
+                        "type": finding.vulnerability_type,  # backward compatibility
+                        "severity": finding.severity,
+                        "description": finding.description,
+                        "line": finding.line_number,
+                        "code_snippet": finding.code_snippet
+                    }
+                ]
+            }
+            patterns_by_lang[lang].append(file_entry)
+
+            if finding.severity == 'high':
+                unsafe_patterns["critical_findings"].append({
+                    "file_path": finding.file_path,
+                    "pattern_type": finding.vulnerability_type,
+                    "severity": finding.severity,
+                    "description": finding.description,
+                    "line": finding.line_number
+                })
+
+        unsafe_patterns["critical_findings"].sort(key=lambda x: x["file_path"])
+        unsafe_patterns["patterns_by_language"] = dict(patterns_by_lang)
+
+        return unsafe_patterns
+
+    @staticmethod
+    def _validate_unsafe_patterns(unsafe_patterns: Dict[str, Any]) -> None:
+        """Validate unsafe_patterns structure and surface concise errors."""
+        allowed_severities = {"high", "medium", "low"}
+        errors: List[str] = []
+
+        patterns_by_lang = unsafe_patterns.get("patterns_by_language", {})
+        for lang, files in patterns_by_lang.items():
+            if not isinstance(files, list):
+                errors.append(f"language {lang}: files not list")
+                continue
+            for file_entry in files:
+                for pattern in file_entry.get("patterns", []):
+                    if "pattern" not in pattern:
+                        errors.append(f"{lang} {file_entry.get('file_path','unknown')}: missing pattern")
+                    sev = pattern.get("severity")
+                    if sev not in allowed_severities:
+                        errors.append(f"{lang} {file_entry.get('file_path','unknown')}: invalid severity {sev}")
+                    if len(errors) >= 20:
+                        break
+                if len(errors) >= 20:
+                    break
+            if len(errors) >= 20:
+                break
+
+        if errors:
+            raise ValueError(f"unsafe_patterns validation failed: {errors[:5]} (total {len(errors)})")
+
     def analyze_security_vulnerabilities(self, file_list: List[str], semantic: Dict[str, Any]) -> Dict[str, Any]:
         """
         Analyze files for security vulnerabilities.
@@ -446,50 +588,8 @@ class SecurityAnalyzer:
         for finding in findings:
             lang = finding.file_path.split('.')[-1] if '.' in finding.file_path else 'unknown'
             analyzed_languages.add(lang)
-        
-        unsafe_patterns = {
-            "summary": {
-                "total_patterns": len(findings),
-                "high_severity": len([f for f in findings if f.severity == 'high']),
-                "medium_severity": len([f for f in findings if f.severity == 'medium']),
-                "low_severity": len([f for f in findings if f.severity == 'low']),
-                "languages_covered": len(analyzed_languages)
-            },
-            "patterns_by_language": {},
-            "critical_findings": []
-        }
-
-        # Group findings by language
-        from collections import defaultdict
-        patterns_by_lang = defaultdict(list)
-        for finding in findings:
-            lang = finding.file_path.split('.')[-1] if '.' in finding.file_path else 'unknown'
-            if lang not in unsafe_patterns["patterns_by_language"]:
-                unsafe_patterns["patterns_by_language"][lang] = []
-            unsafe_patterns["patterns_by_language"][lang].append({
-                "file_path": finding.file_path,
-                "language": lang,
-                "patterns": [{
-                    "type": finding.vulnerability_type,
-                    "severity": finding.severity,
-                    "description": finding.description,
-                    "line": finding.line_number,
-                    "code_snippet": finding.code_snippet
-                }]
-            })
-
-            # Add high severity findings to critical findings
-            if finding.severity == 'high':
-                unsafe_patterns["critical_findings"].append({
-                    "file_path": finding.file_path,
-                    "pattern_type": finding.vulnerability_type,
-                    "severity": finding.severity,
-                    "description": finding.description,
-                    "line": finding.line_number
-                })
-
-        # Sort critical findings
-        unsafe_patterns["critical_findings"].sort(key=lambda x: x["file_path"])
+        unsafe_patterns = self._build_unsafe_patterns(findings, analyzed_languages)
+        self._validate_unsafe_patterns(unsafe_patterns)
 
         # Add advanced architectural analysis
         arch_analyzer = AdvancedArchitecturalAnalyzer()
@@ -559,7 +659,8 @@ class SecurityAnalyzer:
 
                     # Check if line matches any pattern
                     for pattern in vuln_config['patterns']:
-                        if re.search(pattern, line, re.IGNORECASE):
+                        match = re.search(pattern, line, re.IGNORECASE)
+                        if match:
                             # Additional context checking for certain patterns
                             if vuln_config.get('context_check', False):
                                 if not self._validate_context(line, vuln_type, content, line_num):
@@ -571,9 +672,104 @@ class SecurityAnalyzer:
                             if is_safe:
                                 continue
 
+                            # Special handling for hardcoded_secrets with zero false positive validation
+                            if vuln_type == 'hardcoded_secrets' and self.secret_validator:
+                                # Extract the potential secret from the match
+                                secret = self._extract_secret_from_line(line, pattern)
+                                if secret:
+                                    is_valid, reason, confidence = self.secret_validator.validate_secret(
+                                        secret=secret,
+                                        file_path=file_path,
+                                        line_num=line_num,
+                                        file_content=content
+                                    )
+                                    
+                                    # Skip if validation rejects it (false positive)
+                                    # Threshold: 0.85 ensures only high-confidence secrets are reported
+                                    if not is_valid or confidence < 0.85:
+                                        # False positive rejected by validator
+                                        continue
+                            
+                            # Special handling for SQL injection with deep validation
+                            if vuln_type == 'sql_injection' and self.sql_injection_validator:
+                                context_lines = self._get_context_lines(content, line_num, context_size=5)
+                                is_vuln, reason, confidence = self.sql_injection_validator.validate_sql_operation(
+                                    code_line=line,
+                                    file_path=file_path,
+                                    line_num=line_num,
+                                    file_content=content,
+                                    context_lines=context_lines
+                                )
+                                
+                                # Skip if validation determines it's not vulnerable (e.g., parameterized query)
+                                if not is_vuln or confidence < 0.7:
+                                    # Not vulnerable or low confidence - skip
+                                    continue
+                            
+                            # Special handling for command injection with deep validation
+                            if vuln_type == 'command_injection' and self.command_injection_validator:
+                                context_lines = self._get_context_lines(content, line_num, context_size=5)
+                                is_vuln, reason, confidence = self.command_injection_validator.validate_command_execution(
+                                    code_line=line,
+                                    file_path=file_path,
+                                    line_num=line_num,
+                                    file_content=content,
+                                    context_lines=context_lines
+                                )
+                                
+                                # Skip if validation determines it's not vulnerable (e.g., list form, no shell)
+                                if not is_vuln or confidence < 0.7:
+                                    # Not vulnerable or low confidence - skip
+                                    continue
+                            
+                            # Special handling for path traversal with deep validation
+                            if vuln_type == 'path_traversal' and self.path_traversal_validator:
+                                context_lines = self._get_context_lines(content, line_num, context_size=5)
+                                is_vuln, reason, confidence = self.path_traversal_validator.validate_path_operation(
+                                    code_line=line,
+                                    file_path=file_path,
+                                    line_num=line_num,
+                                    file_content=content,
+                                    context_lines=context_lines
+                                )
+                                
+                                # Skip if validation determines it's not vulnerable (e.g., safe path operations)
+                                if not is_vuln or confidence < 0.7:
+                                    continue
+                            
+                            # Special handling for XSS with deep validation
+                            if vuln_type == 'xss' and self.xss_validator:
+                                context_lines = self._get_context_lines(content, line_num, context_size=5)
+                                is_vuln, reason, confidence = self.xss_validator.validate_output_rendering(
+                                    code_line=line,
+                                    file_path=file_path,
+                                    line_num=line_num,
+                                    file_content=content,
+                                    context_lines=context_lines
+                                )
+                                
+                                # Skip if validation determines it's not vulnerable (e.g., escaped output)
+                                if not is_vuln or confidence < 0.7:
+                                    continue
+                            
+                            # Special handling for SSRF with deep validation
+                            if vuln_type == 'ssrf' and self.ssrf_validator:
+                                context_lines = self._get_context_lines(content, line_num, context_size=5)
+                                is_vuln, reason, confidence = self.ssrf_validator.validate_http_request(
+                                    code_line=line,
+                                    file_path=file_path,
+                                    line_num=line_num,
+                                    file_content=content,
+                                    context_lines=context_lines
+                                )
+                                
+                                # Skip if validation determines it's not vulnerable (e.g., static URL, allowlist)
+                                if not is_vuln or confidence < 0.7:
+                                    continue
+
                             finding = SecurityFinding(
                                 vulnerability_type=vuln_type,
-                                severity=vuln_config['severity'],
+                                severity=self._normalize_severity(vuln_config['severity']),
                                 file_path=file_path,
                                 line_number=line_num,
                                 description=vuln_config['description'],
@@ -589,17 +785,16 @@ class SecurityAnalyzer:
                 try:
                     adapter = self.adapter_manager.get_adapter_for_file(file_path)
                     if adapter:
-                        print(f"DEBUG: Using adapter {adapter.__class__.__name__} for {file_path}")
+                        # DEBUG_DISABLED: print(f"DEBUG: Using adapter {adapter.__class__.__name__} for {file_path}")
                         ast_result = adapter.extract_ast(file_path)
                         unsafe_patterns = ast_result.get("unsafe_patterns", [])
-                        print(f"DEBUG: ast_result keys: {list(ast_result.keys())}")
-                        print(f"DEBUG: Found {len(unsafe_patterns)} unsafe patterns in {file_path}")
+                        # DEBUG_DISABLED: print(f"DEBUG: ast_result keys: {list(ast_result.keys())}")
+                        # DEBUG_DISABLED: print(f"DEBUG: Found {len(unsafe_patterns)} unsafe patterns in {file_path}")
                         for pattern in unsafe_patterns:
-                            print(f"DEBUG: Pattern: {pattern}")
-                            severity_map = {"high": "high", "medium": "medium", "low": "low"}
+                            # DEBUG_DISABLED: print(f"DEBUG: Pattern: {pattern}")
                             finding = SecurityFinding(
                                 vulnerability_type=pattern.get("type", "unknown"),
-                                severity=severity_map.get(pattern.get("severity", "low"), "low"),
+                                severity=self._normalize_severity(pattern.get("severity", "low")),
                                 file_path=file_path,
                                 line_number=pattern.get("line", 0),
                                 description=pattern.get("description", "Unsafe pattern detected"),
@@ -609,7 +804,8 @@ class SecurityAnalyzer:
                             )
                             findings.append(finding)
                     else:
-                        print(f"DEBUG: No adapter found for {file_path}")
+                        # DEBUG_DISABLED: print(f"DEBUG: No adapter found for {file_path}")
+                        pass
                 except Exception as e:
                     # Log error but continue
                     print(f"Error in AST analysis for {file_path}: {e}")
@@ -688,6 +884,14 @@ class SecurityAnalyzer:
             return any(indicator in context_text for indicator in dangerous_indicators)
 
         return True
+
+    def _extract_secret_from_line(self, line: str, pattern: str) -> str:
+        """Extract the actual secret value from a line of code."""
+        # Try to extract string value after = sign
+        match = re.search(r'["\']([^"\']+)["\']', line)
+        if match:
+            return match.group(1)
+        return ""
 
     def _get_context_lines(self, content: str, line_num: int, context_size: int = 3) -> List[str]:
         """Get lines around a specific line number for context."""

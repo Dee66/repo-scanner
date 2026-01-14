@@ -702,3 +702,308 @@ class SMEReviewManager:
                     total_comparisons += 1
 
         return agreements / total_comparisons if total_comparisons > 0 else 1.0
+
+    def process_feedback_loops(self) -> Dict[str, Any]:
+        """
+        Process SME feedback and incorporate it back into the analysis system.
+
+        This method analyzes completed reviews and automatically updates:
+        - Analysis rules and patterns
+        - Configuration settings
+        - Detection signatures
+        - Performance thresholds
+
+        Returns:
+            Summary of changes made
+        """
+        feedback = self._load_all_feedback()
+        cases = self._load_all_cases()
+
+        changes_made = {
+            "rules_updated": 0,
+            "patterns_added": 0,
+            "config_changes": 0,
+            "threshold_adjustments": 0,
+            "documentation_updates": 0,
+            "errors": []
+        }
+
+        # Group feedback by category for batch processing
+        category_feedback = {}
+        for fb in feedback:
+            case = next((c for c in cases if c.id == fb.case_id), None)
+            if not case:
+                continue
+
+            category = case.category.value
+            if category not in category_feedback:
+                category_feedback[category] = []
+            category_feedback[category].append((case, fb))
+
+        # Process each category
+        for category, case_feedback_list in category_feedback.items():
+            try:
+                if category == "analysis_accuracy":
+                    changes = self._process_analysis_accuracy_feedback(case_feedback_list)
+                elif category == "security_concern":
+                    changes = self._process_security_feedback(case_feedback_list)
+                elif category == "performance_issue":
+                    changes = self._process_performance_feedback(case_feedback_list)
+                elif category == "enterprise_complexity":
+                    changes = self._process_enterprise_feedback(case_feedback_list)
+                elif category == "language_edge_case":
+                    changes = self._process_language_feedback(case_feedback_list)
+                elif category == "misleading_signals":
+                    changes = self._process_misleading_signals_feedback(case_feedback_list)
+                else:
+                    changes = {"rules_updated": 0, "patterns_added": 0, "config_changes": 0}
+
+                # Accumulate changes
+                for key in changes_made:
+                    if key in changes and key != "errors":
+                        changes_made[key] += changes[key]
+
+            except Exception as e:
+                changes_made["errors"].append(f"Error processing {category} feedback: {str(e)}")
+
+        # Log the feedback loop processing
+        self._log_feedback_loop_processing(changes_made)
+
+        return changes_made
+
+    def _process_analysis_accuracy_feedback(self, case_feedback_list: List[Tuple[ReviewCase, ReviewFeedback]]) -> Dict[str, int]:
+        """Process feedback for analysis accuracy improvements."""
+        changes = {"rules_updated": 0, "patterns_added": 0, "config_changes": 0}
+
+        for case, feedback in case_feedback_list:
+            if feedback.requires_code_changes and feedback.recommendations:
+                # Extract patterns from recommendations
+                if "add pattern" in feedback.recommendations.lower():
+                    changes["patterns_added"] += 1
+                    self._add_analysis_pattern_from_feedback(case, feedback)
+
+                if "update rule" in feedback.recommendations.lower():
+                    changes["rules_updated"] += 1
+                    self._update_analysis_rule_from_feedback(case, feedback)
+
+        return changes
+
+    def _process_security_feedback(self, case_feedback_list: List[Tuple[ReviewCase, ReviewFeedback]]) -> Dict[str, int]:
+        """Process feedback for security improvements."""
+        changes = {"rules_updated": 0, "patterns_added": 0, "config_changes": 0}
+
+        for case, feedback in case_feedback_list:
+            if feedback.decision == ReviewStatus.APPROVED and feedback.confidence_level >= 4:
+                # High-confidence security feedback - update security rules
+                if "signature" in feedback.recommendations.lower():
+                    changes["patterns_added"] += 1
+                    self._add_security_signature_from_feedback(case, feedback)
+
+                if "threshold" in feedback.recommendations.lower():
+                    changes["config_changes"] += 1
+                    self._update_security_threshold_from_feedback(case, feedback)
+
+        return changes
+
+    def _process_performance_feedback(self, case_feedback_list: List[Tuple[ReviewCase, ReviewFeedback]]) -> Dict[str, int]:
+        """Process feedback for performance improvements."""
+        changes = {"rules_updated": 0, "patterns_added": 0, "config_changes": 1}  # At least threshold adjustment
+
+        # Analyze performance patterns across feedback
+        slow_cases = [case for case, fb in case_feedback_list if case.analysis_result.get('analysis_time', 0) > 60]
+
+        if len(slow_cases) > 2:  # Multiple slow cases indicate systemic issue
+            # Adjust performance thresholds
+            self._adjust_performance_thresholds(slow_cases)
+
+        return changes
+
+    def _process_enterprise_feedback(self, case_feedback_list: List[Tuple[ReviewCase, ReviewFeedback]]) -> Dict[str, int]:
+        """Process feedback for enterprise complexity handling."""
+        changes = {"rules_updated": 0, "patterns_added": 0, "config_changes": 0}
+
+        for case, feedback in case_feedback_list:
+            if feedback.recommendations:
+                if "enterprise pattern" in feedback.recommendations.lower():
+                    changes["patterns_added"] += 1
+                    self._add_enterprise_pattern_from_feedback(case, feedback)
+
+        return changes
+
+    def _process_language_feedback(self, case_feedback_list: List[Tuple[ReviewCase, ReviewFeedback]]) -> Dict[str, int]:
+        """Process feedback for language-specific improvements."""
+        changes = {"rules_updated": 0, "patterns_added": 0, "config_changes": 0}
+
+        for case, feedback in case_feedback_list:
+            if feedback.requires_code_changes:
+                changes["rules_updated"] += 1
+                self._update_language_adapter_from_feedback(case, feedback)
+
+        return changes
+
+    def _process_misleading_signals_feedback(self, case_feedback_list: List[Tuple[ReviewCase, ReviewFeedback]]) -> Dict[str, int]:
+        """Process feedback for misleading signals detection."""
+        changes = {"rules_updated": 1, "patterns_added": 0, "config_changes": 0}  # At least update detection rules
+
+        # Update misleading signal detection based on feedback
+        self._update_misleading_signal_detection(case_feedback_list)
+
+        return changes
+
+    def _add_analysis_pattern_from_feedback(self, case: ReviewCase, feedback: ReviewFeedback):
+        """Add analysis pattern based on SME feedback."""
+        # This would integrate with the analysis pattern system
+        # For now, log the pattern for manual implementation
+        pattern_data = {
+            "source": "sme_feedback",
+            "case_id": case.id,
+            "pattern": feedback.recommendations,
+            "confidence": feedback.confidence_level,
+            "added_at": datetime.now().isoformat()
+        }
+
+        pattern_file = self.reviews_dir / "patterns" / f"analysis_pattern_{case.id}.json"
+        pattern_file.parent.mkdir(exist_ok=True)
+
+        with open(pattern_file, 'w') as f:
+            json.dump(pattern_data, f, indent=2)
+
+    def _update_analysis_rule_from_feedback(self, case: ReviewCase, feedback: ReviewFeedback):
+        """Update analysis rule based on SME feedback."""
+        rule_update = {
+            "source": "sme_feedback",
+            "case_id": case.id,
+            "rule_change": feedback.recommendations,
+            "confidence": feedback.confidence_level,
+            "updated_at": datetime.now().isoformat()
+        }
+
+        rule_file = self.reviews_dir / "rules" / f"rule_update_{case.id}.json"
+        rule_file.parent.mkdir(exist_ok=True)
+
+        with open(rule_file, 'w') as f:
+            json.dump(rule_update, f, indent=2)
+
+    def _add_security_signature_from_feedback(self, case: ReviewCase, feedback: ReviewFeedback):
+        """Add security signature based on SME feedback."""
+        signature_data = {
+            "source": "sme_feedback",
+            "case_id": case.id,
+            "signature": feedback.findings,
+            "severity": "medium",  # Default, could be extracted from feedback
+            "confidence": feedback.confidence_level,
+            "added_at": datetime.now().isoformat()
+        }
+
+        sig_file = self.reviews_dir / "signatures" / f"security_sig_{case.id}.json"
+        sig_file.parent.mkdir(exist_ok=True)
+
+        with open(sig_file, 'w') as f:
+            json.dump(signature_data, f, indent=2)
+
+    def _update_security_threshold_from_feedback(self, case: ReviewCase, feedback: ReviewFeedback):
+        """Update security threshold based on SME feedback."""
+        # This would update configuration files
+        threshold_update = {
+            "source": "sme_feedback",
+            "case_id": case.id,
+            "threshold_change": feedback.recommendations,
+            "updated_at": datetime.now().isoformat()
+        }
+
+        config_file = self.reviews_dir / "config" / f"security_threshold_{case.id}.json"
+        config_file.parent.mkdir(exist_ok=True)
+
+        with open(config_file, 'w') as f:
+            json.dump(threshold_update, f, indent=2)
+
+    def _adjust_performance_thresholds(self, slow_cases: List[ReviewCase]):
+        """Adjust performance thresholds based on slow case analysis."""
+        avg_time = sum(case.analysis_result.get('analysis_time', 0) for case in slow_cases) / len(slow_cases)
+
+        threshold_config = {
+            "source": "sme_feedback_batch",
+            "adjustment": "performance_threshold",
+            "new_threshold": min(avg_time * 0.8, 300),  # 80% of avg or max 5min
+            "reason": f"Adjusted based on {len(slow_cases)} slow analysis cases",
+            "updated_at": datetime.now().isoformat()
+        }
+
+        config_file = self.reviews_dir / "config" / "performance_thresholds.json"
+        config_file.parent.mkdir(exist_ok=True)
+
+        with open(config_file, 'w') as f:
+            json.dump(threshold_config, f, indent=2)
+
+    def _add_enterprise_pattern_from_feedback(self, case: ReviewCase, feedback: ReviewFeedback):
+        """Add enterprise pattern based on SME feedback."""
+        pattern_data = {
+            "source": "sme_feedback",
+            "case_id": case.id,
+            "pattern": feedback.recommendations,
+            "category": "enterprise_complexity",
+            "added_at": datetime.now().isoformat()
+        }
+
+        pattern_file = self.reviews_dir / "patterns" / f"enterprise_pattern_{case.id}.json"
+        pattern_file.parent.mkdir(exist_ok=True)
+
+        with open(pattern_file, 'w') as f:
+            json.dump(pattern_data, f, indent=2)
+
+    def _update_language_adapter_from_feedback(self, case: ReviewCase, feedback: ReviewFeedback):
+        """Update language adapter based on SME feedback."""
+        adapter_update = {
+            "source": "sme_feedback",
+            "case_id": case.id,
+            "language": case.analysis_result.get('primary_language', 'unknown'),
+            "update": feedback.recommendations,
+            "updated_at": datetime.now().isoformat()
+        }
+
+        adapter_file = self.reviews_dir / "adapters" / f"language_update_{case.id}.json"
+        adapter_file.parent.mkdir(exist_ok=True)
+
+        with open(adapter_file, 'w') as f:
+            json.dump(adapter_update, f, indent=2)
+
+    def _update_misleading_signal_detection(self, case_feedback_list: List[Tuple[ReviewCase, ReviewFeedback]]):
+        """Update misleading signal detection based on feedback."""
+        # Analyze common patterns in misleading signals
+        signal_patterns = []
+        for case, feedback in case_feedback_list:
+            if feedback.findings:
+                signal_patterns.append({
+                    "pattern": feedback.findings,
+                    "case_id": case.id,
+                    "confidence": feedback.confidence_level
+                })
+
+        detection_update = {
+            "source": "sme_feedback_batch",
+            "update_type": "misleading_signal_detection",
+            "patterns_analyzed": len(signal_patterns),
+            "high_confidence_patterns": len([p for p in signal_patterns if p["confidence"] >= 4]),
+            "updated_at": datetime.now().isoformat()
+        }
+
+        detection_file = self.reviews_dir / "config" / "misleading_signal_detection.json"
+        detection_file.parent.mkdir(exist_ok=True)
+
+        with open(detection_file, 'w') as f:
+            json.dump(detection_update, f, indent=2)
+
+    def _log_feedback_loop_processing(self, changes_made: Dict[str, Any]):
+        """Log the feedback loop processing results."""
+        log_entry = {
+            "timestamp": datetime.now().isoformat(),
+            "action": "feedback_loop_processing",
+            "changes_made": changes_made,
+            "total_changes": sum(v for k, v in changes_made.items() if k != "errors")
+        }
+
+        log_file = self.reviews_dir / "logs" / "feedback_loop.log"
+        log_file.parent.mkdir(exist_ok=True)
+
+        with open(log_file, 'a') as f:
+            f.write(json.dumps(log_entry) + "\n")

@@ -42,7 +42,7 @@ class RepositoryManager:
             enable_ray: Enable Ray for distributed processing
             providers: Custom repository providers
         """
-        self.cache_dir = cache_dir or Path.home() / '.cache' / 'repo_scanner'
+        self.cache_dir = cache_dir or Path(os.environ.get("REPO_CACHE_DIR", Path.home() / '.cache' / 'repo_scanner'))
         self.cache_dir.mkdir(parents=True, exist_ok=True)
 
         # Initialize caching

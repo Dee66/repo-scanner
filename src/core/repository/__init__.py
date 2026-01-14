@@ -89,7 +89,7 @@ class GitRepositoryProvider(RepositoryProvider):
     """Git repository provider using pygit2."""
 
     def __init__(self, cache_dir: Optional[Path] = None, redis_client: Optional[redis.Redis] = None):
-        self.cache_dir = cache_dir or Path(tempfile.gettempdir()) / 'repo_cache'
+        self.cache_dir = cache_dir or Path(os.environ.get("REPO_CACHE_DIR", tempfile.gettempdir()) / 'repo_cache')
         self.cache_dir.mkdir(exist_ok=True)
         self.redis = redis_client
 

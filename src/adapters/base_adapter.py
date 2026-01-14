@@ -5,6 +5,11 @@ from typing import Dict, List, Any, Optional
 from pathlib import Path
 import tree_sitter
 from tree_sitter import Language, Parser
+import logging
+
+from src.core.security.malicious_repo_protection import MaliciousRepoProtection, SecurityLimits
+
+logger = logging.getLogger(__name__)
 
 
 class BaseLanguageAdapter(ABC):
@@ -118,9 +123,42 @@ class BaseLanguageAdapter(ABC):
         return complexity
 
     def _read_file_content(self, file_path: str) -> Optional[str]:
-        """Read file content safely."""
+        """Read file content safely with malicious content validation."""
         try:
+            file_path_obj = Path(file_path)
+            
+            # Validate content safety
+            try:
+                # Create a temporary protection instance for this file
+                # Use parent directory as repo root for validation
+                protection = MaliciousRepoProtection(
+                    repo_root=file_path_obj.parent,
+                    limits=SecurityLimits()
+                )
+                
+                if not protection.validate_file_safe(file_path_obj):
+                    logger.warning("File failed safety validation: %s", file_path)
+                    return None
+                    
+            except Exception as e:
+                logger.error("Safety validation failed for %s: %s", file_path, e)
+                return None
+            
+            # Read file content
             with open(file_path, 'r', encoding='utf-8') as f:
-                return f.read()
-        except (IOError, UnicodeDecodeError):
+                content = f.read()
+            
+            # Validate content
+            try:
+                if not protection.validate_file_content_safe(file_path_obj, content):
+                    logger.warning("File content failed safety validation: %s", file_path)
+                    return None
+            except Exception as e:
+                logger.error("Content safety validation failed for %s: %s", file_path, e)
+                return None
+                
+            return content
+            
+        except (IOError, UnicodeDecodeError) as e:
+            logger.debug("Could not read file %s: %s", file_path, e)
             return None

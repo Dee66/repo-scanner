@@ -251,3 +251,134 @@ def _summarize_canonical_data(canonical_data: Dict) -> Dict:
             "risk_synthesis", "decision_artifacts", "authority_ceiling_evaluation"
         ])
     }
+
+
+def verify_reproducibility(previous_results: Dict, current_results: Dict) -> Dict:
+    """
+    BPS-012: Verify that analysis results are reproducible.
+
+    Compares previous analysis results with current results to ensure reproducibility.
+    """
+    reproducibility_checks = {}
+
+    # Check if both results have determinism hashes
+    prev_hash = previous_results.get("determinism_verification", {}).get("determinism_hash")
+    curr_hash = current_results.get("determinism_verification", {}).get("determinism_hash")
+
+    if prev_hash and curr_hash:
+        reproducibility_checks["hash_consistency"] = prev_hash == curr_hash
+    else:
+        reproducibility_checks["hash_consistency"] = False
+
+    # Check key result components for consistency
+    key_components = [
+        "repository_root", "files", "structure", "semantic", "security_analysis",
+        "compliance_analysis", "dependency_analysis", "risk_synthesis"
+    ]
+
+    component_consistency = {}
+    for component in key_components:
+        prev_comp = previous_results.get(component, {})
+        curr_comp = current_results.get(component, {})
+
+        # Simple consistency check - same keys and similar structure
+        prev_keys = set(_flatten_keys(prev_comp))
+        curr_keys = set(_flatten_keys(curr_comp))
+
+        component_consistency[component] = {
+            "key_overlap": len(prev_keys & curr_keys) / max(len(prev_keys | curr_keys), 1),
+            "structure_preserved": _compare_structure(prev_comp, curr_comp)
+        }
+
+    reproducibility_checks["component_consistency"] = component_consistency
+
+    # Overall reproducibility assessment
+    hash_consistent = reproducibility_checks["hash_consistency"]
+    avg_key_overlap = sum(c["key_overlap"] for c in component_consistency.values()) / len(component_consistency)
+    structure_preserved = all(c["structure_preserved"] for c in component_consistency.values())
+
+    overall_reproducible = hash_consistent and (avg_key_overlap > 0.95) and structure_preserved
+
+    return {
+        "reproducible": overall_reproducible,
+        "reproducibility_checks": reproducibility_checks,
+        "reproducibility_score": avg_key_overlap if hash_consistent else 0.0,
+        "verification_timestamp": "2025-12-23T00:00:00Z"
+    }
+
+
+def _flatten_keys(data: Dict, prefix: str = "") -> List[str]:
+    """Flatten nested dictionary keys for comparison."""
+    keys = []
+    for key, value in data.items():
+        full_key = f"{prefix}.{key}" if prefix else key
+        keys.append(full_key)
+        if isinstance(value, dict):
+            keys.extend(_flatten_keys(value, full_key))
+    return keys
+
+
+def _compare_structure(dict1: Dict, dict2: Dict) -> bool:
+    """Compare structure of two dictionaries."""
+    if type(dict1) != type(dict2):
+        return False
+
+    if not isinstance(dict1, dict):
+        return True  # Non-dict values are considered structurally equivalent
+
+    keys1 = set(dict1.keys())
+    keys2 = set(dict2.keys())
+
+    # Allow some flexibility - 80% key overlap considered structural preservation
+    overlap = len(keys1 & keys2)
+    total = len(keys1 | keys2)
+
+    return (overlap / total) > 0.8 if total > 0 else True
+
+
+def enforce_reproducibility_guarantee(analysis_results: Dict, repository_path: str) -> Dict:
+    """
+    BPS-012: Enforce reproducibility guarantee for analysis results.
+
+    Stores analysis results and verifies they can be reproduced.
+    """
+    import os
+    import json
+
+    # Create reproducibility cache directory
+    cache_dir = os.environ.get("SCANNER_CACHE_DIR", os.path.join(os.path.dirname(repository_path), ".scanner_cache"))
+    os.makedirs(cache_dir, exist_ok=True)
+
+    # Generate cache key from repository path
+    repo_hash = hashlib.md5(repository_path.encode()).hexdigest()
+    cache_file = os.path.join(cache_dir, f"reproducibility_{repo_hash}.json")
+
+    reproducibility_status = {
+        "guarantee_enforced": False,
+        "previous_results_available": False,
+        "reproducibility_verified": False,
+        "cache_file": cache_file
+    }
+
+    try:
+        # Try to load previous results
+        if os.path.exists(cache_file):
+            with open(cache_file, 'r') as f:
+                previous_results = json.load(f)
+            reproducibility_status["previous_results_available"] = True
+
+            # Verify reproducibility
+            reproducibility_check = verify_reproducibility(previous_results, analysis_results)
+            reproducibility_status["reproducibility_verified"] = reproducibility_check["reproducible"]
+            reproducibility_status["reproducibility_details"] = reproducibility_check
+
+        # Store current results for future reproducibility checks
+        with open(cache_file, 'w') as f:
+            json.dump(analysis_results, f, indent=2, sort_keys=True)
+
+        reproducibility_status["guarantee_enforced"] = True
+
+    except Exception as e:
+        reproducibility_status["error"] = str(e)
+
+    return reproducibility_status

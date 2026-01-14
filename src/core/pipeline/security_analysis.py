@@ -4,110 +4,127 @@ import logging
 from typing import Dict, List, Any
 from pathlib import Path
 
-from ..adapters.language_adapter_manager import LanguageAdapterManager
+from .security_analysis import SecurityAnalyzer
 
 logger = logging.getLogger(__name__)
 
 
 def analyze_security_vulnerabilities(file_list: List[str], semantic_analysis: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Analyze security vulnerabilities across all files using language-specific adapters.
+    Analyze security vulnerabilities across all files using the SecurityAnalyzer.
 
-    This function collects unsafe patterns detected by language adapters and
+    This function uses the SecurityAnalyzer to detect vulnerabilities and
     synthesizes them into a comprehensive security analysis report.
     """
     logger.info("Starting security vulnerability analysis")
 
-    # Initialize adapter manager
-    adapter_manager = LanguageAdapterManager()
+    # Use the SecurityAnalyzer's analyze_security_vulnerabilities method
+    return analyzer.analyze_security_vulnerabilities(file_list, semantic_analysis)
 
-    # Collect unsafe patterns from all files
-    unsafe_patterns = {
-        "summary": {
-            "total_patterns": 0,
-            "high_severity": 0,
-            "medium_severity": 0,
-            "low_severity": 0,
-            "languages_covered": 0
-        },
-        "patterns_by_language": {},
-        "critical_findings": []
+
+def _get_language_from_path(file_path: str) -> str:
+    """Determine language from file extension."""
+    path = Path(file_path)
+    ext = path.suffix.lower()
+
+    language_map = {
+        '.py': 'python',
+        '.js': 'javascript',
+        '.java': 'java',
+        '.rs': 'rust',
+        '.php': 'php',
+        '.cpp': 'cpp',
+        '.c': 'c',
+        '.go': 'go',
+        '.rb': 'ruby',
+        '.cs': 'csharp'
     }
 
-    languages_processed = set()
-
-    # Process each file
-    for file_path in file_list:
-        try:
-            # Get appropriate adapter for this file
-            adapter = adapter_manager.get_adapter_for_file(file_path)
-
-            if adapter:
-                # Extract AST which includes unsafe patterns
-                ast_result = adapter.extract_ast(file_path)
-
-                # Check if unsafe patterns were detected
-                file_unsafe_patterns = ast_result.get("unsafe_patterns", [])
-
-                if file_unsafe_patterns:
-                    # Get language name
-                    language = adapter.language_name
-                    languages_processed.add(language)
-
-                    # Initialize language entry if not exists
-                    if language not in unsafe_patterns["patterns_by_language"]:
-                        unsafe_patterns["patterns_by_language"][language] = []
-
-                    # Add file patterns
-                    unsafe_patterns["patterns_by_language"][language].append({
-                        "file_path": file_path,
-                        "language": language,
-                        "patterns": file_unsafe_patterns
-                    })
-
-                    # Update summary counts
-                    for pattern in file_unsafe_patterns:
-                        severity = pattern.get("severity", "low")
-                        unsafe_patterns["summary"]["total_patterns"] += 1
-
-                        if severity == "high":
-                            unsafe_patterns["summary"]["high_severity"] += 1
-                            # Add to critical findings
-                            unsafe_patterns["critical_findings"].append({
-                                "file_path": file_path,
-                                "pattern_type": pattern.get("type", "Unknown"),
-                                "severity": severity,
-                                "description": pattern.get("description", "No description"),
-                                "line": pattern.get("line", 0)
-                            })
-                        elif severity == "medium":
-                            unsafe_patterns["summary"]["medium_severity"] += 1
-                        elif severity == "low":
-                            unsafe_patterns["summary"]["low_severity"] += 1
-
-        except Exception as e:
-            logger.warning(f"Failed to analyze security patterns in {file_path}: {str(e)}")
-            continue
-
-    # Update languages covered count
-    unsafe_patterns["summary"]["languages_covered"] = len(languages_processed)
-
-    # Sort critical findings by severity (high first) and then by file path
-    unsafe_patterns["critical_findings"].sort(key=lambda x: (
-        {"high": 0, "medium": 1, "low": 2}.get(x["severity"], 3),
-        x["file_path"]
-    ))
+    return language_map.get(ext, 'unknown')
 
     # Limit critical findings to top 50 most severe
     unsafe_patterns["critical_findings"] = unsafe_patterns["critical_findings"][:50]
 
-    logger.info(f"Security analysis completed: {unsafe_patterns['summary']['total_patterns']} patterns found across {len(languages_processed)} languages")
+    logger.info("Security analysis completed: %d patterns found across %d languages", 
+                unsafe_patterns['summary']['total_patterns'], len(languages_processed))
 
     return {
         "unsafe_patterns": unsafe_patterns,
         "security_posture": _assess_security_posture(unsafe_patterns),
         "recommendations": _generate_security_recommendations(unsafe_patterns)
     }
+
+
+def _extract_evidence_snippet(file_path: str, pattern: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """Extract evidence snippet for a security finding with provenance information."""
+    evidence = []
+    try:
+        line_number = pattern.get("line", 0)
+        if line_number > 0:
+            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                lines = f.readlines()
+            
+            # Get context around the finding (3 lines before and after)
+            start_line = max(0, line_number - 4)  # 0-based indexing
+            end_line = min(len(lines), line_number + 3)
+            
+            snippet_lines = []
+            byte_start = 0
+            byte_end = 0
+            
+            for i in range(start_line, end_line):
+                line_content = lines[i].rstrip('\n\r')
+                if i == line_number - 1:  # The finding line (convert to 0-based)
+                    # Calculate byte range for the finding line
+                    byte_start = sum(len(lines[j].encode('utf-8')) for j in range(start_line, i))
+                    byte_end = byte_start + len(line_content.encode('utf-8'))
+                
+                snippet_lines.append({
+                    "line_number": i + 1,
+                    "content": line_content,
+                    "is_finding_line": (i + 1) == line_number
+                })
+            
+            # Get repository commit SHA (if available)
+            repo_commit = _get_repository_commit_sha()
+            
+            evidence.append({
+                "type": "code_snippet",
+                "file_path": file_path,
+                "line_range": f"{start_line + 1}-{end_line}",
+                "byte_range": f"{byte_start}-{byte_end}" if byte_start < byte_end else None,
+                "repo_commit_sha": repo_commit,
+                "evidence_snippet": snippet_lines,
+                "description": f"Code snippet showing {pattern.get('type', 'security issue')} at line {line_number}"
+            })
+    except Exception:
+        # If we can't read the file, just return minimal evidence
+        evidence.append({
+            "type": "metadata",
+            "file_path": file_path,
+            "line_range": str(pattern.get("line", 0)),
+            "repo_commit_sha": _get_repository_commit_sha(),
+            "description": "Security finding detected but unable to extract code snippet"
+        })
+    
+    return evidence
+
+
+def _get_repository_commit_sha() -> str:
+    """Get the current repository commit SHA."""
+    try:
+        import subprocess
+        result = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            capture_output=True,
+            text=True,
+            timeout=5
+        )
+        if result.returncode == 0:
+            return result.stdout.strip()
+    except Exception:
+        pass
+    return "unknown"
 
 
 def _assess_security_posture(unsafe_patterns: Dict[str, Any]) -> Dict[str, Any]:
@@ -182,7 +199,7 @@ def _generate_security_recommendations(unsafe_patterns: Dict[str, Any]) -> List[
 
         # Check for common patterns by language
         if language.lower() == "javascript":
-            eval_count = sum(1 for p in lang_patterns if p.get("type") == "dynamic_code_execution")
+            eval_count = sum(1 for p in lang_patterns if (p.get("pattern") or p.get("type")) == "dynamic_code_execution")
             if eval_count > 0:
                 recommendations.append({
                     "priority": "high",
@@ -192,7 +209,7 @@ def _generate_security_recommendations(unsafe_patterns: Dict[str, Any]) -> List[
                 })
 
         elif language.lower() == "python":
-            pickle_count = sum(1 for p in lang_patterns if p.get("type") == "deserialization_vulnerability")
+            pickle_count = sum(1 for p in lang_patterns if (p.get("pattern") or p.get("type")) == "deserialization_vulnerability")
             if pickle_count > 0:
                 recommendations.append({
                     "priority": "high",
@@ -202,7 +219,7 @@ def _generate_security_recommendations(unsafe_patterns: Dict[str, Any]) -> List[
                 })
 
         elif language.lower() == "php":
-            sql_injection_count = sum(1 for p in lang_patterns if p.get("type") == "sql_injection")
+            sql_injection_count = sum(1 for p in lang_patterns if (p.get("pattern") or p.get("type")) == "sql_injection")
             if sql_injection_count > 0:
                 recommendations.append({
                     "priority": "high",

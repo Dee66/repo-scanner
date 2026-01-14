@@ -1,0 +1,164 @@
+# Alert Rules for Repository Intelligence Scanner
+
+groups:
+  - name: repo_scanner_alerts
+    rules:
+      # Service Availability Alerts
+      - alert: RepoScannerDown
+        expr: up{job="repo-scanner-api"} == 0
+        for: 5m
+        labels:
+          severity: critical
+          service: repo-scanner
+        annotations:
+          summary: "Repository Intelligence Scanner API is down"
+          description: "Repository Intelligence Scanner API has been down for more than 5 minutes."
+          runbook_url: "https://docs.scanner.company.com/runbooks/repo-scanner-down"
+
+      - alert: RepoScannerHighErrorRate
+        expr: rate(http_requests_total{job="repo-scanner-api", status=~"5.."}[5m]) / rate(http_requests_total{job="repo-scanner-api"}[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          service: repo-scanner
+        annotations:
+          summary: "High error rate on Repository Intelligence Scanner"
+          description: "Error rate is {{ $value | printf \"%.2f\" }}% over the last 5 minutes."
+          runbook_url: "https://docs.scanner.company.com/runbooks/high-error-rate"
+
+      # Performance Alerts
+      - alert: RepoScannerHighLatency
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job="repo-scanner-api"}[5m])) > 10
+        for: 5m
+        labels:
+          severity: warning
+          service: repo-scanner
+        annotations:
+          summary: "High latency on Repository Intelligence Scanner"
+          description: "95th percentile latency is {{ $value | printf \"%.2f\" }}s over the last 5 minutes."
+          runbook_url: "https://docs.scanner.company.com/runbooks/high-latency"
+
+      - alert: RepoScannerHighCPUUsage
+        expr: rate(process_cpu_user_seconds_total{job="repo-scanner-api"}[5m]) / rate(process_cpu_seconds_total{job="repo-scanner-api"}[5m]) > 0.8
+        for: 10m
+        labels:
+          severity: warning
+          service: repo-scanner
+        annotations:
+          summary: "High CPU usage on Repository Intelligence Scanner"
+          description: "CPU usage is {{ $value | printf \"%.2f\" }}% over the last 5 minutes."
+          runbook_url: "https://docs.scanner.company.com/runbooks/high-cpu"
+
+      - alert: RepoScannerHighMemoryUsage
+        expr: process_resident_memory_bytes{job="repo-scanner-api"} / process_virtual_memory_max_bytes{job="repo-scanner-api"} > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          service: repo-scanner
+        annotations:
+          summary: "High memory usage on Repository Intelligence Scanner"
+          description: "Memory usage is {{ $value | printf \"%.2f\" }}% of available memory."
+          runbook_url: "https://docs.scanner.company.com/runbooks/high-memory"
+
+      # Business Logic Alerts
+      - alert: RepoScannerScanQueueBacklog
+        expr: repo_scanner_scan_queue_length > 100
+        for: 5m
+        labels:
+          severity: warning
+          service: repo-scanner
+        annotations:
+          summary: "Scan queue backlog is high"
+          description: "Scan queue has {{ $value }} pending scans."
+          runbook_url: "https://docs.scanner.company.com/runbooks/queue-backlog"
+
+      - alert: RepoScannerFailedScans
+        expr: increase(repo_scanner_scan_failures_total[10m]) > 5
+        for: 5m
+        labels:
+          severity: warning
+          service: repo-scanner
+        annotations:
+          summary: "High number of failed scans"
+          description: "{{ $value }} scans have failed in the last 10 minutes."
+          runbook_url: "https://docs.scanner.company.com/runbooks/failed-scans"
+
+      # Security Alerts
+      - alert: RepoScannerSecurityViolation
+        expr: increase(repo_scanner_security_violations_total[5m]) > 0
+        labels:
+          severity: critical
+          service: repo-scanner
+        annotations:
+          summary: "Security violation detected"
+          description: "A security violation was detected in scan results."
+          runbook_url: "https://docs.scanner.company.com/runbooks/security-violation"
+
+      # External Dependency Alerts
+      - alert: RepoScannerExternalAPIDown
+        expr: up{job=~"external-api-.*"} == 0
+        for: 5m
+        labels:
+          severity: warning
+          service: repo-scanner
+        annotations:
+          summary: "External API dependency is down"
+          description: "External API {{ $labels.job }} is unavailable."
+          runbook_url: "https://docs.scanner.company.com/runbooks/external-api-down"
+
+      # System Resource Alerts
+      - alert: RepoScannerDiskSpaceLow
+        expr: (node_filesystem_avail_bytes / node_filesystem_size_bytes) < 0.1
+        for: 5m
+        labels:
+          severity: warning
+          service: repo-scanner
+        annotations:
+          summary: "Disk space is low"
+          description: "Disk space is below 10% on {{ $labels.device }}."
+          runbook_url: "https://docs.scanner.company.com/runbooks/low-disk-space"
+
+      - alert: RepoScannerNetworkErrors
+        expr: increase(node_network_receive_errs_total[5m]) > 10
+        for: 5m
+        labels:
+          severity: warning
+          service: repo-scanner
+        annotations:
+          summary: "Network errors detected"
+          description: "{{ $value }} network errors in the last 5 minutes."
+          runbook_url: "https://docs.scanner.company.com/runbooks/network-errors"
+
+  - name: repo_scanner_slo_alerts
+    rules:
+      # Service Level Objective Alerts
+      - alert: RepoScannerSLOErrorBudgetExceeded
+        expr: (1 - (sum(rate(http_requests_total{job="repo-scanner-api", status=~"2.."}[30d])) / sum(rate(http_requests_total{job="repo-scanner-api"}[30d])))) > 0.001
+        labels:
+          severity: critical
+          service: repo-scanner
+        annotations:
+          summary: "SLO Error Budget Exceeded"
+          description: "Error rate has exceeded the 99.999% SLO budget."
+          runbook_url: "https://docs.scanner.company.com/runbooks/slo-error-budget"
+
+      - alert: RepoScannerSLOLatencyExceeded
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job="repo-scanner-api"}[30d])) > 2
+        labels:
+          severity: warning
+          service: repo-scanner
+        annotations:
+          summary: "SLO Latency Exceeded"
+          description: "95th percentile latency has exceeded 2 seconds over 30 days."
+          runbook_url: "https://docs.scanner.company.com/runbooks/slo-latency"
+
+      - alert: RepoScannerSLOAvailability
+        expr: (sum(up{job="repo-scanner-api"}) / count(up{job="repo-scanner-api"})) < 0.99999
+        for: 1h
+        labels:
+          severity: critical
+          service: repo-scanner
+        annotations:
+          summary: "SLO Availability Not Met"
+          description: "Service availability has dropped below 99.999%."
+          runbook_url: "https://docs.scanner.company.com/runbooks/slo-availability"

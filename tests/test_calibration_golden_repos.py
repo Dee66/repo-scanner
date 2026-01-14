@@ -1,49 +1,47 @@
-import json
-from pathlib import Path
+"""Calibration tests for detector accuracy using golden repositories."""
+
 import pytest
+from tests.test_calibration import CalibrationHarness
 
 
-def _load(path: Path):
-    return json.loads(path.read_text(encoding='utf-8'))
-
-
-def _high_ids(report: dict):
-    arts = report.get('decision_artifacts', {}).get('artifacts', [])
-    return {a.get('id') for a in arts if (a.get('severity') or '').upper() == 'HIGH'}
-
-
-@pytest.mark.xfail(reason="Golden expected files not yet set up for calibration")
 def test_golden_repos_precision_threshold():
     """Compute precision on HIGH findings across golden repos.
 
     The test will fail if overall precision for HIGH findings falls below 0.60.
     """
-    base = Path('tests/golden')
-    expected_files = sorted(base.glob('expected_*.json'))
-    assert expected_files, "No golden expected files found"
+    harness = CalibrationHarness()
+    repos = harness.golden_repos
+
+    if not repos:
+        pytest.skip("No golden repositories found")
 
     total_tp = 0
     total_fp = 0
+    total_fn = 0
 
-    for ef in expected_files:
-        name = ef.name.replace('expected_', '').replace('.json', '')
-        pf = base / f'predicted_{name}.json'
-        if not pf.exists():
-            pytest.skip(f'Missing predicted file for {name}')
-        exp = _load(ef)
-        pred = _load(pf)
+    for repo in repos:
+        result = harness.run_calibration_test(repo)
 
-        exp_high = _high_ids(exp)
-        pred_high = _high_ids(pred)
+        if result["error"] or not result["metrics"]:
+            continue
 
-        tp = len(exp_high & pred_high)
-        fp = len(pred_high - exp_high)
-
-        total_tp += tp
-        total_fp += fp
+        metrics = result["metrics"]
+        total_tp += metrics["true_positives"]
+        total_fp += metrics["false_positives"]
+        total_fn += metrics["false_negatives"]
 
     if total_tp + total_fp == 0:
-        pytest.skip('No HIGH findings in predictions; nothing to evaluate')
+        pytest.skip('No findings detected; nothing to evaluate')
 
     precision = total_tp / (total_tp + total_fp)
-    assert precision >= 0.60, f'Precision for HIGH findings too low: {precision:.2f} < 0.60'
+    recall = total_tp / (total_tp + total_fn) if (total_tp + total_fn) > 0 else 0
+
+    print(f"\nCalibration results across {len(repos)} golden repos:")
+    print(f"  True positives: {total_tp}")
+    print(f"  False positives: {total_fp}")
+    print(f"  False negatives: {total_fn}")
+    print(f"  Precision: {precision:.3f}")
+    print(f"  Recall: {recall:.3f}")
+
+    # Assert minimum precision threshold for detector reliability
+    assert precision >= 0.60, f'Precision for findings too low: {precision:.2f} < 0.60'

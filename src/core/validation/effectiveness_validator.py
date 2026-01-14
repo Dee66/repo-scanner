@@ -182,7 +182,7 @@ class EffectivenessValidator:
                 accuracy_score > 0.5      # More lenient accuracy requirement
             )
 
-            print(f"DEBUG: {repo_type} - success={success}, time={execution_time:.2f}s, accuracy={accuracy_score:.2f}, contract={contract_valid}, risk={actual_risk}, issues={issues_found}")
+            # DEBUG_DISABLED: print(f"DEBUG: {repo_type} - success={success}, time={execution_time:.2f}s, accuracy={accuracy_score:.2f}, contract={contract_valid}, risk={actual_risk}, issues={issues_found}")
 
             return ValidationResult(
                 test_name=repo_type,

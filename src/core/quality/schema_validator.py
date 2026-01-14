@@ -22,7 +22,7 @@ except Exception:
 
 def _schema_dir() -> Path:
     # project root is parents[3] from src/core/quality
-    return Path(__file__).resolve().parents[3] / "docs" / "schemas"
+    return Path(__file__).resolve().parents[3] / "schemas" / "output"
 
 
 def load_schema(name: str) -> Dict[str, Any]:
@@ -85,7 +85,7 @@ def _validate_file(path_to_json: str, schema_name: str) -> None:
 
 
 def validate_scan_report(path_to_json: str) -> None:
-    _validate_file(path_to_json, 'scan_report.schema.json')
+    _validate_file(path_to_json, 'scan_report.json')
 
 
 def validate_bounty_assessment(path_to_json: str) -> None:

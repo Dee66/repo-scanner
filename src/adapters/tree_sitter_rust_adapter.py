@@ -65,7 +65,6 @@ class TreeSitterRustAdapter(BaseLanguageAdapter):
         try:
             tree = self._parse_large_file_incrementally(content, file_path)
             if tree:
-                print(f"DEBUG: Tree-sitter parsing succeeded for {file_path}")
                 return {
                     "file_path": file_path,
                     "imports": self._extract_imports(tree, content),
@@ -84,7 +83,6 @@ class TreeSitterRustAdapter(BaseLanguageAdapter):
                     "impls": self._extract_impls(tree, content)
                 }
             else:
-                print(f"DEBUG: Tree-sitter parsing failed, using regex fallback for {file_path}")
                 # Fallback to regex parsing
                 return {
                     "file_path": file_path,
@@ -92,7 +90,6 @@ class TreeSitterRustAdapter(BaseLanguageAdapter):
                 }
 
         except Exception as e:
-            print(f"DEBUG: Tree-sitter parsing failed for {file_path}: {e}")
             return {
                 "file_path": file_path,
                 "error": f"Failed to parse Rust file: {str(e)}",
@@ -647,8 +644,6 @@ class TreeSitterRustAdapter(BaseLanguageAdapter):
     def _detect_unsafe_patterns(self, content: str, tree) -> List[Dict[str, Any]]:
         """Detect unsafe Rust patterns that could lead to security vulnerabilities."""
         unsafe_patterns = []
-        
-        print(f"DEBUG: Detecting unsafe patterns in content length {len(content)}")
 
         # Pattern 1: Use of unsafe blocks - can bypass Rust's safety guarantees
         if 'unsafe' in content:
@@ -719,9 +714,7 @@ class TreeSitterRustAdapter(BaseLanguageAdapter):
         for func in ['unwrap()', 'expect(']:
             escaped_func = re.escape(func)
             if func in content:
-                print(f"DEBUG: Found {func} in content")
                 for match in re.finditer(rf'\.{escaped_func}', content):
-                    print(f"DEBUG: Matched {func} at position {match.start()}")
                     unsafe_patterns.append({
                         "type": "panic_on_error",
                         "pattern": f".{func}",
@@ -746,7 +739,6 @@ class TreeSitterRustAdapter(BaseLanguageAdapter):
                         "code": content[match.start():match.start() + 60].strip()
                     })
 
-        print(f"DEBUG: Total unsafe patterns detected: {len(unsafe_patterns)}")
         return unsafe_patterns
 
     def _extract_with_regex(self, content: str) -> Dict[str, Any]:

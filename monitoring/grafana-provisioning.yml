@@ -1,0 +1,26 @@
+# Grafana Dashboard Configuration for Repository Intelligence Scanner
+
+apiVersion: 1
+
+providers:
+  - name: 'repo-scanner'
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 10
+    allowUiUpdates: true
+    options:
+      path: /var/lib/grafana/dashboards
+
+dashboards:
+  - name: 'repo-scanner-overview'
+    type: 'file'
+    file: 'repo-scanner-overview.json'
+  - name: 'repo-scanner-performance'
+    type: 'file'
+    file: 'repo-scanner-performance.json'
+  - name: 'repo-scanner-reliability'
+    type: 'file'
+    file: 'repo-scanner-reliability.json'
+  - name: 'repo-scanner-security'
+    type: 'file'
+    file: 'repo-scanner-security.json'

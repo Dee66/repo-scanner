@@ -338,7 +338,6 @@ bounty_recommendations: array of objects
 
 **Constraints**
 - Profitability score must use Bayesian probability framework
-- Merge confidence must achieve 99.999% accuracy target
 - All recommendations must be evidence-based
 - Compatibility factors must reference specific maintainer preferences
 

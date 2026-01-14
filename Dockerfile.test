@@ -1,0 +1,22 @@
+# Test Dockerfile for Rollback Testing
+# Creates containers that can simulate various failure scenarios
+
+FROM repo-scanner:latest
+
+# Install curl for health checks
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
+# Copy test scripts
+COPY deployment/test_entrypoint.sh /test_entrypoint.sh
+RUN chmod +x /test_entrypoint.sh
+
+# Set test environment variables
+ARG FAILURE_SCENARIO=none
+ARG STARTUP_FAILURE=false
+ARG RUNTIME_FAILURE=false
+ENV FAILURE_SCENARIO=$FAILURE_SCENARIO
+ENV STARTUP_FAILURE=$STARTUP_FAILURE
+ENV RUNTIME_FAILURE=$RUNTIME_FAILURE
+
+# Override entrypoint for testing
+ENTRYPOINT ["/test_entrypoint.sh"]

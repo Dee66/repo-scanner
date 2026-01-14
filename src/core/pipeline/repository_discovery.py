@@ -3,8 +3,12 @@
 import os
 from pathlib import Path
 from typing import Optional
+import logging
 
 from src.core.exceptions import RepositoryDiscoveryError, FileAccessError
+from src.core.security.malicious_repo_protection import MaliciousRepoProtection, SecurityLimits
+
+logger = logging.getLogger(__name__)
 
 # Cache for repository root discovery
 _repo_root_cache: dict[str, str] = {}
@@ -90,7 +94,7 @@ def get_canonical_file_list(repository_root: str) -> list[str]:
         cached_files = _file_list_cache[repository_root]
         # Validate cache integrity
         if not all(isinstance(f, str) for f in cached_files):
-            print(f"DEBUG: Cache corruption detected for {repository_root}, rebuilding...")
+            # DEBUG_DISABLED: print(f"DEBUG: Cache corruption detected for {repository_root}, rebuilding...")
             _file_list_cache.pop(repository_root, None)
         else:
             return cached_files.copy()
@@ -100,58 +104,227 @@ def get_canonical_file_list(repository_root: str) -> list[str]:
     
     root_path = Path(repository_root)
     files = []
+    
+    # Initialize malicious repo protection
+    repo_protection = MaliciousRepoProtection(
+        repo_root=root_path,
+        limits=SecurityLimits(
+            max_file_size_bytes=10 * 1024 * 1024,  # 10 MB
+            max_files_total=50000,  # 50k files
+            forbid_symlinks=True,
+            max_directory_depth=20,
+            max_line_count=100000,  # 100k lines
+        )
+    )
+    
+    # Validate the root directory
+    if not repo_protection.validate_directory_safe(root_path):
+        logger.error("Repository root failed safety validation: %s", repository_root)
+        return []
     # Directories to always skip
     _EXCLUDE_DIRS = {
-        'node_modules',
+        # Python
         '__pycache__',
-        'build',
-        'dist',
-        'venv',
-        '.venv',
-        '.env',
         '.pytest_cache',
+        '.mypy_cache',
+        '.tox',
+        '.coverage',
+        'htmlcov',
+        'site-packages',
+        'dist-info',
+        '.eggs',
+        '*.egg-info',
+        'pip-wheel-metadata',
+
+        # JavaScript/Node.js
+        'node_modules',
+        'bower_components',
+        '.npm',
+        '.yarn',
+        'jspm_packages',
+
+        # Java/Maven/Gradle
         'target',
+        'build',
         'out',
+        '.gradle',
+        '.m2',
+        '.maven',
+
+        # .NET/C#
+        'bin',
+        'obj',
+        '.nuget',
+
+        # Go
+        'vendor',
+        'Godeps',
+
+        # Rust
+        'target',
+        'Cargo.lock.target',
+
+        # IDEs and editors
         '.idea',
         '.vscode',
-        '.egg-info',
-        '.mypy_cache',
-        'site-packages',
-        'vendor',
-        'third_party',
-        'deps',
+        '.vs',
+        '.eclipse',
+        '*.swp',
+        '*.swo',
+        '*~',
+
+        # OS generated
+        '.DS_Store',
+        'Thumbs.db',
+        '.Trashes',
+        '.fseventsd',
+        '.DocumentRevisions-V100',
+        '.TemporaryItems',
+        '.Spotlight-V100',
+
+        # Version control
+        '.git',
+        '.svn',
+        '.hg',
+        '.bzr',
+
+        # Virtual environments
+        'venv',
+        '.venv',
+        'env',
+        '.env',
+        'ENV',
+
+        # Package managers
+        '.bundle',
+        'vendor/bundle',
+
+        # Build tools
+        'dist',
+        'build',
+        'cmake-build-*',
+        '.cmake',
+
+        # Testing and coverage
+        'coverage',
+        '.nyc_output',
+        'test-results',
+        'junit-reports',
+
+        # Documentation generation
+        'docs/_build',
+        'docs/build',
+        'site',
+        '.doctrees',
+
+        # Logs and temporary files
+        'logs',
+        '*.log',
+        'tmp',
+        'temp',
+        '.tmp',
+
+        # Cache directories
+        '.cache',
+        '.pytest_cache',
+        '__pycache__',
+        'node_modules/.cache',
+        '.yarn/cache',
+
+        # Output and generated directories
+        'output',
+        'outputs',
+        'out',
+        'dist',
+        'build',
+        'generated',
+        '__generated__',
+        '.generated',
+        'auto-generated',
+
+        # Scanner-specific
         '.scanner_cache',
         'analysis',
         'tmp_scan_output',
         'scan_output',
         'reports',
+        'scan_results',
+        'batch_scan_results',
+        'scan_results_cc',
+        'scan_results_debug',
+        'scan_results_pa',
+        'scan_results_litmus',
         'outputs',
-        '.cache',
-        '.export',
-        'dist-info',
-        '__generated__',
+        'outputs_ci',
+        'outputs_determinism',
+        'tmp_scan_output_qav011',
+        'golden-repos',
+        'test_scan_output',
+        'test_repositories',
+        'test_repo',
+        'test_data',
+        'validation_data',
+
+        # CI/CD
+        '.github/workflows/.cache',
+        '.circleci/cache',
+        '.travis/cache',
+
+        # Docker
+        '.docker',
+
+        # Kubernetes
+        '.kube',
+
+        # Terraform
+        '.terraform',
+
+        # Ansible
+        '.ansible',
+
+        # Database
+        '.sqlite',
+        '*.db',
+        '*.sqlite3',
+
+        # Backup files
+        '*.bak',
+        '*.backup',
+        '*~',
+        '*.orig',
+        '*.rej',
+
+        # Archives (often contain generated code)
+        '*.zip',
+        '*.tar.gz',
+        '*.tgz',
+        '*.rar',
+        '*.7z',
+
+        # Lock files (but keep the actual lock files for analysis)
+        # Note: We exclude directories containing lock files, not the files themselves
     }
 
     try:
         # Use os.walk for better performance than rglob
         for dirpath, dirnames, filenames in os.walk(root_path):
             if not isinstance(dirpath, str):
-                print(f"DEBUG: Non-string dirpath: {dirpath} (type: {type(dirpath)})")
+            # DEBUG_DISABLED: print(f"DEBUG: Non-string dirpath: {dirpath} (type: {type(dirpath)})")
                 continue
             if not all(isinstance(d, str) for d in dirnames):
                 non_strings = [d for d in dirnames if not isinstance(d, str)]
-                print(f"DEBUG: Non-string dirnames: {non_strings[:5]} (types: {[type(d) for d in non_strings[:5]]})")
+            # DEBUG_DISABLED: print(f"DEBUG: Non-string dirnames: {non_strings[:5]} (types: {[type(d) for d in non_strings[:5]]})")
                 dirnames[:] = [d for d in dirnames if isinstance(d, str)]
             if not all(isinstance(f, str) for f in filenames):
                 non_strings = [f for f in filenames if not isinstance(f, str)]
-                print(f"DEBUG: Non-string filenames: {non_strings[:5]} (types: {[type(f) for f in non_strings[:5]]})")
+            # DEBUG_DISABLED: print(f"DEBUG: Non-string filenames: {non_strings[:5]} (types: {[type(f) for f in non_strings[:5]]})")
                 filenames[:] = [f for f in filenames if isinstance(f, str)]
             
             # Filter dirnames in-place to control traversal. Keep '.git' only.
             filtered = []
             for d in dirnames:
                 if not isinstance(d, str):
-                    print(f"DEBUG: Non-string dirname: {d} (type: {type(d)})")
+            # DEBUG_DISABLED: print(f"DEBUG: Non-string dirname: {d} (type: {type(d)})")
                     continue
                 if d == '.git':
                     filtered.append(d)
@@ -166,23 +339,75 @@ def get_canonical_file_list(repository_root: str) -> list[str]:
 
             for filename in filenames:
                 if not isinstance(filename, str):
-                    print(f"DEBUG: Non-string filename: {filename} (type: {type(filename)})")
+            # DEBUG_DISABLED: print(f"DEBUG: Non-string filename: {filename} (type: {type(filename)})")
                     continue
+
+                # Skip files in version control directories
+                dirpath_parts = Path(dirpath).parts
+                if any(part in ('.git', '.svn', '.hg', '.bzr') for part in dirpath_parts):
+                    continue
+
                 # Skip compiled and temporary files
-                if filename.endswith(('.pyc', '.pyo', '.class', '.so')):
+                if filename.endswith((
+                    '.pyc', '.pyo', '.class', '.so', '.dll', '.exe', '.dylib',
+                    '.o', '.obj', '.lib', '.a', '.pdb', '.ilk'
+                )):
                     continue
-                if filename in ('.coverage', 'coverage.xml'):
+
+                # Skip coverage and test artifacts
+                if filename in ('.coverage', 'coverage.xml', '.coverage.*', 'nosetests.xml', 'junit.xml'):
                     continue
+                if filename.startswith('coverage') and filename.endswith(('.xml', '.html', '.lcov')):
+                    continue
+
                 # Skip typical generated bundle artifacts
-                if filename.endswith(('.min.js', '.bundle.js', '.map')):
+                if filename.endswith(('.min.js', '.bundle.js', '.map', '.min.css', '.bundle.css')):
                     continue
+
+                # Skip log files
+                if filename.endswith('.log') or '.log.' in filename or filename in ('debug.log', 'error.log'):
+                    continue
+
+                # Skip backup and temporary files
+                if filename.endswith(('~', '.bak', '.backup', '.orig', '.rej', '.tmp', '.temp')):
+                    continue
+                if filename.startswith(('#', '.')) and filename.endswith(('#', '~')):
+                    continue
+
+                # Skip OS-specific files
+                if filename in ('.DS_Store', 'Thumbs.db', 'Desktop.ini', 'ehthumbs.db'):
+                    continue
+
+                # Skip generated files by common tools
+                if filename.endswith((
+                    '.generated.cs', '.generated.vb', '.g.cs', '.g.vb',  # C#/VB generated
+                    '.generated.go',  # Go generated
+                    '.generated.rs',  # Rust generated
+                    '.generated.ts',  # TypeScript generated
+                    '_pb2.py',  # Protocol buffers
+                    '.spec.ts',  # TypeScript generated
+                )):
+                    continue
+
                 file_path = Path(dirpath) / filename
                 # Get absolute path for consistent file access
                 try:
                     resolved_path = str(file_path.resolve())
                     if not isinstance(resolved_path, str):
-                        print(f"DEBUG: Non-string resolved path: {resolved_path} (type: {type(resolved_path)})")
+            # DEBUG_DISABLED: print(f"DEBUG: Non-string resolved path: {resolved_path} (type: {type(resolved_path)})")
                         continue
+                    
+                    # Validate file safety before adding to list
+                    if not repo_protection.validate_file_safe(Path(resolved_path)):
+                        logger.warning("Skipping unsafe file: %s", resolved_path)
+                        continue
+                    
+                    # Check file count limit
+                    if len(files) >= repo_protection.limits.max_files_total:
+                        logger.error("Repository exceeds maximum file count (%d)", 
+                                   repo_protection.limits.max_files_total)
+                        break
+                    
                     files.append(resolved_path)
                 except (OSError, RuntimeError):
                     # Skip problematic files

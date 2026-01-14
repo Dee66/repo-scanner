@@ -2,7 +2,8 @@
 
 ## Overview
 
-The Repository Intelligence Scanner detects sophisticated architectural security patterns across codebases, providing enterprise-grade security analysis with 99.999% reliability.
+The Repository Intelligence Scanner detects sophisticated architectural security patterns across codebases, providing enterprise-grade security analysis.
+The Repository Intelligence Scanner detects sophisticated architectural security patterns across codebases, providing enterprise-grade security analysis.
 
 ## Detected Architectural Patterns
 

@@ -9,7 +9,7 @@ def test_scan_report_includes_schema_version_if_defined(tmp_path):
     the generated machine output must include `governance.schema_version`.
     Otherwise the test is a no-op.
     """
-    schema_path = Path("docs/schemas/scan_report.schema.json")
+    schema_path = Path(__file__).parent.parent / "schemas" / "output" / "scan_report.json"
     if not schema_path.exists():
         pytest.skip("No scan_report schema present")
 
@@ -18,28 +18,51 @@ def test_scan_report_includes_schema_version_if_defined(tmp_path):
     except Exception:
         pytest.skip("Unable to read scan_report schema")
 
-    governance_props = schema.get("properties", {}).get("governance", {}).get("properties", {})
+    governance_props = schema.get("properties", {}).get("metadata", {}).get("properties", {})
     if "schema_version" not in governance_props:
-        pytest.skip("Schema does not declare governance.schema_version; skipping compatibility assertion")
+        pytest.skip("Schema does not declare metadata.schema_version; skipping compatibility assertion")
 
     # Generate a minimal machine output and assert presence and correctness of schema_version
     analysis = {
         "repository_root": str(tmp_path),
         "files": [],
-        "decision_artifacts": {}
+        "decision_artifacts": {
+            "executive_verdict": "PASS",
+            "safe_to_change_surface": [],
+            "no_touch_zones": [],
+            "misleading_signals": [],
+            "what_not_to_fix": [],
+            "confidence_and_limits": {
+                "overall_confidence": 0.8,
+                "confidence_breakdown": {
+                    "structural_analysis": 0.8,
+                    "governance_signals": 0.8,
+                    "testing_coverage": 0.8,
+                    "integration_patterns": 0.8
+                },
+                "analysis_limits": ["Test limit"],
+                "assumptions_made": ["Test assumption"]
+            },
+            "validity_window": {
+                "valid_from": "2024-01-01T00:00:00Z",
+                "valid_until": "2024-01-31T00:00:00Z",
+                "invalidation_triggers": ["Test trigger"]
+            },
+            "artifacts": []
+        }
     }
     out = generate_machine_output(analysis, str(tmp_path))
-    gov = out.get("governance", {})
-    assert "schema_version" in gov and gov.get("schema_version"), (
-        "Schema declares governance.schema_version but generated output is missing governance.schema_version"
+    metadata = out.get("metadata", {})
+    assert "schema_version" in metadata and metadata.get("schema_version"), (
+        "Schema declares metadata.schema_version but generated output is missing metadata.schema_version"
     )
 
     # Ensure the produced schema_version matches docs/schemas/VERSION
     verpath = Path('docs') / 'schemas' / 'VERSION'
     if verpath.exists():
         expected = verpath.read_text(encoding='utf-8').strip()
-        assert gov.get('schema_version') == expected, (
-            f"Generated governance.schema_version ({gov.get('schema_version')}) does not match docs/schemas/VERSION ({expected})"
+        assert metadata.get('schema_version') == expected, (
+            f"Generated metadata.schema_version ({metadata.get('schema_version')}) does not match docs/schemas/VERSION ({expected})"
         )
 
     # Validate the generated output against the scan_report schema

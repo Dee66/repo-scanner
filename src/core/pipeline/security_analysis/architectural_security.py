@@ -29,6 +29,8 @@ class ArchitecturalFinding:
     file_path: str
     line_number: int
     code_snippet: str
+    uncertainty_reason: Optional[str] = None  # BPS-003: Explain uncertainty when confidence < 1.0
+    confidence_reason: Optional[str] = None  # BPS-004: Explain confidence level assignment
 
 class AdvancedArchitecturalAnalyzer:
     """Analyzes advanced architectural security patterns."""
@@ -170,6 +172,14 @@ class AdvancedArchitecturalAnalyzer:
             confidence = min(1.0, total_weight / len(pattern_data['patterns']))
 
             if confidence >= 0.5:  # Only report if confidence is reasonable
+                # BPS-003: Add uncertainty reason when confidence is not perfect
+                uncertainty_reason = None
+                if confidence < 1.0:
+                    uncertainty_reason = f"Partial pattern match: {len(evidence)}/{len(pattern_data['patterns'])} patterns detected"
+                
+                # BPS-004: Add confidence justification
+                confidence_reason = f"Confidence calculated as {confidence:.2f} based on {len(evidence)} pattern matches out of {len(pattern_data['patterns'])} total patterns (weight: {total_weight:.2f})"
+                
                 finding = ArchitecturalFinding(
                     architecture_type=arch_type,
                     confidence=confidence,
@@ -177,7 +187,9 @@ class AdvancedArchitecturalAnalyzer:
                     description=pattern_data['description'],
                     file_path=file_path,
                     line_number=evidence[0]['line'],
-                    code_snippet=evidence[0]['snippet']
+                    code_snippet=evidence[0]['snippet'],
+                    uncertainty_reason=uncertainty_reason,
+                    confidence_reason=confidence_reason
                 )
                 self.findings.append(finding)
 
@@ -255,7 +267,7 @@ class AdvancedArchitecturalAnalyzer:
 
     def _finding_to_dict(self, finding: ArchitecturalFinding) -> Dict[str, Any]:
         """Convert finding to dictionary."""
-        return {
+        result = {
             'architecture_type': finding.architecture_type.value,
             'confidence': finding.confidence,
             'evidence': finding.evidence,
@@ -264,3 +276,10 @@ class AdvancedArchitecturalAnalyzer:
             'line_number': finding.line_number,
             'code_snippet': finding.code_snippet
         }
+        # BPS-003: Include uncertainty reason if present
+        if finding.uncertainty_reason:
+            result['uncertainty_reason'] = finding.uncertainty_reason
+        # BPS-004: Include confidence reason
+        if finding.confidence_reason:
+            result['confidence_reason'] = finding.confidence_reason
+        return result

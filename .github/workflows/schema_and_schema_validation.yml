@@ -17,13 +17,53 @@ jobs:
         run: pip install poetry && poetry install -v
       - name: Run schema validation
         run: |
-          python -c "from src.core.quality.schema_validator import validate_scan_report; import json, sys; print('Running schema validation'); sys.exit(0)"
-      - name: Run determinism quick check
+          python -c "
+          from src.core.quality.schema_validator import validate_scan_report
+          import json
+          import sys
+          
+          # Validate existing scan report if it exists
+          import os
+          if os.path.exists('scan_report.json'):
+              try:
+                  validate_scan_report('scan_report.json')
+                  print('✓ Schema validation passed')
+              except Exception as e:
+                  print(f'✗ Schema validation failed: {e}')
+                  sys.exit(1)
+          else:
+              print('No existing scan_report.json to validate')
+          "
+      - name: Run determinism check
         run: |
           python -c "from src.core.pipeline.repository_discovery import clear_caches; print('Clearing caches'); clear_caches()"
-          python -m src.cli scan . --output-dir outputs_ci --format json
-          sha=$(sha256sum outputs_ci/scan_report.json | awk '{print $1}')
-          echo "Result SHA: $sha"
+          
+          # Run scanner and check it completes without errors
+          if python -m src.cli scan . --output-dir outputs_ci --format json; then
+              echo "✓ Scanner completed successfully"
+              
+              # Check that output file was created
+              if [ -f "outputs_ci/scan_report.json" ]; then
+                  echo "✓ Output file created"
+                  
+                  # Validate the generated output against schema
+                  python -c "
+                  from src.core.quality.schema_validator import validate_scan_report
+                  try:
+                      validate_scan_report('outputs_ci/scan_report.json')
+                      print('✓ Generated output validates against schema')
+                  except Exception as e:
+                      print(f'✗ Generated output schema validation failed: {e}')
+                      exit(1)
+                  "
+              else
+                  echo "✗ No output file generated"
+                  exit(1)
+              fi
+          else
+              echo "✗ Scanner failed to run"
+              exit(1)
+          fi
       - name: Upload outputs
         uses: actions/upload-artifact@v4
         with:

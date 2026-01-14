@@ -4,10 +4,13 @@ import argparse
 import json
 import os
 import sys
+import logging
 from datetime import datetime
 from pathlib import Path
 from urllib.parse import urlparse
 import re
+
+logger = logging.getLogger(__name__)
 
 from src.core.exceptions import ScannerError, RepositoryDiscoveryError, AnalysisError, OutputGenerationError, ValidationError
 from src.core.pipeline.analysis import execute_pipeline
@@ -38,8 +41,14 @@ try:
 
     if is_feature_enabled("graceful_degradation"):
         from src.optional.recovery_strategies import register_all_recovery_strategies
+        from src.optional.graceful_degradation import initialize_graceful_degradation
         if register_all_recovery_strategies:
             register_all_recovery_strategies()
+        initialize_graceful_degradation()
+
+    if is_feature_enabled("blue_green_deployment"):
+        from src.optional.blue_green_deployment import initialize_blue_green_deployment
+        initialize_blue_green_deployment()
 
     # Warn about spec compliance
     warn_about_spec_compliance()
@@ -399,6 +408,56 @@ def main():
             help="Output format (default: prometheus)"
         )
 
+        # Feedback commands for continuous learning
+        feedback_parser = subparsers.add_parser('feedback', help='Submit feedback on scan findings')
+        feedback_parser.add_argument(
+            "scan_id",
+            type=str,
+            help="Scan ID to provide feedback for"
+        )
+        feedback_parser.add_argument(
+            "finding_id",
+            type=str,
+            help="Finding ID to classify"
+        )
+        feedback_parser.add_argument(
+            "classification",
+            type=str,
+            choices=["TP", "FP", "UNKNOWN"],
+            help="Classification: TP (True Positive), FP (False Positive), or UNKNOWN"
+        )
+        feedback_parser.add_argument(
+            "--comment",
+            type=str,
+            help="Optional comment explaining the classification"
+        )
+
+        # List scans command
+        list_scans_parser = subparsers.add_parser('list-scans', help='List recent scans')
+        list_scans_parser.add_argument(
+            "--limit",
+            type=int,
+            default=10,
+            help="Number of recent scans to show (default: 10)"
+        )
+
+        # Show findings command
+        show_findings_parser = subparsers.add_parser('show-findings', help='Show findings from a scan')
+        show_findings_parser.add_argument(
+            "scan_id",
+            type=str,
+            help="Scan ID to show findings for"
+        )
+
+        # Analyze feedback command
+        analyze_feedback_parser = subparsers.add_parser('analyze-feedback', 
+            help='Generate pattern improvement report based on feedback')
+        analyze_feedback_parser.add_argument(
+            "--output",
+            type=str,
+            help="Output file for report (default: print to stdout)"
+        )
+
         args = parser.parse_args()
 
         # Set environment variables for optional features based on CLI flags
@@ -439,6 +498,14 @@ def main():
             handle_api_command(args)
         elif args.command == 'metrics':
             handle_metrics_command(args)
+        elif args.command == 'feedback':
+            handle_feedback_command(args)
+        elif args.command == 'list-scans':
+            handle_list_scans_command(args)
+        elif args.command == 'show-findings':
+            handle_show_findings_command(args)
+        elif args.command == 'analyze-feedback':
+            handle_analyze_feedback_command(args)
         else:
             parser.print_help()
             sys.exit(1)
@@ -544,6 +611,27 @@ def handle_scan_command(args):
     except Exception as e:
         raise AnalysisError(f"Analysis pipeline failed: {e}", {"error": str(e)}) from e
 
+    # Store scan results in learning system
+    try:
+        from src.core.learning.learning_system import get_learning_system
+        import hashlib
+        
+        # Generate scan ID
+        scan_id = hashlib.sha256(
+            f"{repo_path}:{datetime.utcnow().isoformat()}".encode()
+        ).hexdigest()[:16]
+        
+        learning = get_learning_system()
+        learning.record_scan_result(scan_id, str(repo_path), analysis_result)
+        
+        print(f"📝 Scan ID: {scan_id}")
+        print(f"   Use 'repo-scanner show-findings {scan_id}' to review findings")
+        print(f"   Use 'repo-scanner feedback {scan_id} <finding_id> <TP|FP>' to provide feedback")
+        
+    except Exception as e:
+        # Don't fail the scan if learning system has issues
+        logger.warning("Failed to store scan results in learning system: %s", e)
+
     # Determine report type and output format
     if args.report_type is not None:
         report_type = args.report_type
@@ -564,10 +652,14 @@ def handle_scan_command(args):
     # Generate outputs based on report type
     try:
         if report_type and report_type in ["comprehensive", "both"]:
+            # Use enhanced report generator with executive summary and risk scoring
+            from src.core.quality.enhanced_report_generator import EnhancedReportGenerator
+            
+            enhanced_generator = EnhancedReportGenerator()
             report_path = output_dir / "scan_report.md"
-            report_content = generate_primary_report(analysis_result, str(repo_path))
+            report_content = enhanced_generator.generate_report(analysis_result, str(repo_path))
             report_path.write_text(report_content)
-            print(f"Comprehensive report written to {report_path}")
+            print(f"📊 Comprehensive report written to {report_path}")
 
         if report_type and report_type in ["verdict", "both"]:
             verdict_path = output_dir / "verdict_report.md"
@@ -621,6 +713,7 @@ def handle_api_command(args):
         launch_api()
     except ImportError as e:
         raise ValidationError(f"API server launcher not available: {e}")
+def handle_bounty_command(args):
     """Handle bounty analysis command."""
     # Check if bounty features are enabled
     try:
@@ -660,6 +753,7 @@ def handle_api_command(args):
         repo_path = Path(args.repository_path)
 
     if args.fetch_algora_bounties:
+        from src.optional.bounty.bounty_service import BountyService
         bounty_service = BountyService()
         bounties = bounty_service.fetch_bounties(args.org, args.limit, args.status)
         
@@ -711,6 +805,7 @@ def handle_api_command(args):
         print(f"Algora bounties analysis written to {batch_path}")
         return
     elif args.fetch_github_issues:
+        from src.optional.bounty.bounty_service import BountyService
         bounty_service = BountyService()
         bounties = bounty_service.fetch_github_issues(args.repo, args.labels, args.limit)
         
@@ -824,6 +919,7 @@ def handle_api_command(args):
 
     # Execute bounty analysis
     try:
+        from src.optional.bounty.bounty_service import BountyService
         bounty_service = BountyService()
         repository_url = f"file://{repo_path.absolute()}"  # Mock URL for local repo
 
@@ -882,6 +978,7 @@ def handle_api_command(args):
                 json.dump(bounty_assessments[0], f, indent=2, sort_keys=True)
             print(f"Bounty assessment written to {assessment_path}")
             try:
+                from src.core.quality.schema_validator import schema_validator
                 schema_validator.validate_bounty_assessment(str(assessment_path))
             except Exception as e:
                 raise ValidationError(f"Schema validation failed for bounty_assessment.json: {e}", {"path": str(assessment_path), "error": str(e)}) from e
@@ -911,6 +1008,16 @@ def handle_api_command(args):
 
 def handle_validate_command(args):
     """Handle bounty validation command."""
+    # Check if bounty features are enabled
+    try:
+        from src.optional.optional_config import is_feature_enabled
+        if not is_feature_enabled("bounty_service"):
+            raise ValidationError(
+                "Bounty features are not enabled. Use --enable-bounties flag or set REPO_SCANNER_ENABLE_BOUNTIES=true"
+            )
+    except ImportError:
+        raise ValidationError("Bounty features are not available in this installation")
+
     output_dir = Path(args.output_dir)
 
     # Create output directory
@@ -921,6 +1028,7 @@ def handle_validate_command(args):
 
     # Execute validation
     try:
+        from src.optional.bounty.bounty_service import BountyService
         bounty_service = BountyService()
         validation_results = bounty_service.validate_bounty_accuracy()
 
@@ -1036,6 +1144,231 @@ def handle_metrics_command(args):
         sys.exit(1)
     except Exception as e:
         print(f"❌ Error retrieving metrics: {e}")
+        sys.exit(1)
+
+
+def handle_feedback_command(args):
+    """Handle feedback submission on scan findings."""
+    try:
+        from src.core.learning.learning_system import get_learning_system
+        
+        learning = get_learning_system()
+        
+        # Submit feedback
+        learning.submit_feedback(
+            finding_id=args.finding_id,
+            classification=args.classification,
+            comment=args.comment
+        )
+        
+        print(f"✅ Feedback recorded: {args.finding_id} classified as {args.classification}")
+        if args.comment:
+            print(f"   Comment: {args.comment}")
+        
+        # Show updated pattern statistics
+        from src.core.learning.learning_system import FeedbackDatabase
+        db = FeedbackDatabase()
+        
+        # Get finding to determine pattern
+        conn = db.conn
+        finding = conn.execute(
+            "SELECT pattern_id FROM findings WHERE finding_id = ?",
+            (args.finding_id,)
+        ).fetchone()
+        
+        if finding:
+            stats = db.get_pattern_stats(finding['pattern_id'])
+            if stats and stats.total_reports >= 3:
+                print(f"\n📊 Pattern Statistics ({finding['pattern_id']}):")
+                print(f"   Total Reports: {stats.total_reports}")
+                print(f"   True Positives: {stats.true_positives}")
+                print(f"   False Positives: {stats.false_positives}")
+                print(f"   FP Rate: {stats.false_positive_rate:.1%}")
+                print(f"   Adjusted Confidence: {stats.adjusted_confidence:.0%}")
+        
+    except Exception as e:
+        print(f"❌ Error recording feedback: {e}")
+        import traceback
+        if os.getenv('DEBUG', '').lower() == 'true':
+            traceback.print_exc()
+        sys.exit(1)
+
+
+def handle_list_scans_command(args):
+    """Handle listing recent scans."""
+    try:
+        from src.core.learning.learning_system import FeedbackDatabase
+        
+        db = FeedbackDatabase()
+        
+        # Get recent scans
+        scans = db.conn.execute("""
+            SELECT scan_id, repository_path, scan_timestamp, total_findings
+            FROM scans
+            ORDER BY scan_timestamp DESC
+            LIMIT ?
+        """, (args.limit,)).fetchall()
+        
+        if not scans:
+            print("No scans found in database.")
+            return
+        
+        print(f"\n📋 Recent Scans (showing {len(scans)} most recent):\n")
+        for scan in scans:
+            print(f"  Scan ID: {scan['scan_id']}")
+            print(f"  Repository: {scan['repository_path']}")
+            print(f"  Timestamp: {scan['scan_timestamp']}")
+            print(f"  Findings: {scan['total_findings']}")
+            print()
+        
+    except Exception as e:
+        print(f"❌ Error listing scans: {e}")
+        import traceback
+        if os.getenv('DEBUG', '').lower() == 'true':
+            traceback.print_exc()
+        sys.exit(1)
+
+
+def handle_show_findings_command(args):
+    """Handle showing findings from a scan."""
+    try:
+        from src.core.learning.learning_system import FeedbackDatabase
+        
+        db = FeedbackDatabase()
+        
+        # Get scan info
+        scan = db.conn.execute(
+            "SELECT * FROM scans WHERE scan_id = ?",
+            (args.scan_id,)
+        ).fetchone()
+        
+        if not scan:
+            print(f"❌ Scan not found: {args.scan_id}")
+            sys.exit(1)
+        
+        print(f"\n📋 Scan: {scan['scan_id']}")
+        print(f"Repository: {scan['repository_path']}")
+        print(f"Timestamp: {scan['scan_timestamp']}")
+        print(f"Total Findings: {scan['total_findings']}\n")
+        
+        # Get findings
+        findings = db.get_findings_by_scan(args.scan_id)
+        
+        if not findings:
+            print("No findings in this scan.")
+            return
+        
+        # Group by severity
+        by_severity = {}
+        for finding in findings:
+            if finding.severity not in by_severity:
+                by_severity[finding.severity] = []
+            by_severity[finding.severity].append(finding)
+        
+        # Print grouped findings
+        for severity in ['critical', 'high', 'medium', 'low']:
+            if severity not in by_severity:
+                continue
+            
+            severity_findings = by_severity[severity]
+            emoji = {
+                'critical': '🚨',
+                'high': '⚠️',
+                'medium': '⚡',
+                'low': '✅'
+            }.get(severity, '❓')
+            
+            print(f"{emoji} {severity.upper()} ({len(severity_findings)} findings):")
+            for finding in severity_findings:
+                # Check if feedback exists
+                feedback = db.conn.execute(
+                    "SELECT classification FROM feedback WHERE finding_id = ?",
+                    (finding.finding_id,)
+                ).fetchone()
+                
+                feedback_status = f" [{feedback['classification']}]" if feedback else ""
+                
+                print(f"  • {finding.finding_id}{feedback_status}")
+                print(f"    {finding.description}")
+                print(f"    Location: {finding.file_path}:{finding.line_number}")
+                print(f"    Confidence: {finding.confidence:.0%}")
+                print()
+        
+        print("\nTo provide feedback on a finding:")
+        print(f"  repo-scanner feedback {args.scan_id} <finding_id> <TP|FP|UNKNOWN>")
+        
+    except Exception as e:
+        print(f"❌ Error showing findings: {e}")
+        import traceback
+        if os.getenv('DEBUG', '').lower() == 'true':
+            traceback.print_exc()
+        sys.exit(1)
+
+
+def handle_analyze_feedback_command(args):
+    """Handle generating pattern improvement report."""
+    try:
+        from src.core.learning.learning_system import get_learning_system
+        
+        learning = get_learning_system()
+        
+        print("📊 Analyzing pattern effectiveness based on feedback...\n")
+        
+        report = learning.generate_improvement_report()
+        
+        # Format report
+        output = ["# Pattern Improvement Analysis\n"]
+        
+        summary = report.get('summary', {})
+        output.append("## Summary\n")
+        output.append(f"- Total Patterns Evaluated: {report.get('total_patterns_evaluated', 0)}")
+        output.append(f"- High Priority Issues: {summary.get('high_priority_issues', 0)}")
+        output.append(f"- Medium Priority Issues: {summary.get('medium_priority_issues', 0)}")
+        output.append(f"- Well Performing: {summary.get('well_performing', 0)}\n")
+        
+        # Problematic patterns
+        problematic = report.get('problematic_patterns', [])
+        if problematic:
+            output.append("## 🚨 Problematic Patterns (>20% FP Rate - DISABLE or REFINE)\n")
+            for pattern in problematic:
+                output.append(f"### {pattern['pattern_id']}")
+                output.append(f"- Type: {pattern['pattern_type']}")
+                output.append(f"- False Positive Rate: {pattern['fp_rate']}")
+                output.append(f"- Total Reports: {pattern['total_reports']}")
+                output.append(f"- **Recommendation:** {pattern['recommendation']}\n")
+        
+        # Needs review
+        needs_review = report.get('needs_review', [])
+        if needs_review:
+            output.append("## ⚠️ Patterns Needing Review (>10% FP Rate)\n")
+            for pattern in needs_review:
+                output.append(f"### {pattern['pattern_id']}")
+                output.append(f"- False Positive Rate: {pattern['fp_rate']}")
+                output.append(f"- **Recommendation:** {pattern['recommendation']}\n")
+        
+        # Performing well
+        performing_well = report.get('performing_well', [])
+        if performing_well:
+            output.append("## ✅ Well-Performing Patterns\n")
+            for pattern in performing_well[:10]:  # Show top 10
+                output.append(f"- {pattern['pattern_id']}: {pattern['accuracy']} accuracy, "
+                            f"confidence {pattern['adjusted_confidence']}")
+        
+        report_text = '\n'.join(output)
+        
+        # Output report
+        if args.output:
+            output_path = Path(args.output)
+            output_path.write_text(report_text)
+            print(f"✅ Report written to {output_path}")
+        else:
+            print(report_text)
+        
+    except Exception as e:
+        print(f"❌ Error analyzing feedback: {e}")
+        import traceback
+        if os.getenv('DEBUG', '').lower() == 'true':
+            traceback.print_exc()
         sys.exit(1)
 
 

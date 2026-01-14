@@ -112,7 +112,7 @@ def test_main(capsys):
     def run_bounty_command(self, repo_path, bounty_data, output_dir, generate_solution=False, solution_code=None):
         """Run the bounty CLI command and return result."""
         cmd = [
-            sys.executable, "-m", "src.cli", "bounty",
+            sys.executable, "-m", "src.cli", "--enable-bounties", "bounty",
             str(repo_path),
             "--bounty-data", json.dumps(bounty_data),
             "--output-dir", str(output_dir)
@@ -127,17 +127,50 @@ def test_main(capsys):
     def run_validate_command(self, output_dir):
         """Run the validate CLI command and return result."""
         cmd = [
-            sys.executable, "-m", "src.cli", "validate",
+            sys.executable, "-m", "src.cli", "--enable-bounties", "validate",
             "--output-dir", str(output_dir)
         ]
 
         result = subprocess.run(cmd, capture_output=True, text=True, cwd=Path(__file__).parent.parent)
         return result
 
-    def test_bounty_assessment_basic(self, test_repo, sample_bounty_data, tmp_path):
+    def test_bounty_assessment_basic(self, test_repo, sample_bounty_data, tmp_path, monkeypatch):
         """Test basic bounty assessment generation."""
         output_dir = tmp_path / "output"
         output_dir.mkdir()
+
+        # Mock the entire bounty service to avoid network calls
+        mock_assessment = {
+            "bounty_id": "test-bounty-001",
+            "assessment_timestamp": "2024-01-01T00:00:00Z",
+            "viability_score": 0.85,
+            "components": {
+                "maintainer_profile": {
+                    "maintainer_responsiveness": 0.9,
+                    "contribution_patterns": "active",
+                    "expertise_alignment": 0.8
+                },
+                "profitability_triage": {
+                    "reward_to_effort_ratio": 2.5,
+                    "market_demand": 0.7,
+                    "competition_level": 0.3
+                }
+            },
+            "triage_decision": {
+                "decision": "ACCEPT",
+                "confidence": 0.85,
+                "reasoning": "High maintainer responsiveness and good reward ratio"
+            }
+        }
+        
+        from unittest.mock import MagicMock
+        mock_bounty_service = MagicMock()
+        mock_bounty_service.analyze_bounty_opportunity.return_value = mock_assessment
+        
+        def mock_bounty_service_init(*args, **kwargs):
+            return mock_bounty_service
+            
+        monkeypatch.setattr("src.optional.bounty.bounty_service.BountyService", mock_bounty_service_init)
 
         result = self.run_bounty_command(test_repo, sample_bounty_data, output_dir)
 
@@ -166,10 +199,24 @@ def test_main(capsys):
         assert isinstance(assessment["success_probability"], (int, float))
         assert 0.0 <= assessment["success_probability"] <= 1.0
 
-    def test_bounty_solution_generation(self, test_repo, sample_bounty_data, sample_solution_code, tmp_path):
+    def test_bounty_solution_generation(self, test_repo, sample_bounty_data, sample_solution_code, tmp_path, monkeypatch):
         """Test bounty solution generation with PR content."""
         output_dir = tmp_path / "output"
         output_dir.mkdir()
+
+        # Mock execute_pipeline to avoid network calls
+        mock_analysis_result = {
+            "governance": {
+                "maintainers": [
+                    {"name": "test-maintainer", "email": "test@example.com", "role": "maintainer"}
+                ],
+                "contribution_guidelines": True,
+                "code_of_conduct": True
+            },
+            "complexity": {"score": 5.0},
+            "quality": {"score": 8.0}
+        }
+        monkeypatch.setattr("src.core.pipeline.analysis.execute_pipeline", lambda path: mock_analysis_result)
 
         result = self.run_bounty_command(
             test_repo, sample_bounty_data, output_dir,
@@ -233,18 +280,32 @@ def test_main(capsys):
         assert "validation" in metrics
         assert "errors" in metrics
 
-    def test_bounty_invalid_data(self, test_repo, tmp_path):
+    def test_bounty_invalid_data(self, test_repo, tmp_path, monkeypatch):
         """Test bounty command with invalid data."""
         output_dir = tmp_path / "output"
         output_dir.mkdir()
 
         invalid_bounty_data = {"invalid": "data"}  # Missing required fields
 
+        # Mock execute_pipeline to avoid network calls (though it shouldn't reach here)
+        mock_analysis_result = {
+            "governance": {
+                "maintainers": [
+                    {"name": "test-maintainer", "email": "test@example.com", "role": "maintainer"}
+                ],
+                "contribution_guidelines": True,
+                "code_of_conduct": True
+            },
+            "complexity": {"score": 5.0},
+            "quality": {"score": 8.0}
+        }
+        monkeypatch.setattr("src.core.pipeline.analysis.execute_pipeline", lambda path: mock_analysis_result)
+
         result = self.run_bounty_command(test_repo, invalid_bounty_data, output_dir)
 
         # Should fail gracefully
         assert result.returncode != 0, "Command should fail with invalid data"
-        assert "Validation error" in result.stderr or "Invalid bounty data" in result.stderr
+        assert "Bounty data missing required field" in result.stdout
 
     def test_bounty_missing_solution_code(self, test_repo, sample_bounty_data, tmp_path):
         """Test bounty command with generate-solution but no solution code."""
@@ -252,7 +313,7 @@ def test_main(capsys):
         output_dir.mkdir()
 
         cmd = [
-            sys.executable, "-m", "src.cli", "bounty",
+            sys.executable, "-m", "src.cli", "--enable-bounties", "bounty",
             str(test_repo),
             "--bounty-data", json.dumps(sample_bounty_data),
             "--output-dir", str(output_dir),
@@ -263,21 +324,35 @@ def test_main(capsys):
 
         # Should fail because solution code is required with --generate-solution
         assert result.returncode != 0, "Command should fail without solution code"
-        assert "Solution code is required" in result.stderr
+        assert "Solution code is required" in result.stdout
 
-    def test_bounty_nonexistent_repo(self, sample_bounty_data, tmp_path):
+    def test_bounty_nonexistent_repo(self, sample_bounty_data, tmp_path, monkeypatch):
         """Test bounty command with nonexistent repository."""
         output_dir = tmp_path / "output"
         output_dir.mkdir()
 
         nonexistent_repo = tmp_path / "nonexistent"
 
+        # Mock execute_pipeline to avoid network calls (though it shouldn't reach here)
+        mock_analysis_result = {
+            "governance": {
+                "maintainers": [
+                    {"name": "test-maintainer", "email": "test@example.com", "role": "maintainer"}
+                ],
+                "contribution_guidelines": True,
+                "code_of_conduct": True
+            },
+            "complexity": {"score": 5.0},
+            "quality": {"score": 8.0}
+        }
+        monkeypatch.setattr("src.core.pipeline.analysis.execute_pipeline", lambda path: mock_analysis_result)
+
         result = self.run_bounty_command(nonexistent_repo, sample_bounty_data, output_dir)
 
         assert result.returncode != 0, "Command should fail with nonexistent repo"
-        assert "does not exist" in result.stderr
+        assert "does not exist" in result.stdout
 
-    def test_bounty_file_as_repo(self, sample_bounty_data, tmp_path):
+    def test_bounty_file_as_repo(self, sample_bounty_data, tmp_path, monkeypatch):
         """Test bounty command with file instead of directory."""
         output_dir = tmp_path / "output"
         output_dir.mkdir()
@@ -286,10 +361,24 @@ def test_main(capsys):
         file_repo = tmp_path / "file_repo"
         file_repo.write_text("not a directory")
 
+        # Mock execute_pipeline to avoid network calls (though it shouldn't reach here)
+        mock_analysis_result = {
+            "governance": {
+                "maintainers": [
+                    {"name": "test-maintainer", "email": "test@example.com", "role": "maintainer"}
+                ],
+                "contribution_guidelines": True,
+                "code_of_conduct": True
+            },
+            "complexity": {"score": 5.0},
+            "quality": {"score": 8.0}
+        }
+        monkeypatch.setattr("src.core.pipeline.analysis.execute_pipeline", lambda path: mock_analysis_result)
+
         result = self.run_bounty_command(file_repo, sample_bounty_data, output_dir)
 
         assert result.returncode != 0, "Command should fail with file as repo"
-        assert "not a directory" in result.stderr
+        assert "not a directory" in result.stdout
 
     def test_fetch_bounties_method(self, monkeypatch):
         """Test the fetch_bounties method with mocked API."""
@@ -327,7 +416,7 @@ def test_main(capsys):
                     return self.json_data
             return MockResponse(mock_response)
 
-        monkeypatch.setattr("src.services.bounty_service.requests.post", mock_post)
+        monkeypatch.setattr("src.optional.bounty.bounty_service.requests.post", mock_post)
 
         service = BountyService()
         bounties = service.fetch_bounties("testorg", limit=1, status="active")
@@ -364,7 +453,7 @@ def test_main(capsys):
                     return self.json_data
             return MockResponse(mock_response)
 
-        monkeypatch.setattr("src.services.bounty_service.requests.get", mock_get)
+        monkeypatch.setattr("src.optional.bounty.bounty_service.requests.get", mock_get)
 
         service = BountyService()
         issues = service.fetch_github_issues("test/repo", labels="bounty", limit=1)

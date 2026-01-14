@@ -163,6 +163,10 @@ def validate_git_url(url: str) -> bool:
 
     parsed = urlparse(url)
 
+    # Only allow secure schemes
+    if parsed.scheme not in ["https", "ssh", "git"]:
+        return False
+
     # Block localhost and private IPs (additional check beyond validate_url)
     hostname = parsed.hostname.lower()
     if hostname in ['localhost', '127.0.0.1', '::1'] or hostname.startswith('192.168.') or hostname.startswith('10.') or hostname.startswith('172.'):
@@ -535,13 +539,15 @@ async def detailed_health_check():
 
 @app.get("/metrics")
 async def get_metrics():
-    """Get Prometheus-compatible metrics."""
-    from .metrics_collector import get_metrics_collector
+    """Get application and system metrics in JSON format."""
     metrics_collector = get_metrics_collector()
-    prometheus_output = metrics_collector.get_prometheus_metrics()
+    metrics = await metrics_collector.collect_metrics()
 
-    # Return as plain text with proper content type for Prometheus
-    return Response(content=prometheus_output, media_type="text/plain; version=0.0.4; charset=utf-8")
+    return {
+        "application": metrics.get("application", {}),
+        "system": metrics.get("system", {}),
+        "timestamp": metrics.get("timestamp", datetime.utcnow().isoformat())
+    }
 
 @app.get("/performance")
 async def get_performance_stats():
@@ -600,25 +606,30 @@ async def start_scan(request: ScanRequest, background_tasks: BackgroundTasks):
     # Sanitize inputs first
     if INPUT_SANITIZATION_AVAILABLE:
         sanitizer = get_input_sanitizer()
+        try:
+            # Sanitize repository URL if provided
+            if request.repository_url:
+                request.repository_url = sanitizer.sanitize_input(request.repository_url, 'repository_url')
 
-        # Sanitize repository URL if provided
-        if request.repository_url:
-            request.repository_url = sanitizer.sanitize_input(request.repository_url, 'repository_url')
+            # Sanitize repository path if provided
+            if request.repository_path:
+                request.repository_path = sanitizer.sanitize_input(request.repository_path, 'filepath')
 
-        # Sanitize repository path if provided
-        if request.repository_path:
-            request.repository_path = sanitizer.sanitize_input(request.repository_path, 'filepath')
+            # Sanitize branch name
+            request.branch = sanitizer.sanitize_input(request.branch, 'branch_name')
 
-        # Sanitize branch name
-        request.branch = sanitizer.sanitize_input(request.branch, 'branch_name')
+            # Sanitize output format
+            if hasattr(request, 'output_format'):
+                request.output_format = sanitizer.sanitize_input(request.output_format, 'text', max_length=20)
 
-        # Sanitize output format
-        if hasattr(request, 'output_format'):
-            request.output_format = sanitizer.sanitize_input(request.output_format, 'text', max_length=20)
-
-        # Sanitize report type
-        if hasattr(request, 'report_type'):
-            request.report_type = sanitizer.sanitize_input(request.report_type, 'text', max_length=20)
+            # Sanitize report type
+            if hasattr(request, 'report_type'):
+                request.report_type = sanitizer.sanitize_input(request.report_type, 'text', max_length=20)
+        except ValueError as e:
+            message = str(e)
+            if "maximum length" in message.lower():
+                raise HTTPException(status_code=413, detail=message)
+            raise HTTPException(status_code=400, detail=message)
 
     # Validate request before accepting
     if not request.repository_path and not request.repository_url:
@@ -749,11 +760,21 @@ async def process_scan_job(job_id: str):
         metadata={"job_id": job_id}
     )
 
+    job = jobs.get(job_id)
+    if not job:
+        logger.error(f"Job {job_id} not found when attempting processing")
+        return
+
+    temp_dir = None
+    job.setdefault("started_at", datetime.utcnow())
+
     try:
-        request = job["request"]
+        request = job.get("request", {})
+
+        output_format = request.get("output_format", "both")
+        report_type = request.get("report_type", "comprehensive")
 
         # Determine repository path
-        temp_dir = None
         if request.get("repository_path"):
             repo_path = Path(request["repository_path"])
         elif request.get("repository_url"):

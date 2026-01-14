@@ -29,11 +29,31 @@ except ImportError:
 from ..timeouts_and_limits import analysis_timeout, analysis_limits
 from ..resource_manager import get_resource_manager
 
+# Behavioral principles validation
+from ..behavioral_principles import validate_behavioral_compliance, refusal_checker
+from ..principles.trust import apply_conservative_bias
+from ..authority_limits import AuthorityDomain, enforce_authority_limits
+from ..offline_enforcement import enforce_offline_mode
+
 logger = logging.getLogger(__name__)
 
 from src.core.pipeline.repository_discovery import discover_repository_root, get_canonical_file_list
 from src.core.pipeline.structural_modeling import analyze_repository_structure
 from src.core.pipeline.static_semantic_analysis import analyze_semantic_structure
+from src.core.pipeline.inter_file_dependency_analysis import analyze_inter_file_dependencies
+from src.core.pipeline.documentation_accuracy_analysis import analyze_documentation_accuracy
+from src.core.pipeline.code_implementation_pattern_detection import detect_code_implementation_patterns
+from src.core.pipeline.claims_accuracy_scoring import score_claims_vs_implementation_accuracy
+from src.core.pipeline.feature_completeness_assessment import assess_feature_completeness
+from src.core.pipeline.documentation_accuracy_confidence import calculate_documentation_accuracy_confidence
+from src.core.pipeline.documentation_code_gap_analysis import analyze_documentation_code_gaps
+from src.core.pipeline.documentation_accuracy_reporting import generate_documentation_accuracy_report
+from src.core.pipeline.primary_report_generator import generate_primary_report
+from src.core.pipeline.machine_readable_output_generator import MachineReadableOutputGenerator
+from src.core.pipeline.silence_policy import evaluate_silence_policy
+from src.core.pipeline.quality_bar import evaluate_quality_bar
+from src.core.pipeline.success_criteria import evaluate_success_criteria
+from src.core.validation.schema_validator import get_schema_validator
 from src.core.pipeline.code_comprehension import analyze_code_comprehension
 from src.core.pipeline.advanced_code_analysis import analyze_advanced_code
 from src.core.pipeline.compliance_analysis import analyze_compliance
@@ -53,7 +73,7 @@ from src.core.analysis.ast_analysis import ASTAnalysisEngine
 from src.core.pipeline.risk_synthesis import synthesize_risks
 from src.core.pipeline.decision_artifact_generation import generate_decision_artifacts
 from src.core.pipeline.authority_ceiling_evaluation import evaluate_authority_ceiling
-from src.core.pipeline.determinism_verification import verify_determinism
+from src.core.pipeline.determinism_verification import verify_determinism, enforce_reproducibility_guarantee
 from src.core.pipeline.enterprise_edge_case_handler import EnterpriseRepositoryHandler, EdgeCaseConfig
 
 
@@ -85,6 +105,14 @@ ANALYSIS_PIPELINE_STAGES = [
     "repository_discovery",
     "structural_modeling",
     "static_semantic_analysis",
+    "inter_file_dependency_analysis",
+    "documentation_accuracy_analysis",
+    "code_implementation_pattern_detection",
+    "claims_accuracy_scoring",
+    "feature_completeness_assessment",
+    "documentation_accuracy_confidence",
+    "documentation_code_gap_analysis",
+    "documentation_accuracy_reporting",
     "advanced_code_analysis",
     "code_comprehension_analysis",
     "compliance_analysis",
@@ -103,7 +131,13 @@ ANALYSIS_PIPELINE_STAGES = [
     "risk_and_gap_synthesis",
     "decision_artifact_generation",
     "authority_ceiling_evaluation",
-    "determinism_verification"
+    "silence_policy_evaluation",
+    "primary_report_generation",
+    "machine_readable_output_generation",
+    "schema_validation",
+    "quality_bar_evaluation",
+    "determinism_verification",
+    "success_criteria_evaluation"
 ]
 
 PARALLELISM_MODEL = {
@@ -143,9 +177,9 @@ def execute_pipeline(repository_path: str) -> dict:
         from src.optional.metrics_collector import get_metrics_collector, record_operation_start
         metrics_collector = get_metrics_collector()
         operation_start = record_operation_start("analysis_pipeline", {"repository_path": repository_path})
-        print(f"DEBUG: Metrics recording started for {repository_path}, operation_start={operation_start}")
+            # DEBUG_DISABLED: print(f"DEBUG: Metrics recording started for {repository_path}, operation_start={operation_start}")
     except ImportError as e:
-        print(f"DEBUG: Failed to import metrics collector: {e}")
+            # DEBUG_DISABLED: print(f"DEBUG: Failed to import metrics collector: {e}")
         pass
 
     # Start performance tracking
@@ -155,6 +189,23 @@ def execute_pipeline(repository_path: str) -> dict:
         # Log initial memory usage
         initial_memory = performance_optimizer.get_memory_usage()
         logger.info(f"Starting analysis - Initial memory: {initial_memory['rss_mb']:.1f}MB")
+
+        # BPS-015: Enforce offline-only execution mode
+        offline_enforcement = enforce_offline_mode({
+            "operation": "repository_analysis",
+            "repository_path": repository_path,
+            "stage": "pipeline_initialization"
+        })
+
+        if offline_enforcement["enforcement_status"] == "violated":
+            logger.error("Offline mode violation detected - aborting analysis")
+            return {
+                "repository_root": None,
+                "files": [],
+                "status": "analysis_aborted_offline_violation",
+                "offline_enforcement": offline_enforcement,
+                "error": "Offline mode requirements not met"
+            }
 
         # Repository discovery
         repo_root = discover_repository_root(repository_path)
@@ -172,6 +223,50 @@ def execute_pipeline(repository_path: str) -> dict:
             non_strings = [f for f in file_list if not isinstance(f, str)]
             if non_strings:
                 logger.error(f"Non-string items in file_list: {len(non_strings)} items, first 5: {non_strings[:5]}")
+
+        # BPS-006 to BPS-010: Perform behavioral rule refusal checks
+        analysis_request = {
+            "type": "comprehensive_security_analysis",  # Default analysis type
+            "repository_path": repository_path
+        }
+        repository_content = {
+            "files": file_list,
+            "repository_root": repo_root
+        }
+
+        refusal_artifacts = refusal_checker.perform_refusal_checks(analysis_request, repository_content)
+        if refusal_artifacts:
+            logger.warning(f"Analysis refused due to behavioral rule violations: {len(refusal_artifacts)} refusals")
+            # Return early with refusal artifacts
+            return {
+                "repository_root": repo_root,
+                "files": file_list,
+                "status": "analysis_refused",
+                "refusal_artifacts": [self._refusal_to_dict(r) for r in refusal_artifacts],
+                "behavioral_validation": {"compliant": False, "refusals": len(refusal_artifacts)}
+            }
+
+        # BPS-014: Evaluate authority ceiling limits
+        authority_evaluation = enforce_authority_limits(
+            "comprehensive_repository_analysis",
+            AuthorityDomain.REPOSITORY_ANALYSIS,
+            {
+                "repository_path": repository_path,
+                "file_count": len(file_list),
+                "analysis_type": "comprehensive_security_analysis"
+            }
+        )
+
+        if not authority_evaluation["authority_evaluation"]["can_proceed"]:
+            logger.warning(f"Analysis blocked due to authority ceiling violations: {authority_evaluation['authority_evaluation']['violation_count']} violations")
+            # Return early with authority violation
+            return {
+                "repository_root": repo_root,
+                "files": file_list,
+                "status": "analysis_blocked_authority_violation",
+                "authority_evaluation": authority_evaluation,
+                "behavioral_validation": {"compliant": True}  # Behavioral rules passed
+            }
 
         # Auto-select pipeline based on repository complexity
         complexity_threshold = 10000  # Much higher threshold for enterprise repos
@@ -210,7 +305,7 @@ def execute_pipeline(repository_path: str) -> dict:
                         "pipeline_type": "enterprise_edge_case",
                         "edge_cases_handled": enterprise_result.get("edge_cases_handled", {})
                     })
-                    print(f"DEBUG: Metrics recorded for enterprise pipeline, success={'results' in enterprise_result}")
+            # DEBUG_DISABLED: print(f"DEBUG: Metrics recorded for enterprise pipeline, success={'results' in enterprise_result}")
                 except ImportError:
                     pass
 
@@ -218,7 +313,7 @@ def execute_pipeline(repository_path: str) -> dict:
 
         # Check for very large repositories that need distributed processing first
         complexity = _estimate_repository_complexity(file_list)
-        print(f"DEBUG: Repository complexity: {complexity}, file count: {len(file_list)}")
+            # DEBUG_DISABLED: print(f"DEBUG: Repository complexity: {complexity}, file count: {len(file_list)}")
         if len(file_list) > 10000 or complexity > 1000:
             logger.info(f"Very large repository detected ({len(file_list)} files), using distributed pipeline")
             try:
@@ -266,7 +361,7 @@ def execute_pipeline(repository_path: str) -> dict:
                                 "file_count": len(file_list),
                                 "pipeline_type": "distributed"
                             })
-                            print(f"DEBUG: Metrics recorded for distributed pipeline")
+            # DEBUG_DISABLED: print(f"DEBUG: Metrics recorded for distributed pipeline")
                         except ImportError:
                             pass
 
@@ -275,9 +370,9 @@ def execute_pipeline(repository_path: str) -> dict:
                         security_analysis = analyze_security_vulnerabilities(file_list, {"analysis_type": "distributed"})
                         result["unsafe_patterns"] = security_analysis.get("unsafe_patterns", {})
                         result["security_analysis"] = security_analysis
-                        print(f"DEBUG: Added security analysis to distributed pipeline result")
+            # DEBUG_DISABLED: print(f"DEBUG: Added security analysis to distributed pipeline result")
                     except Exception as e:
-                        print(f"DEBUG: Failed to add security analysis to distributed pipeline: {e}")
+            # DEBUG_DISABLED: print(f"DEBUG: Failed to add security analysis to distributed pipeline: {e}")
                         result["unsafe_patterns"] = {"summary": {"total_patterns": 0}}
                         result["security_analysis"] = {"error": str(e)}
 
@@ -332,7 +427,7 @@ def execute_pipeline(repository_path: str) -> dict:
                             "file_count": len(file_list),
                             "pipeline_type": "optimized"
                         })
-                        print(f"DEBUG: Metrics recorded for optimized pipeline")
+            # DEBUG_DISABLED: print(f"DEBUG: Metrics recorded for optimized pipeline")
                     except ImportError:
                         pass
 
@@ -364,7 +459,7 @@ def execute_pipeline(repository_path: str) -> dict:
                     "file_count": len(file_list),
                     "pipeline_type": "standard"
                 })
-                print(f"DEBUG: Metrics recorded for standard pipeline")
+            # DEBUG_DISABLED: print(f"DEBUG: Metrics recorded for standard pipeline")
             except ImportError:
                 pass
 
@@ -414,7 +509,7 @@ def _estimate_repository_complexity(file_list: List[str]) -> float:
     # Validate input
     if not all(isinstance(f, str) for f in file_list):
         non_strings = [f for f in file_list if not isinstance(f, str)]
-        print(f"DEBUG: Non-string items in file_list for complexity estimation: {non_strings[:5]} (types: {[type(f) for f in non_strings[:5]]})")
+            # DEBUG_DISABLED: print(f"DEBUG: Non-string items in file_list for complexity estimation: {non_strings[:5]} (types: {[type(f) for f in non_strings[:5]]})")
         # Filter out non-strings
         file_list = [f for f in file_list if isinstance(f, str)]
 
@@ -558,9 +653,9 @@ def _execute_standard_pipeline(repository_path: str, repo_root: str, file_list: 
     try:
         structure = _run_stage('structural_modeling', analyze_repository_structure, file_list)
     except Exception as e:
-        print(f"DEBUG: Error in standard pipeline analyze_repository_structure: {e}")
-        print(f"DEBUG: file_list sample: {file_list[:5]}")
-        print(f"DEBUG: file_list types: {[type(f) for f in file_list[:5]]}")
+            # DEBUG_DISABLED: print(f"DEBUG: Error in standard pipeline analyze_repository_structure: {e}")
+            # DEBUG_DISABLED: print(f"DEBUG: file_list sample: {file_list[:5]}")
+            # DEBUG_DISABLED: print(f"DEBUG: file_list types: {[type(f) for f in file_list[:5]]}")
         raise
 
     # AST analysis (multi-language code parsing)
@@ -570,6 +665,41 @@ def _execute_standard_pipeline(repository_path: str, repo_root: str, file_list: 
     # Static semantic analysis (must be second)
     semantic = _run_stage('static_semantic_analysis', analyze_semantic_structure, file_list, structure)
 
+    # Inter-file dependency analysis (depends on semantic)
+    inter_file_dependencies = _run_stage('inter_file_dependency_analysis', analyze_inter_file_dependencies, file_list, semantic)
+
+    # Documentation accuracy analysis (depends on repository structure)
+    documentation_accuracy = _run_stage('documentation_accuracy_analysis', analyze_documentation_accuracy, repo_root, file_list)
+
+    # Code implementation pattern detection (depends on semantic analysis)
+    code_implementation_patterns = _run_stage('code_implementation_pattern_detection', detect_code_implementation_patterns, file_list, semantic)
+
+    # Claims vs implementation accuracy scoring (depends on documentation and patterns)
+    claims_accuracy_scoring = _run_stage('claims_accuracy_scoring', score_claims_vs_implementation_accuracy,
+                                        documentation_accuracy.get('documentation_claims', {}),
+                                        code_implementation_patterns)
+
+    # Feature completeness assessment (depends on documentation claims and implementation patterns)
+    feature_completeness = _run_stage('feature_completeness_assessment', assess_feature_completeness,
+                                     documentation_accuracy.get('documentation_claims', {}),
+                                     code_implementation_patterns)
+
+    # Documentation accuracy confidence metrics (depends on claims, patterns, and accuracy scoring)
+    documentation_confidence = _run_stage('documentation_accuracy_confidence', calculate_documentation_accuracy_confidence,
+                                         documentation_accuracy.get('documentation_claims', {}),
+                                         code_implementation_patterns, claims_accuracy_scoring)
+
+    # Documentation-code gap analysis (depends on claims, patterns, and accuracy scoring)
+    documentation_code_gaps = _run_stage('documentation_code_gap_analysis', analyze_documentation_code_gaps,
+                                        documentation_accuracy.get('documentation_claims', {}),
+                                        code_implementation_patterns, claims_accuracy_scoring)
+
+    # Documentation accuracy reporting (depends on all DAC components)
+    documentation_accuracy_report = _run_stage('documentation_accuracy_reporting', generate_documentation_accuracy_report,
+                                             documentation_accuracy.get('documentation_claims', {}),
+                                             code_implementation_patterns, claims_accuracy_scoring,
+                                             feature_completeness, documentation_confidence, documentation_code_gaps)
+
     # Advanced code analysis (depends on semantic)
     advanced_code_analysis = _run_stage('advanced_code_analysis', analyze_advanced_code, file_list, semantic)
 
@@ -578,6 +708,29 @@ def _execute_standard_pipeline(repository_path: str, repo_root: str, file_list: 
 
     # Security vulnerability analysis (depends on semantic)
     security_analysis = _run_stage('security_vulnerability_analysis', analyze_security_vulnerabilities, file_list, semantic)
+
+    # Malicious intent detection
+    malicious_intent_analysis = {}
+    try:
+        from src.core.security.malicious_intent_detection import analyze_malicious_intent
+        
+        # Build file content dict for analysis
+        repository_files = {}
+        file_cache = FileCache()
+        for file_path in file_list[:1000]:  # Limit to first 1000 files for performance
+            try:
+                content = file_cache.get_file_content(file_path)
+                if content:
+                    repository_files[file_path] = content
+            except:
+                pass
+        
+        malicious_intent_analysis = _run_stage('malicious_intent_detection', 
+                                               analyze_malicious_intent, 
+                                               repository_files)
+    except Exception as e:
+        logger.warning("Malicious intent detection failed: %s", e)
+        malicious_intent_analysis = {"error": str(e), "detections": []}
 
     # Enhanced security analysis (optional based on feature flags)
     from ..feature_flags import is_feature_enabled, FeatureFlag
@@ -654,21 +807,85 @@ def _execute_standard_pipeline(repository_path: str, repo_root: str, file_list: 
     authority_ceiling_evaluation = _run_stage('authority_ceiling_evaluation', evaluate_authority_ceiling, file_list, structure, semantic, test_signals, governance, intent_posture, misleading_signals, safe_change_surface, risk_synthesis, decision_artifacts)
     determinism_verification = _run_stage('determinism_verification', verify_determinism, file_list, structure, semantic, test_signals, governance, intent_posture, misleading_signals, safe_change_surface, risk_synthesis, decision_artifacts, authority_ceiling_evaluation)
 
+    # BPS-012: Enforce reproducibility guarantee
+    reproducibility_status = enforce_reproducibility_guarantee(locals(), repository_path)
+
     execution_time = time.time() - start_time
 
     # Get final memory usage and performance stats
     final_memory = performance_optimizer.get_memory_usage()
     memory_delta = final_memory['rss_mb'] - initial_memory['rss_mb']
 
-    return {
-        "repository_root": repo_root,
-        "files": file_list,
+    # BPS-002: Validate evidence separation from judgment in all findings
+    # Extract findings from all analysis stages for behavioral validation
+    all_findings = []
+    
+    # Extract findings from security analysis
+    if 'findings' in security_analysis:
+        all_findings.extend(security_analysis['findings'])
+    
+    # Extract findings from risk synthesis
+    if 'findings' in risk_synthesis:
+        all_findings.extend(risk_synthesis['findings'])
+    
+    # Extract findings from compliance analysis
+    if 'findings' in compliance_analysis:
+        all_findings.extend(compliance_analysis['findings'])
+    
+    # Extract findings from dependency analysis
+    if 'findings' in dependency_analysis:
+        all_findings.extend(dependency_analysis['findings'])
+    
+    # Extract findings from code duplication analysis
+    if 'findings' in code_duplication_analysis:
+        all_findings.extend(code_duplication_analysis['findings'])
+    
+    # Extract findings from API analysis
+    if 'findings' in api_analysis:
+        all_findings.extend(api_analysis['findings'])
+    
+    # Extract findings from advanced code analysis
+    if 'findings' in advanced_code_analysis:
+        all_findings.extend(advanced_code_analysis['findings'])
+    
+    # Extract findings from cryptographic analysis
+    if 'findings' in cryptographic_analysis:
+        all_findings.extend(cryptographic_analysis.get('findings', []))
+    
+    # Extract findings from supply chain analysis
+    if 'findings' in supply_chain_analysis:
+        all_findings.extend(supply_chain_analysis.get('findings', []))
+    
+    # Extract findings from security testing analysis
+    if 'findings' in security_testing_analysis:
+        all_findings.extend(security_testing_analysis.get('findings', []))
+    
+    # Validate behavioral compliance
+    behavioral_validation = validate_behavioral_compliance(all_findings)
+    
+    # Log validation results
+    if not behavioral_validation['compliant']:
+        logger.warning(f"Behavioral principle violations detected: {behavioral_validation['violations']}")
+        # In production, this might trigger a refusal or correction process
+
+    # BPS-013: Apply conservative bias on ambiguity
+
+    # Generate primary human-readable report (before building final result)
+    temp_results = {
         "structure": structure,
-        "ast_analysis": ast_analysis,
         "semantic": semantic,
+        "inter_file_dependencies": inter_file_dependencies,
+        "documentation_accuracy": documentation_accuracy,
+        "code_implementation_patterns": code_implementation_patterns,
+        "claims_accuracy_scoring": claims_accuracy_scoring,
+        "feature_completeness_assessment": feature_completeness,
+        "documentation_accuracy_confidence": documentation_confidence,
+        "documentation_code_gap_analysis": documentation_code_gaps,
+        "documentation_accuracy_report": documentation_accuracy_report,
         "advanced_code_analysis": advanced_code_analysis,
         "code_comprehension": code_comprehension,
         "security_analysis": security_analysis,
+        "malicious_intent": malicious_intent_analysis,
         "cryptographic_analysis": cryptographic_analysis,
         "supply_chain_analysis": supply_chain_analysis,
         "security_testing_analysis": security_testing_analysis,
@@ -684,7 +901,51 @@ def _execute_standard_pipeline(repository_path: str, repo_root: str, file_list: 
         "risk_synthesis": risk_synthesis,
         "decision_artifacts": decision_artifacts,
         "authority_ceiling_evaluation": authority_ceiling_evaluation,
-        "determinism_verification": determinism_verification,
+        "determinism_verification": determinism_verification
+    }
+    silence_policy_evaluation = _run_stage('silence_policy_evaluation', evaluate_silence_policy, temp_results)
+
+    # Check if silence policy requires no output generation
+    if silence_policy_evaluation.get("should_be_silent", False):
+        logger.info("Silence policy triggered - returning silence verdict without generating outputs")
+        result = {
+            "repository_root": repo_root,
+            "files": file_list,
+            "silence_policy_evaluation": silence_policy_evaluation,
+            "outputs_generated": False,
+            "silence_verdict": silence_policy_evaluation.get("silence_verdict")
+        }
+        # Include all analysis results for transparency
+        result.update(temp_results)
+        return result
+
+    primary_report = _run_stage('primary_report_generation', generate_primary_report, temp_results, repository_path)
+
+    # Generate machine-readable output
+    machine_output_generator = MachineReadableOutputGenerator()
+    machine_readable_output = _run_stage('machine_readable_output_generation',
+                                       machine_output_generator.generate_machine_readable_output,
+                                       temp_results, repository_path)
+
+    # Validate machine-readable output against schema
+    schema_validator = get_schema_validator()
+    schema_validation = _run_stage('schema_validation',
+                                  lambda data: schema_validator.validate_data(data, 'output/scan_report'),
+                                  machine_readable_output)
+
+    # Evaluate outputs against quality bar
+    quality_bar_evaluation = _run_stage('quality_bar_evaluation', evaluate_quality_bar, primary_report, machine_readable_output)
+
+    result = {
+        "repository_root": repo_root,
+        "files": file_list,
+        "outputs_generated": True,
+        "silence_policy_evaluation": silence_policy_evaluation,
+        "schema_validation": schema_validation,
+        "quality_bar_evaluation": quality_bar_evaluation,
+        "success_criteria_evaluation": success_criteria_evaluation,
+        "primary_report": primary_report,
+        "machine_readable_output": machine_readable_output,
         "performance_metrics": {
             "execution_time_seconds": execution_time,
             "parallel_stages_used": True,
@@ -697,6 +958,26 @@ def _execute_standard_pipeline(repository_path: str, repo_root: str, file_list: 
             "degradation_config": degradation_config
         },
         "status": "standard_pipeline_complete"
+    }
+    # Include all analysis results
+    result.update(temp_results)
+
+    # Evaluate success criteria
+    success_criteria_evaluation = _run_stage('success_criteria_evaluation', evaluate_success_criteria, result)
+
+    # Apply conservative bias to the entire result
+    result = apply_conservative_bias(result)
+
+    return result
+
+def _refusal_to_dict(refusal: 'RefusalArtifact') -> Dict[str, Any]:
+    """Convert a RefusalArtifact to dictionary format."""
+    return {
+        "reason_for_refusal": refusal.reason_for_refusal,
+        "missing_or_unknown_information": refusal.missing_or_unknown_information,
+        "blast_radius_unbounded_statement": refusal.blast_radius_unbounded_statement,
+        "responsible_human_role_required": refusal.responsible_human_role_required,
+        "timestamp": refusal.timestamp
     }
 
 def validate_parallelism_guarantees(operation: str) -> bool:

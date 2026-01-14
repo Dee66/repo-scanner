@@ -1,8 +1,9 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
   "title": "Scan Report",
   "type": "object",
-  "required": ["run_id","repository","summary","tasks","gaps","unsafe_patterns","metadata"],
+  "required": ["run_id","repository","summary","tasks","gaps","unsafe_patterns","decision_artifacts","metadata"],
   "properties": {
     "run_id": {"type":"string"},
     "repository": {
@@ -140,12 +141,158 @@
       },
       "required": ["profitability_score", "merge_confidence", "maintainer_compatibility", "bounty_recommendations"]
     },
+    "decision_artifacts": {
+      "type": "object",
+      "description": "Decision artifacts providing executive guidance and safety boundaries",
+      "properties": {
+        "executive_verdict": {
+          "type": "string",
+          "description": "High-level executive summary and verdict on repository state"
+        },
+        "safe_to_change_surface": {
+          "type": "array",
+          "description": "List of files and components that are safe to modify",
+          "items": {
+            "type": "object",
+            "properties": {
+              "file_path": {"type": "string"},
+              "component": {"type": "string"},
+              "confidence": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+              "rationale": {"type": "string"}
+            },
+            "required": ["file_path", "component", "confidence", "rationale"]
+          }
+        },
+        "no_touch_zones": {
+          "type": "array",
+          "description": "Critical files and components that should not be modified",
+          "items": {
+            "type": "object",
+            "properties": {
+              "file_path": {"type": "string"},
+              "component": {"type": "string"},
+              "severity": {"type": "string", "enum": ["critical", "high", "medium"]},
+              "rationale": {"type": "string"}
+            },
+            "required": ["file_path", "component", "severity", "rationale"]
+          }
+        },
+        "misleading_signals": {
+          "type": "array",
+          "description": "Signals that appear positive but are actually misleading",
+          "items": {
+            "type": "object",
+            "properties": {
+              "signal_type": {"type": "string"},
+              "description": {"type": "string"},
+              "file_path": {"type": "string"},
+              "line_number": {"type": "integer", "minimum": 1},
+              "why_misleading": {"type": "string"}
+            },
+            "required": ["signal_type", "description", "why_misleading"]
+          }
+        },
+        "what_not_to_fix": {
+          "type": "array",
+          "description": "Issues that should not be fixed due to higher-level constraints",
+          "items": {
+            "type": "object",
+            "properties": {
+              "issue_type": {"type": "string"},
+              "description": {"type": "string"},
+              "file_path": {"type": "string"},
+              "rationale": {"type": "string"},
+              "priority_level": {"type": "string", "enum": ["do_not_fix", "fix_only_if_safe", "requires_external_coordination"]}
+            },
+            "required": ["issue_type", "description", "rationale", "priority_level"]
+          }
+        },
+        "refusal_artifact_if_applicable": {
+          "type": "object",
+          "description": "Refusal artifact if the system cannot provide guidance",
+          "properties": {
+            "refusal_reason": {"type": "string"},
+            "refusal_category": {"type": "string", "enum": ["authority_ceiling_exceeded", "insufficient_evidence", "contradictory_signals", "external_dependency_required"]},
+            "refusal_timestamp": {"type": "string", "format": "date-time"},
+            "next_steps": {"type": "array", "items": {"type": "string"}}
+          }
+        },
+        "confidence_and_limits": {
+          "type": "object",
+          "description": "Confidence levels and explicit limits of the analysis",
+          "properties": {
+            "overall_confidence": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+            "confidence_breakdown": {
+              "type": "object",
+              "properties": {
+                "structural_analysis": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+                "governance_signals": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+                "testing_coverage": {"type": "number", "minimum": 0.0, "maximum": 1.0},
+                "integration_patterns": {"type": "number", "minimum": 0.0, "maximum": 1.0}
+              }
+            },
+            "analysis_limits": {
+              "type": "array",
+              "items": {"type": "string"}
+            },
+            "assumptions_made": {
+              "type": "array",
+              "items": {"type": "string"}
+            }
+          },
+          "required": ["overall_confidence", "confidence_breakdown", "analysis_limits"]
+        },
+        "validity_window": {
+          "type": "object",
+          "description": "Time window during which this analysis remains valid",
+          "properties": {
+            "valid_from": {"type": "string", "format": "date-time"},
+            "valid_until": {"type": "string", "format": "date-time"},
+            "invalidation_triggers": {
+              "type": "array",
+              "items": {"type": "string"}
+            },
+            "recommended_refresh_interval": {"type": "string"}
+          },
+          "required": ["valid_from", "valid_until", "invalidation_triggers"]
+        },
+        "artifacts": {
+          "type": "array",
+          "description": "Individual evidence artifacts and findings",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {"type": "string"},
+              "type": {"type": "string"},
+              "severity": {"type": "string"},
+              "title": {"type": "string"},
+              "description": {"type": "string"},
+              "evidence": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "source_path": {"type": "string"},
+                    "snippet": {"type": "string"},
+                    "line_range": {"type": "array", "items": {"type": "integer"}, "minItems": 2, "maxItems": 2},
+                    "byte_range": {"type": "array", "items": {"type": "integer"}, "minItems": 2, "maxItems": 2},
+                    "repo_commit": {"type": "string"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "required": ["executive_verdict", "safe_to_change_surface", "no_touch_zones", "misleading_signals", "what_not_to_fix", "confidence_and_limits", "validity_window"]
+    },
     "metadata": {
       "type":"object",
       "properties": {
         "scanner_version":{"type":"string"},
         "run_timestamp":{"type":"string","format":"date-time"},
-        "deterministic_hash":{"type":"string"}
+        "deterministic_hash":{"type":"string"},
+        "schema_version":{"type":"string"}
       }
     }
   }

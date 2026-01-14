@@ -60,11 +60,10 @@ htmlcov/
 .dmypy.json
 dmypy.json
 
-# Large validation data files
-validation_data/repositories/*/.git/
-validation_data/security/*.json
-validation_data/repositories/*_report.json
-validation_data/repositories/validation_results/*.json
+# Large validation data files - exclude entire repositories directory
+validation_data/repositories/*/
+validation_data/security/
+validation_data/temp/
 
 # Temporary files
 tmp/
@@ -86,34 +85,43 @@ logs/
 scan_results*/
 scan_output/
 outputs*/
-tmp_scan_output/
+tmp_scan_output*/
 batch_scan_results/
-reports/
-*.json
-validation_results.json
-phase_5_validation_report.json
-readiness_assessment*.json
-deployment*.json
-performance_results.json
-ci_data_report*.json
+reports/scan_results/
+reports/batch_scan_results/
+reports/deployment/
+reports/validation/
 
-# Test data and repositories
-test_data/
-test_repositories/
-test_repo/
-test_scan_output/
+# Result files (keep only essential configs)
+*.json
+!package.json
+!tsconfig.json
+!*config.json
+!pyproject.toml
+!schemas/**/*.json
+
+# Test data and repositories (keep structure, ignore generated data)
+test_data/test_repositories/*/.scanner_cache/
 flask_test*/
 requests_test/
-analysis/
-experiments/
 final_test/
-enhanced_scanner/
-monitoring/
-deployment/
-helm/
-k8s/
-tools/
-config/
+
+# Build/compilation outputs (common patterns)
+node_modules/
+dist/
+target/
+build/
+out/
+bin/
+obj/
+*.egg-info/
+
+# Generated/temporary directories
+experiments/enhanced_scanner/
+.benchmarks/
+
+# Archive directory (old files)
+archive/
 
 # SME reviews (generated)
 sme_reviews/reports/

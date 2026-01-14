@@ -43,10 +43,11 @@ OPTIONAL_FEATURES_CONFIG = {
         "retry_delay": float(os.getenv("REPO_SCANNER_RETRY_DELAY", "1.0")),
     },
 
-    # Graceful degradation for component failures
-    "graceful_degradation": {
-        "enabled": os.getenv("REPO_SCANNER_ENABLE_DEGRADATION", "false").lower() == "true",
-        "degradation_timeout": int(os.getenv("REPO_SCANNER_DEGRADATION_TIMEOUT", "300")),
+    # Blue-green deployment strategy
+    "blue_green_deployment": {
+        "enabled": os.getenv("REPO_SCANNER_ENABLE_BLUE_GREEN", "false").lower() == "true",
+        "rollback_timeout": int(os.getenv("REPO_SCANNER_BG_ROLLBACK_TIMEOUT", "600")),
+        "health_check_interval": int(os.getenv("REPO_SCANNER_BG_HEALTH_INTERVAL", "30")),
     },
 
     # Prometheus-compatible metrics collection

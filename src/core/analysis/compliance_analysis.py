@@ -69,8 +69,12 @@ class ComplianceAnalysis(AnalysisComponent):
             "details": compliance_results
         }
 
+        # Generate certification reports
+        certification_reports = self._generate_certification_reports(repo, compliance_results)
+
         return {
-            "compliance_analysis": overall_compliance
+            "compliance_analysis": overall_compliance,
+            "certification_reports": certification_reports
         }
 
     def _check_gdpr_compliance(self, repo: Path) -> Dict[str, Any]:
@@ -323,3 +327,168 @@ class ComplianceAnalysis(AnalysisComponent):
         # Check that HTTP URLs are not used (only HTTPS)
         http_only = self._check_file_contains(repo, r"http://")
         return not http_only
+
+    def _generate_certification_reports(self, repo: Path, compliance_results: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Generate certification reports for various standards.
+
+        Args:
+            repo: Repository path
+            compliance_results: Results from compliance checks
+
+        Returns:
+            Dict containing certification reports
+        """
+        reports = {}
+
+        # ISO 27001 Information Security Management Systems
+        reports["iso27001"] = self._generate_iso27001_report(repo, compliance_results)
+
+        # NIST Cybersecurity Framework
+        reports["nist_csf"] = self._generate_nist_csf_report(repo, compliance_results)
+
+        # SOC 2 Trust Services Criteria
+        reports["soc2"] = self._generate_soc2_report(repo, compliance_results)
+
+        return reports
+
+    def _generate_iso27001_report(self, repo: Path, compliance_results: Dict[str, Any]) -> Dict[str, Any]:
+        """Generate ISO 27001 certification report."""
+        iso27001_controls = {
+            "A.5": "Information security policies",  # Maps to security best practices
+            "A.6": "Organization of information security",  # Maps to security controls
+            "A.7": "Human resource security",  # Not directly checked
+            "A.8": "Asset management",  # Maps to license compliance
+            "A.9": "Access control",  # Maps to security measures
+            "A.10": "Cryptography",  # Maps to confidentiality
+            "A.11": "Physical and environmental security",  # Not applicable
+            "A.12": "Operations security",  # Maps to availability
+            "A.13": "Communications security",  # Maps to HTTPS usage
+            "A.14": "System acquisition, development and maintenance",  # Maps to dependency security
+            "A.15": "Supplier relationships",  # Not directly checked
+            "A.16": "Information security incident management",  # Maps to security incident response
+            "A.17": "Information security aspects of business continuity",  # Maps to availability
+            "A.18": "Compliance",  # Maps to overall compliance
+        }
+
+        control_compliance = {}
+        for control, description in iso27001_controls.items():
+            if "security" in description.lower():
+                control_compliance[control] = compliance_results.get("security", {}).get("compliant", False)
+            elif "license" in description.lower():
+                control_compliance[control] = compliance_results.get("license", {}).get("compliant", False)
+            elif "cryptography" in description.lower() or "confidentiality" in description.lower():
+                control_compliance[control] = compliance_results.get("soc2", {}).get("criteria", {}).get("confidentiality", {}).get("compliant", False)
+            elif "availability" in description.lower():
+                control_compliance[control] = compliance_results.get("soc2", {}).get("criteria", {}).get("availability", {}).get("compliant", False)
+            elif "https" in description.lower():
+                control_compliance[control] = compliance_results.get("security", {}).get("checks", {}).get("uses_https", False)
+            elif "dependency" in description.lower():
+                control_compliance[control] = compliance_results.get("dependencies", {}).get("compliant", False)
+            else:
+                control_compliance[control] = False
+
+        compliant_controls = sum(control_compliance.values())
+        total_controls = len(control_compliance)
+
+        return {
+            "standard": "ISO 27001:2022",
+            "compliance_score": compliant_controls / total_controls if total_controls > 0 else 0,
+            "compliant_controls": compliant_controls,
+            "total_controls": total_controls,
+            "control_details": control_compliance,
+            "certification_recommendations": [
+                "Implement comprehensive information security policies",
+                "Establish security organization and responsibilities",
+                "Conduct regular security audits and assessments",
+                "Develop incident response and business continuity plans"
+            ]
+        }
+
+    def _generate_nist_csf_report(self, repo: Path, compliance_results: Dict[str, Any]) -> Dict[str, Any]:
+        """Generate NIST Cybersecurity Framework report."""
+        nist_functions = {
+            "Identify": ["Asset Management", "Risk Assessment", "Supply Chain Risk Management"],
+            "Protect": ["Access Control", "Data Security", "Information Protection Processes", "Protective Technology"],
+            "Detect": ["Anomalies and Events", "Security Continuous Monitoring", "Detection Processes"],
+            "Respond": ["Response Planning", "Communications", "Analysis", "Mitigation", "Improvements"],
+            "Recover": ["Recovery Planning", "Improvements", "Communications"]
+        }
+
+        function_compliance = {}
+        for function, categories in nist_functions.items():
+            category_compliance = []
+            for category in categories:
+                if "access" in category.lower():
+                    category_compliance.append(compliance_results.get("security", {}).get("compliant", False))
+                elif "data" in category.lower() or "information" in category.lower():
+                    category_compliance.append(compliance_results.get("gdpr", {}).get("compliant", False) or compliance_results.get("hipaa", {}).get("compliant", False))
+                elif "monitoring" in category.lower():
+                    category_compliance.append(compliance_results.get("security", {}).get("checks", {}).get("has_codeql", False))
+                elif "response" in category.lower() or "recovery" in category.lower():
+                    category_compliance.append(compliance_results.get("soc2", {}).get("compliant", False))
+                else:
+                    category_compliance.append(False)
+            function_compliance[function] = any(category_compliance)
+
+        compliant_functions = sum(function_compliance.values())
+        total_functions = len(function_compliance)
+
+        return {
+            "standard": "NIST Cybersecurity Framework v1.1",
+            "compliance_score": compliant_functions / total_functions if total_functions > 0 else 0,
+            "compliant_functions": compliant_functions,
+            "total_functions": total_functions,
+            "function_details": function_compliance,
+            "certification_recommendations": [
+                "Implement comprehensive risk assessment processes",
+                "Deploy continuous monitoring and detection capabilities",
+                "Develop incident response and recovery plans",
+                "Establish regular security assessments and audits"
+            ]
+        }
+
+    def _generate_soc2_report(self, repo: Path, compliance_results: Dict[str, Any]) -> Dict[str, Any]:
+        """Generate SOC 2 certification report."""
+        soc2_criteria = {
+            "Security": ["Access Controls", "System Operations", "Change Management", "Risk Mitigation"],
+            "Availability": ["System Availability", "Monitoring", "Incident Response"],
+            "Processing Integrity": ["Data Processing", "Quality Assurance", "Output Controls"],
+            "Confidentiality": ["Data Protection", "Encryption", "Access Controls"],
+            "Privacy": ["Data Collection", "Data Usage", "Data Retention", "Data Disposal"]
+        }
+
+        criteria_compliance = {}
+        for criterion, controls in soc2_criteria.items():
+            control_compliance = []
+            for control in controls:
+                if "access" in control.lower():
+                    control_compliance.append(compliance_results.get("security", {}).get("compliant", False))
+                elif "availability" in control.lower() or "monitoring" in control.lower():
+                    control_compliance.append(compliance_results.get("soc2", {}).get("criteria", {}).get("availability", {}).get("compliant", False))
+                elif "integrity" in control.lower() or "processing" in control.lower():
+                    control_compliance.append(compliance_results.get("soc2", {}).get("criteria", {}).get("integrity", {}).get("compliant", False))
+                elif "confidentiality" in control.lower() or "encryption" in control.lower():
+                    control_compliance.append(compliance_results.get("soc2", {}).get("criteria", {}).get("confidentiality", {}).get("compliant", False))
+                elif "privacy" in control.lower():
+                    control_compliance.append(compliance_results.get("soc2", {}).get("criteria", {}).get("privacy", {}).get("compliant", False))
+                else:
+                    control_compliance.append(False)
+            criteria_compliance[criterion] = any(control_compliance)
+
+        compliant_criteria = sum(criteria_compliance.values())
+        total_criteria = len(criteria_compliance)
+
+        return {
+            "standard": "SOC 2 Trust Services Criteria",
+            "compliance_score": compliant_criteria / total_criteria if total_criteria > 0 else 0,
+            "compliant_criteria": compliant_criteria,
+            "total_criteria": total_criteria,
+            "criteria_details": criteria_compliance,
+            "certification_recommendations": [
+                "Implement comprehensive access controls and monitoring",
+                "Establish data protection and encryption measures",
+                "Develop incident response and business continuity procedures",
+                "Conduct regular independent audits and assessments"
+            ]
+        }
