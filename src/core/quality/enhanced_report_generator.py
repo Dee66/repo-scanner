@@ -123,10 +123,15 @@ class EnhancedReportGenerator:
         if not security_analysis:
             return 1.0
         
+        # Try direct path first, then nested path (unsafe_patterns.patterns_by_language)
         patterns = security_analysis.get('patterns_by_language', {})
+        if not patterns:
+            patterns = security_analysis.get('unsafe_patterns', {}).get('patterns_by_language', {})
         all_patterns = []
         for lang_patterns in patterns.values():
-            all_patterns.extend(lang_patterns)
+            for entry in lang_patterns:
+                inner = entry.get('patterns', [entry])
+                all_patterns.extend(inner)
         
         if not all_patterns:
             return 1.0
@@ -201,14 +206,25 @@ class EnhancedReportGenerator:
         """Generate executive summary."""
         # Count findings by severity
         security = results.get('security_analysis', {})
+        # Try direct path first, then nested path
         patterns = security.get('patterns_by_language', {})
+        if not patterns:
+            patterns = security.get('unsafe_patterns', {}).get('patterns_by_language', {})
         all_patterns = []
         for lang_patterns in patterns.values():
-            all_patterns.extend(lang_patterns)
+            for entry in lang_patterns:
+                inner = entry.get('patterns', [entry])
+                all_patterns.extend(inner)
         
         critical_count = sum(1 for p in all_patterns if p.get('severity') == 'critical')
         high_count = sum(1 for p in all_patterns if p.get('severity') == 'high')
         medium_count = sum(1 for p in all_patterns if p.get('severity') == 'medium')
+        
+        # Fallback: pull counts from summary if pattern counting yielded nothing
+        if critical_count == 0 and high_count == 0 and medium_count == 0:
+            summary = security.get('unsafe_patterns', {}).get('summary', {})
+            high_count = summary.get('high_severity', 0)
+            medium_count = summary.get('medium_severity', 0)
         
         # Malicious intent
         malicious = results.get('malicious_intent', {})
@@ -323,32 +339,39 @@ This repository does not have any high-priority security or quality issues.
         
         # Extract security vulnerabilities
         security = results.get('security_analysis', {})
+        # Try direct path first, then nested path
         patterns = security.get('patterns_by_language', {})
+        if not patterns:
+            patterns = security.get('unsafe_patterns', {}).get('patterns_by_language', {})
         for lang, lang_patterns in patterns.items():
-            for pattern in lang_patterns:
-                severity = pattern.get('severity', 'medium')
-                confidence = pattern.get('confidence', 0.5)
+            for entry in lang_patterns:
+                # entry may be a flat pattern dict or a file-level dict with nested patterns
+                inner_patterns = entry.get('patterns', [entry])
+                file_path = entry.get('file_path', entry.get('file', 'unknown'))
+                for pattern in inner_patterns:
+                    severity = pattern.get('severity', 'medium')
+                    confidence = pattern.get('confidence', 0.5)
                 
-                # Calculate priority score
-                severity_weight = {
-                    'critical': 10,
-                    'high': 7,
-                    'medium': 4,
-                    'low': 2
-                }.get(severity, 1)
-                priority_score = severity_weight * confidence
+                    # Calculate priority score
+                    severity_weight = {
+                        'critical': 10,
+                        'high': 7,
+                        'medium': 4,
+                        'low': 2
+                    }.get(severity, 1)
+                    priority_score = severity_weight * confidence
                 
-                risks.append({
-                    'title': pattern.get('description', 'Security Issue'),
-                    'severity': severity,
-                    'impact': pattern.get('impact', 'Security vulnerability'),
-                    'confidence': f"{confidence:.0%}",
-                    'evidence': f"{pattern.get('file', 'unknown')}:{pattern.get('line', '?')}\n{pattern.get('evidence', '')}",
-                    'remediation': pattern.get('remediation', 'Review and fix'),
-                    'effort': self._estimate_effort(severity),
-                    'priority': 'CRITICAL' if priority_score >= 8 else 'HIGH' if priority_score >= 5 else 'MEDIUM',
-                    'priority_score': priority_score
-                })
+                    risks.append({
+                        'title': pattern.get('description', 'Security Issue'),
+                        'severity': severity,
+                        'impact': pattern.get('impact', 'Security vulnerability'),
+                        'confidence': f"{confidence:.0%}",
+                        'evidence': f"{pattern.get('file', file_path)}:{pattern.get('line', '?')}\n{pattern.get('evidence', '')}",
+                        'remediation': pattern.get('remediation', 'Review and fix'),
+                        'effort': self._estimate_effort(severity),
+                        'priority': 'CRITICAL' if priority_score >= 8 else 'HIGH' if priority_score >= 5 else 'MEDIUM',
+                        'priority_score': priority_score
+                    })
         
         # Extract malicious intent patterns
         malicious = results.get('malicious_intent', {})

@@ -114,3 +114,51 @@ def test_get_canonical_file_list_invalid_path():
     """Test canonical file list with invalid path."""
     result = get_canonical_file_list("/nonexistent/path")
     assert result == []
+
+
+class TestGovernanceHiddenDirs:
+    """Test that .github and similar governance dirs are NOT excluded."""
+
+    def test_github_workflows_included(self, tmp_path):
+        """Files under .github/workflows/ should appear in file list."""
+        wf_dir = tmp_path / ".github" / "workflows"
+        wf_dir.mkdir(parents=True)
+        (wf_dir / "ci.yml").write_text("name: CI")
+        (tmp_path / "main.py").write_text("print('hi')")
+
+        file_list = get_canonical_file_list(str(tmp_path))
+        rel_paths = [str(Path(f).relative_to(tmp_path)) for f in file_list]
+        assert ".github/workflows/ci.yml" in rel_paths
+
+    def test_gitlab_ci_included(self, tmp_path):
+        """Files under .gitlab/ should appear in file list."""
+        gl_dir = tmp_path / ".gitlab"
+        gl_dir.mkdir()
+        (gl_dir / "ci.yml").write_text("stages:")
+        (tmp_path / "app.py").write_text("pass")
+
+        file_list = get_canonical_file_list(str(tmp_path))
+        rel_paths = [str(Path(f).relative_to(tmp_path)) for f in file_list]
+        assert ".gitlab/ci.yml" in rel_paths
+
+    def test_cache_dir_still_excluded(self, tmp_path):
+        """.cache and other non-governance dot dirs should still be skipped."""
+        cache_dir = tmp_path / ".cache"
+        cache_dir.mkdir()
+        (cache_dir / "data.bin").write_text("cached")
+        (tmp_path / "main.py").write_text("pass")
+
+        file_list = get_canonical_file_list(str(tmp_path))
+        rel_paths = [str(Path(f).relative_to(tmp_path)) for f in file_list]
+        assert not any(".cache" in p for p in rel_paths)
+
+    def test_dot_git_still_excluded(self, tmp_path):
+        """.git directory should still be excluded."""
+        git_dir = tmp_path / ".git"
+        git_dir.mkdir()
+        (git_dir / "HEAD").write_text("ref: refs/heads/main")
+        (tmp_path / "main.py").write_text("pass")
+
+        file_list = get_canonical_file_list(str(tmp_path))
+        rel_paths = [str(Path(f).relative_to(tmp_path)) for f in file_list]
+        assert not any(".git/" in p or p == ".git" for p in rel_paths)

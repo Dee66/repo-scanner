@@ -16,16 +16,18 @@ class SQLInjectionValidator:
     """Multi-layer validation for SQL injection detection."""
     
     # Unsafe SQL patterns (string concatenation, format strings)
+    # Require SQL structural context (FROM, SET, INTO, VALUES, WHERE) alongside keywords
+    # to avoid matching English words (e.g., "Updated" matching UPDATE)
     UNSAFE_PATTERNS = [
         # Python string formatting with concatenation
-        (r'(SELECT|INSERT|UPDATE|DELETE).*?["\'].*?\+', 'String concatenation in SQL'),
-        (r'\+.*?(SELECT|INSERT|UPDATE|DELETE)', 'String concatenation in SQL'),
-        # F-strings
-        (r'f["\'].*?(SELECT|INSERT|UPDATE|DELETE).*?\{', 'F-string in SQL'),
-        # .format() method
-        (r'["\'].*?(SELECT|INSERT|UPDATE|DELETE).*?["\']\s*\.format\(', '.format() in SQL'),
-        # % formatting
-        (r'["\'].*?(SELECT|INSERT|UPDATE|DELETE).*?["\']\s*%', '% formatting in SQL'),
+        (r'\b(SELECT\b.+?\bFROM\b|INSERT\s+INTO\b|UPDATE\b.+?\bSET\b|DELETE\s+FROM\b).*?["\'].*?\+', 'String concatenation in SQL'),
+        (r'\+.*?\b(SELECT\b.+?\bFROM\b|INSERT\s+INTO\b|UPDATE\b.+?\bSET\b|DELETE\s+FROM\b)', 'String concatenation in SQL'),
+        # F-strings with actual SQL structure
+        (r'f["\'].*?\b(SELECT\b.+?\bFROM\b|INSERT\s+INTO\b|UPDATE\b.+?\bSET\b|DELETE\s+FROM\b).*?\{', 'F-string in SQL'),
+        # .format() method with actual SQL structure
+        (r'["\'].*?\b(SELECT\b.+?\bFROM\b|INSERT\s+INTO\b|UPDATE\b.+?\bSET\b|DELETE\s+FROM\b).*?["\']\s*\.format\(', '.format() in SQL'),
+        # % formatting with actual SQL structure
+        (r'["\'].*?\b(SELECT\b.+?\bFROM\b|INSERT\s+INTO\b|UPDATE\b.+?\bSET\b|DELETE\s+FROM\b).*?["\']\s*%', '% formatting in SQL'),
     ]
     
     # Safe patterns (parameterized queries, ORM)

@@ -193,3 +193,92 @@ class TestEdgeCases:
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
+
+
+class TestFalsePositiveReduction:
+    """Test that English words containing SQL keywords are NOT flagged."""
+
+    def test_fstring_with_updated_english_word(self, validator):
+        """f-string with 'Updated' (contains UPDATE) should NOT be flagged."""
+        code = 'print(f"Updated {count} records")'
+        is_vuln, reason, confidence = validator.validate_sql_operation(
+            code, "app.py", 10, "", []
+        )
+        assert not is_vuln
+
+    def test_fstring_with_selected_english_word(self, validator):
+        """f-string with 'Selected' (contains SELECT) should NOT be flagged."""
+        code = 'print(f"Selected {item} from list")'
+        is_vuln, reason, confidence = validator.validate_sql_operation(
+            code, "app.py", 10, "", []
+        )
+        assert not is_vuln
+
+    def test_fstring_with_deleted_english_word(self, validator):
+        """f-string with 'Deleted' (contains DELETE) should NOT be flagged."""
+        code = 'print(f"Deleted {n} entries")'
+        is_vuln, reason, confidence = validator.validate_sql_operation(
+            code, "app.py", 10, "", []
+        )
+        assert not is_vuln
+
+    def test_fstring_with_inserted_english_word(self, validator):
+        """f-string with 'Inserted' should NOT be flagged."""
+        code = 'print(f"Inserted {n} rows into the log")'
+        is_vuln, reason, confidence = validator.validate_sql_operation(
+            code, "app.py", 10, "", []
+        )
+        assert not is_vuln
+
+    def test_real_sql_select_fstring_still_detected(self, validator):
+        """Real SQL SELECT in f-string SHOULD be flagged."""
+        code = 'query = f"SELECT * FROM users WHERE id = {user_id}"'
+        is_vuln, reason, confidence = validator.validate_sql_operation(
+            code, "app.py", 10, "", []
+        )
+        assert is_vuln
+        assert confidence > 0.7
+
+    def test_real_sql_update_fstring_still_detected(self, validator):
+        """Real SQL UPDATE in f-string SHOULD be flagged."""
+        code = "query = f\"UPDATE users SET name = '{name}'\""  # noqa
+        is_vuln, reason, confidence = validator.validate_sql_operation(
+            code, "app.py", 10, "", []
+        )
+        assert is_vuln
+        assert confidence > 0.7
+
+    def test_real_sql_delete_fstring_still_detected(self, validator):
+        """Real SQL DELETE FROM in f-string SHOULD be flagged."""
+        code = 'query = f"DELETE FROM users WHERE id = {user_id}"'
+        is_vuln, reason, confidence = validator.validate_sql_operation(
+            code, "app.py", 10, "", []
+        )
+        assert is_vuln
+        assert confidence > 0.7
+
+    def test_real_sql_insert_fstring_still_detected(self, validator):
+        """Real SQL INSERT INTO in f-string SHOULD be flagged."""
+        code = 'query = f"INSERT INTO users VALUES ({name}, {email})"'
+        is_vuln, reason, confidence = validator.validate_sql_operation(
+            code, "app.py", 10, "", []
+        )
+        assert is_vuln
+        assert confidence > 0.7
+
+    def test_parameterized_query_still_safe(self, validator):
+        """Parameterized queries should NOT be flagged."""
+        code = 'cursor.execute("SELECT * FROM users WHERE id = ?", (uid,))'
+        is_vuln, reason, confidence = validator.validate_sql_operation(
+            code, "app.py", 10, "", []
+        )
+        assert not is_vuln
+
+    def test_format_with_real_sql_still_detected(self, validator):
+        """SQL with .format() SHOULD be flagged."""
+        code = 'query = "SELECT * FROM users WHERE id = {}".format(uid)'
+        is_vuln, reason, confidence = validator.validate_sql_operation(
+            code, "app.py", 10, "", []
+        )
+        assert is_vuln
+        assert confidence > 0.7

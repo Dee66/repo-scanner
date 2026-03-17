@@ -320,7 +320,12 @@ def get_canonical_file_list(repository_root: str) -> list[str]:
             # DEBUG_DISABLED: print(f"DEBUG: Non-string filenames: {non_strings[:5]} (types: {[type(f) for f in non_strings[:5]]})")
                 filenames[:] = [f for f in filenames if isinstance(f, str)]
             
-            # Filter dirnames in-place to control traversal. Keep '.git' only.
+            # Filter dirnames in-place to control traversal.
+            # Governance-relevant hidden dirs (CI/CD, editor configs) are allowed through.
+            _GOVERNANCE_HIDDEN_DIRS = {
+                '.github', '.gitlab', '.circleci', '.buildkite',
+                '.azure-pipelines', '.husky', '.devcontainer',
+            }
             filtered = []
             for d in dirnames:
                 if not isinstance(d, str):
@@ -329,8 +334,10 @@ def get_canonical_file_list(repository_root: str) -> list[str]:
                 if d == '.git':
                     filtered.append(d)
                     continue
-                # Skip any dot-folder except .git
+                # Allow governance-relevant hidden dirs, skip the rest
                 if d.startswith('.'):
+                    if d in _GOVERNANCE_HIDDEN_DIRS:
+                        filtered.append(d)
                     continue
                 if d in _EXCLUDE_DIRS:
                     continue

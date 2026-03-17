@@ -165,7 +165,7 @@ def run_validation_suite() -> Dict[str, Any]:
 
     # Test against CostPilot (known to have good security practices)
     costpilot_result = validator.validate_against_repository(
-        "/home/dee/workspace/AI/GuardSuite/CostPilot"
+        "/home/dee/workspace/AI/Sentinel/CostPilot"
     )
 
     # In a real scenario, we'd test against multiple repos with known vulnerabilities

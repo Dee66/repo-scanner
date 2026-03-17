@@ -1,4 +1,5 @@
 """Output contract and quality assurance for Repository Intelligence Scanner."""
+from datetime import datetime, timezone
 from pathlib import Path
 
 PRIMARY_REPORT = {
@@ -828,11 +829,13 @@ def generate_machine_output(analysis: dict, repository_path: str) -> dict:
     output = {
         "run_id": "placeholder-run-id",
         "repository": {
-            "name": repo_root.split('/')[-1] if '/' in repo_root else repo_root,
+            "name": Path(repo_root).resolve().name if repo_root else "unknown",
             "path": repo_root
         },
         "summary": {
-            "overall_score": 0.0,
+            "overall_score": analysis.get("risk_synthesis", {}).get("overall_risk_assessment", {}).get("average_risk_score",
+                            analysis.get("risk_synthesis", {}).get("overall_risk_score",
+                            analysis.get("risk_synthesis", {}).get("average_score", 0.0))),
             "files_scanned": len(files),
             "tests_discovered": structure.get("file_counts", {}).get("test", 0),
             "gaps_count": 0
@@ -858,7 +861,7 @@ def generate_machine_output(analysis: dict, repository_path: str) -> dict:
         }),
         "metadata": {
             "scanner_version": "1.1.0",
-            "run_timestamp": "2025-01-01T00:00:00Z",  # Fixed timestamp for determinism
+            "run_timestamp": datetime.now(timezone.utc).isoformat(),
             "deterministic_hash": "placeholder-hash",
             "schema_version": "1.0.0"
         }
@@ -866,7 +869,6 @@ def generate_machine_output(analysis: dict, repository_path: str) -> dict:
 
     # Ensure metadata includes schema_version for compatibility checks
     try:
-        from pathlib import Path
         version_path = Path('docs') / 'schemas' / 'VERSION'
         if version_path.exists():
             ver = version_path.read_text(encoding='utf-8', errors='ignore').strip()

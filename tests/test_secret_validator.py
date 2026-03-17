@@ -210,3 +210,56 @@ class TestRealWorldScenarios:
 
 if __name__ == '__main__':
     pytest.main([__file__, '-v'])
+
+
+class TestConfigKeyExclusion:
+    """Test that config keys and enum constants are NOT flagged as secrets."""
+
+    @pytest.fixture
+    def validator(self):
+        return SecretValidator(min_entropy=4.5, min_length=8)
+
+    def test_dotted_config_path_not_flagged(self, validator):
+        """Dotted config path like 'api_server.enabled' should not be a secret."""
+        is_valid, reason, _ = validator.validate_secret(
+            'api_server.enabled', 'src/config.py', 1,
+            'key="api_server.enabled"'
+        )
+        assert is_valid is False
+        assert 'config path' in reason.lower()
+
+    def test_nested_dotted_config_path(self, validator):
+        """Deeply nested config paths should not be flagged."""
+        is_valid, reason, _ = validator.validate_secret(
+            'monitoring.metrics.endpoint.url', 'src/settings.py', 1,
+            'METRIC_URL = "monitoring.metrics.endpoint.url"'
+        )
+        assert is_valid is False
+        assert 'config path' in reason.lower()
+
+    def test_lowercase_enum_value_not_flagged(self, validator):
+        """Simple lowercase enum values should not be flagged."""
+        is_valid, reason, _ = validator.validate_secret(
+            'basic_auth', 'src/enums.py', 1,
+            'AUTH_TYPE = "basic_auth"'
+        )
+        assert is_valid is False
+
+    def test_config_schema_context_not_flagged(self, validator):
+        """Values in ConfigurationSchema definitions should not be flagged."""
+        is_valid, reason, _ = validator.validate_secret(
+            'xK8mN2pQ9rV3w', 'src/config.py', 1,
+            'ConfigurationSchema(key="server.token", default="xK8mN2pQ9rV3w")'
+        )
+        assert is_valid is False
+        assert 'config' in reason.lower()
+
+    def test_real_high_entropy_key_still_flagged(self, validator):
+        """Real high-entropy tokens in production code should still be flagged."""
+        token = 'ghp_xK8mN2pQ9rV3wZ5cF7jL0tY4uA6dH1sE8i'
+        is_valid, reason, confidence = validator.validate_secret(
+            token, 'src/main.py', 1,
+            f'GITHUB_TOKEN = "{token}"'
+        )
+        assert is_valid is True
+        assert confidence >= 0.85

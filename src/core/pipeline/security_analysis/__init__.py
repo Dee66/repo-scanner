@@ -196,6 +196,8 @@ class SecurityAnalyzer:
                 'cwe_id': 'CWE-502',
                 'owasp_category': 'A08:2021-Software and Data Integrity Failures',
                 'skip_test_files': True,
+                'skip_comments': True,
+                'context_check': True,
                 'safe_patterns': [
                     r'json\.loads?\s*\(\s*sys\.stdin',  # CLI input parsing
                     r'json\.loads?\s*\(\s*response\.text',  # HTTP response parsing (may be safe)
@@ -845,6 +847,8 @@ class SecurityAnalyzer:
 
     def _validate_context(self, line: str, vuln_type: str, content: str, line_num: int) -> bool:
         """Perform additional context validation for certain vulnerability types."""
+        if vuln_type == 'insecure_deserialization':
+            return self._validate_deserialization_context(line, content, line_num)
         if vuln_type == 'path_traversal':
             # For path traversal, check if this looks like a security test or safe operation
             context_lines = self._get_context_lines(content, line_num, 5)
@@ -882,6 +886,38 @@ class SecurityAnalyzer:
             ]
 
             return any(indicator in context_text for indicator in dangerous_indicators)
+
+        return True
+
+    def _validate_deserialization_context(self, line: str, content: str, line_num: int) -> bool:
+        """Check if a deserialization pattern match is actual usage vs detection/scanning code."""
+        stripped = line.strip()
+
+        # Skip matches inside raw strings (regex patterns)
+        # e.g., r'eval\s*\(' or r"\beval\s*\("
+        if re.search(r"r['\"].*$", stripped):
+            # The line defines a raw string (regex pattern), not actual usage
+            if re.search(r"r['\"].*?(eval|pickle|yaml\.load)", stripped):
+                return False
+
+        # Skip matches that are inside string literals used for detection
+        # e.g., if 'eval(' in content: or "eval(" in line
+        if re.search(r"['\"]\s*(eval|pickle|yaml\.load).*?['\"]\s*in\s+", stripped):
+            return False
+        if re.search(r"in\s+.*?['\"]\s*(eval|pickle|yaml\.load)", stripped):
+            return False
+
+        # Skip if the line is building a list/dict of pattern definitions
+        context_lines = self._get_context_lines(content, line_num, context_size=3)
+        context_text = '\n'.join(context_lines).lower()
+        detection_indicators = [
+            'pattern', 'regex', 'detect', 'scan', 'validator',
+            'unsafe_patterns', 'vulnerability', 'finding', 'check_for',
+            're.search', 're.compile', 're.finditer', 're.match',
+        ]
+        indicator_count = sum(1 for ind in detection_indicators if ind in context_text)
+        if indicator_count >= 2:
+            return False
 
         return True
 

@@ -524,98 +524,121 @@ def _generate_bounty_recommendations(profitability_score: float, merge_confidenc
     return recommendations
 
 
-def _generate_executive_verdict(risk_synthesis: Dict, safe_change_surface: Dict) -> Dict:
-    """Generate executive verdict artifact per output contract v2."""
+def _generate_executive_verdict(risk_synthesis: Dict, safe_change_surface: Dict) -> str:
+    """Generate executive verdict string per output contract v2 (schema: type string)."""
     overall_risk = risk_synthesis.get("overall_risk_assessment", {})
     risk_level = overall_risk.get("overall_risk_level", "unknown")
 
-    # Determine verdict based on risk level and safe changes
     safe_changes = safe_change_surface.get("safe_changes", [])
-    unsafe_changes = safe_change_surface.get("unsafe_changes", [])
 
     if risk_level == "high" or not safe_changes:
-        verdict = "UNSAFE"
-        confidence = 0.8
-        safe_action_summary = "Do not make changes until critical issues are addressed"
-        unsafe_action_summary = "Any changes carry significant risk"
+        return (
+            "UNSAFE: Repository exhibits high risk. Do not make changes until critical issues "
+            "are addressed. Any changes carry significant risk."
+        )
     elif risk_level == "medium":
-        verdict = "CAUTION"
-        confidence = 0.7
-        safe_action_summary = "Limited safe changes available - proceed with caution"
-        unsafe_action_summary = "Avoid changes to core functionality and dependencies"
+        return (
+            "CAUTION: Repository is in moderate health. Limited safe changes available — "
+            "proceed with caution and avoid changes to core functionality and dependencies."
+        )
     else:  # low
-        verdict = "SAFE"
-        confidence = 0.9
-        safe_action_summary = "Safe to proceed with recommended changes"
-        unsafe_action_summary = "Avoid changes that would introduce new dependencies or complexity"
-
-    return {
-        "verdict": verdict,
-        "confidence": confidence,
-        "scope_of_assessment": "Full repository analysis including structure, security, testing, and governance",
-        "blocking_risks": unsafe_changes[:3],  # Top 3 blocking risks
-        "safe_action_summary": safe_action_summary,
-        "unsafe_action_summary": unsafe_action_summary,
-        "evidence_index_refs": ["risk_synthesis", "safe_change_surface", "security_analysis"]
-    }
+        return (
+            "SAFE: Repository is in good health. Safe to proceed with recommended changes. "
+            "Avoid changes that would introduce new dependencies or complexity."
+        )
 
 
-def _extract_safe_to_change_surface(safe_change_surface: Dict) -> Dict:
-    """Extract safe-to-change surface artifact."""
-    return {
-        "safe_changes": safe_change_surface.get("safe_changes", []),
-        "change_safety_level": safe_change_surface.get("overall_change_safety", {}).get("overall_safety_level", "unknown"),
-        "safety_factors": safe_change_surface.get("safety_factors", {}),
-        "evidence_refs": ["test_coverage_safety", "complexity_safety", "dependency_safety"]
-    }
+def _extract_safe_to_change_surface(safe_change_surface: Dict) -> List[Dict]:
+    """Extract safe-to-change surface as array per schema."""
+    raw = safe_change_surface.get("safe_changes", [])
+    result = []
+    for item in raw:
+        if isinstance(item, dict):
+            result.append({
+                "file_path": item.get("file_path", item.get("path", "unknown")),
+                "component": item.get("component", item.get("module", "unknown")),
+                "confidence": float(item.get("confidence", 0.8)),
+                "rationale": item.get("rationale", item.get("reason", "Low-risk component"))
+            })
+        elif isinstance(item, str):
+            result.append({
+                "file_path": item,
+                "component": item,
+                "confidence": 0.8,
+                "rationale": "Low-risk component identified by analysis"
+            })
+    return result
 
 
 def _generate_no_touch_zones(risk_synthesis: Dict, safe_change_surface: Dict) -> List[Dict]:
-    """Generate no-touch zones based on high-risk areas."""
+    """Generate no-touch zones based on high-risk areas (schema fields: file_path, component, severity, rationale)."""
     no_touch_zones = []
 
     # Extract high-risk components
     component_risks = risk_synthesis.get("component_risks", {})
 
+    severity_map = {"very_high": "critical", "high": "high", "medium": "medium"}
+
     for risk_name, risk_data in component_risks.items():
+        if not isinstance(risk_data, dict):
+            continue
         risk_level = risk_data.get("risk_level", "low")
         risk_score = risk_data.get("risk_score", 0)
 
         if risk_level in ["high", "very_high"] or risk_score > 5:
+            schema_severity = severity_map.get(risk_level, "high")
             zone = {
-                "zone_type": _map_risk_to_zone_type(risk_name),
-                "reason": risk_data.get("description", f"High {risk_name} risk"),
-                "blast_radius": _calculate_blast_radius(risk_level),
-                "evidence_refs": risk_data.get("risk_factors", [])
+                "file_path": risk_data.get("file_path", risk_data.get("path", f"<{risk_name}>")),
+                "component": _map_risk_to_zone_type(risk_name),
+                "severity": schema_severity,
+                "rationale": risk_data.get("description", f"High {risk_name} risk detected")
             }
             no_touch_zones.append(zone)
 
     return no_touch_zones
 
 
-def _extract_misleading_signals(misleading_signals: Dict) -> Dict:
-    """Extract misleading signals artifact."""
-    return {
-        "total_misleading_signals": misleading_signals.get("total_misleading_signals", 0),
-        "signal_types": misleading_signals.get("signal_types", []),
-        "confidence_impact": misleading_signals.get("confidence_impact", "low"),
-        "evidence_refs": ["misleading_signal_detection"]
-    }
+def _extract_misleading_signals(misleading_signals: Dict) -> List[Dict]:
+    """Extract misleading signals as array per schema."""
+    raw = misleading_signals.get("signals", misleading_signals.get("signal_types", []))
+    result = []
+    for item in raw:
+        if isinstance(item, dict):
+            entry = {
+                "signal_type": item.get("signal_type", item.get("type", "unknown")),
+                "description": item.get("description", str(item)),
+                "why_misleading": item.get("why_misleading", item.get("reason", "Identified as misleading signal"))
+            }
+            if "file_path" in item:
+                entry["file_path"] = item["file_path"]
+            if "line_number" in item:
+                entry["line_number"] = item["line_number"]
+            result.append(entry)
+        elif isinstance(item, str):
+            result.append({
+                "signal_type": item,
+                "description": item,
+                "why_misleading": "Identified as misleading signal by analysis"
+            })
+    return result
 
 
 def _generate_what_not_to_fix(risk_synthesis: Dict) -> List[Dict]:
-    """Generate what not to fix based on negative ROI optimizations."""
+    """Generate what not to fix based on negative ROI optimizations (schema fields: issue_type, description, rationale, priority_level)."""
     negative_roi_opts = risk_synthesis.get("negative_roi_optimizations", [])
 
     what_not_to_fix = []
     for opt in negative_roi_opts:
         item = {
             "issue_type": opt.get("optimization_type", "unknown"),
-            "why_not_to_fix": opt.get("why_negative_roi", ""),
-            "potential_harm": opt.get("potential_risk", ""),
-            "recommended_alternative": opt.get("recommended_alternative", ""),
-            "evidence_refs": ["negative_roi_analysis"]
+            "description": opt.get("description", opt.get("why_negative_roi", "Negative ROI optimization")),
+            "rationale": opt.get("rationale", opt.get("why_negative_roi", opt.get("potential_risk", "Fixing may introduce more risk than it resolves"))),
+            "priority_level": opt.get("priority_level", "do_not_fix")
         }
+        if item["priority_level"] not in ("do_not_fix", "fix_only_if_safe", "requires_external_coordination"):
+            item["priority_level"] = "do_not_fix"
+        if "file_path" in opt:
+            item["file_path"] = opt["file_path"]
         what_not_to_fix.append(item)
 
     return what_not_to_fix
@@ -631,52 +654,59 @@ def _generate_refusal_artifact(risk_synthesis: Dict, safe_change_surface: Dict) 
 
     if risk_level == "high" or (risk_level == "medium" and not safe_changes):
         return {
-            "reason_for_refusal": f"Repository exhibits {risk_level} risk level with insufficient safe change surface",
-            "missing_or_unknowable_information": ["Security vulnerabilities", "Test coverage gaps", "Dependency issues"],
-            "blast_radius_unbounded_statement": "Changes could affect critical business functionality",
-            "responsible_human_role_required": "Senior technical lead or security officer",
-            "evidence_refs": ["risk_synthesis", "safe_change_surface"]
+            "refusal_reason": f"Repository exhibits {risk_level} risk level with insufficient safe change surface",
+            "refusal_category": "authority_ceiling_exceeded",
+            "refusal_timestamp": "2025-12-23T00:00:00Z",
+            "next_steps": [
+                "Address identified security vulnerabilities",
+                "Improve test coverage before proceeding",
+                "Resolve dependency issues",
+                "Consult senior technical lead or security officer"
+            ]
         }
 
-    return None  # No refusal needed
+    return {}  # No refusal needed — return empty object (schema type: object, not null)
 
 
 def _generate_confidence_and_limits(risk_synthesis: Dict, confidence_assessment: Dict) -> Dict:
-    """Generate confidence and limits artifact."""
+    """Generate confidence and limits artifact (schema requires: overall_confidence, confidence_breakdown, analysis_limits)."""
     risk_confidence = risk_synthesis.get("risk_confidence", 0.8)
+    confidence_factors = confidence_assessment.get("confidence_factors", {})
 
     return {
         "overall_confidence": risk_confidence,
-        "confidence_factors": confidence_assessment.get("confidence_factors", {}),
-        "limitations": [
+        "confidence_breakdown": {
+            "structural_analysis": float(confidence_factors.get("data_completeness", risk_confidence)),
+            "governance_signals": float(confidence_factors.get("analysis_consistency", risk_confidence)),
+            "testing_coverage": float(confidence_factors.get("risk_assessment_confidence", risk_confidence)),
+            "integration_patterns": float(confidence_factors.get("risk_assessment_confidence", risk_confidence))
+        },
+        "analysis_limits": [
             "Analysis based on available code and configuration",
             "External dependencies not fully analyzed",
             "Runtime behavior not observed",
             "Business context not available"
         ],
-        "confidence_thresholds": {
-            "high_confidence_threshold": 0.8,
-            "medium_confidence_threshold": 0.6,
-            "low_confidence_threshold": 0.4
-        },
-        "evidence_refs": ["risk_synthesis", "confidence_assessment"]
+        "assumptions_made": [
+            "Repository represents current production state",
+            "Detected patterns reflect intended design"
+        ]
     }
 
 
 def _generate_validity_window() -> Dict:
-    """Generate validity window for the assessment."""
+    """Generate validity window for the assessment (schema requires: valid_from, valid_until, invalidation_triggers)."""
     # Fixed validity window for determinism
     return {
-        "assessment_timestamp": "2025-12-23T00:00:00Z",
         "valid_from": "2025-12-23T00:00:00Z",
         "valid_until": "2025-12-30T00:00:00Z",  # 7 days validity
-        "expiry_reason": "Code and dependencies may change requiring re-assessment",
-        "reassessment_triggers": [
+        "invalidation_triggers": [
             "New code commits",
             "Dependency updates",
             "Security incidents",
             "Configuration changes"
-        ]
+        ],
+        "recommended_refresh_interval": "7 days"
     }
 
 

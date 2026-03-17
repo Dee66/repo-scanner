@@ -1,5 +1,6 @@
 """Context-aware secret validation with zero false positive goal."""
 
+import re
 from typing import Tuple, Dict, Any
 from .entropy import (
     calculate_shannon_entropy,
@@ -69,6 +70,23 @@ class SecretValidator:
         has_indicator, indicator_reason = contains_test_indicator(secret)
         if has_indicator:
             return False, indicator_reason, 0.1
+        
+        # Layer 3.5: Config key / enum constant exclusion
+        # Dotted identifiers (e.g., "api_server.enabled") are config paths, not secrets
+        if re.match(r'^[\w]+(?:\.[\w]+)+$', secret):
+            return False, f"Looks like a config path: {secret}", 0.1
+        # Simple lowercase single words are typically enum values or constants
+        if re.match(r'^[a-z_]+$', secret) and len(secret) < 30:
+            return False, f"Looks like an enum/constant value: {secret}", 0.1
+        # Check surrounding context for config/schema indicators
+        config_indicators = ('key=', 'key =', 'default=', 'default =',
+                             'ConfigurationSchema', 'choices=', 'choices =')
+        # Get the line containing the secret for context check
+        for line in file_content.splitlines():
+            if secret in line:
+                if any(indicator in line for indicator in config_indicators):
+                    return False, "Appears in config/schema definition context", 0.15
+                break
         
         # Layer 4: Entropy check - lower threshold for format-specific keys
         # AWS keys, JWTs have unique formats but may have lower entropy

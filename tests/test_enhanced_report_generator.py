@@ -449,3 +449,69 @@ class TestEdgeCases:
 
 if __name__ == '__main__':
     pytest.main([__file__, '-v'])
+
+
+class TestSecurityDataPathFix:
+    """Test that report generator reads security data from correct nested path."""
+
+    def test_security_risk_with_nested_patterns(self):
+        """Patterns under unsafe_patterns.patterns_by_language should be found."""
+        results = {
+            'security_analysis': {
+                'unsafe_patterns': {
+                    'patterns_by_language': {
+                        'python': [
+                            {'severity': 'high', 'confidence': 0.9},
+                            {'severity': 'high', 'confidence': 0.8},
+                        ]
+                    }
+                }
+            },
+            'malicious_intent': {'risk_score': 1.0, 'malicious_intent_detected': False},
+        }
+        generator = EnhancedReportGenerator()
+        score = generator._calculate_security_risk(results.get('security_analysis', {}))
+        assert score > 1.0, f"Expected > 1.0, got {score}"
+
+    def test_executive_summary_shows_nested_findings(self):
+        """Executive summary should report finding counts from nested path."""
+        results = {
+            'security_analysis': {
+                'unsafe_patterns': {
+                    'summary': {'high_severity': 5, 'medium_severity': 3},
+                    'patterns_by_language': {
+                        'python': [
+                            {'severity': 'high'},
+                            {'severity': 'high'},
+                        ]
+                    }
+                }
+            },
+            'malicious_intent': {'risk_score': 1.0, 'malicious_intent_detected': False},
+        }
+        generator = EnhancedReportGenerator()
+        report = generator._generate_executive_summary(results, 3.0, 'MEDIUM')
+        # Should NOT say "0" for high severity since we have findings
+        assert 'High Severity Issues:** 0' not in report or 'High Severity Issues:** 2' in report or 'High Severity Issues:** 5' in report
+
+    def test_direct_patterns_still_work(self):
+        """Direct patterns_by_language (standard pipeline format) should still work."""
+        results = {
+            'security_analysis': {
+                'patterns_by_language': {
+                    'python': [
+                        {'severity': 'critical', 'confidence': 0.95},
+                    ]
+                }
+            },
+            'malicious_intent': {'risk_score': 1.0, 'malicious_intent_detected': False},
+        }
+        generator = EnhancedReportGenerator()
+        score = generator._calculate_security_risk(results.get('security_analysis', {}))
+        assert score > 1.0
+
+    def test_empty_security_analysis_graceful(self):
+        """Empty security_analysis should return base score without crashing."""
+        generator = EnhancedReportGenerator()
+        score = generator._calculate_security_risk({})
+        assert score == 1.0

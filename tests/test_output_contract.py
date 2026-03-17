@@ -1,6 +1,8 @@
 """Tests for output contract and quality assurance."""
 
 import json
+from datetime import datetime, timezone
+from pathlib import Path
 
 from src.core.quality.output_contract import generate_primary_report, generate_machine_output, generate_executive_verdict
 
@@ -297,3 +299,51 @@ def test_benchmark_against_golden_repos():
     assert isinstance(result, dict)
     assert "current_metrics" in result
     assert "overall_score" in result
+
+
+class TestMetadataFixes:
+    """Test timestamp, repo name, and overall_score fixes."""
+
+    def test_timestamp_is_real(self):
+        """run_timestamp should be a real ISO datetime, not hardcoded."""
+        analysis = {
+            'files': ['main.py'],
+            'risk_synthesis': {'overall_risk_score': 5.0, 'average_score': 3.0},
+            'security_analysis': {},
+            'malicious_intent': {'risk_score': 1.0, 'malicious_intent_detected': False},
+        }
+        now_before = datetime.now(timezone.utc)
+        report = generate_machine_output(analysis, '/tmp/test-repo')
+        now_after = datetime.now(timezone.utc)
+
+        ts = report.get('metadata', {}).get('run_timestamp', '')
+        assert ts != '2025-01-01T00:00:00Z', "Timestamp should not be hardcoded"
+        parsed = datetime.fromisoformat(ts.replace('Z', '+00:00'))
+        assert now_before <= parsed <= now_after
+
+    def test_repo_name_from_dot_path(self):
+        """Repo name should resolve to actual directory name, not empty string."""
+        analysis = {
+            'files': ['main.py'],
+            'risk_synthesis': {'overall_risk_score': 3.0},
+            'security_analysis': {},
+            'malicious_intent': {'risk_score': 1.0, 'malicious_intent_detected': False},
+        }
+        report = generate_machine_output(analysis, '.')
+        repo_name = report.get('repository', {}).get('name', '')
+        assert repo_name != '', "Repo name should not be empty when path is '.'"
+        assert repo_name == Path('.').resolve().name
+
+    def test_overall_score_from_risk_synthesis(self):
+        """overall_score should pull from risk_synthesis, not be 0.0."""
+        analysis = {
+            'files': ['main.py'],
+            'risk_synthesis': {
+                'overall_risk_assessment': {'average_risk_score': 7.5},
+            },
+            'security_analysis': {},
+            'malicious_intent': {'risk_score': 1.0, 'malicious_intent_detected': False},
+        }
+        report = generate_machine_output(analysis, '/tmp/test-repo')
+        score = report.get('summary', {}).get('overall_score', -1)
+        assert score == 7.5, f"Expected 7.5, got {score}"
