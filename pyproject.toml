@@ -44,7 +44,7 @@ dependencies = [
     "syft>=0.83.0",
     "grype>=0.64.0",
     "license-expression>=30.4.4",
-    "pydot>=1.4.0",
+    "pydot>=4.0.1",
     "graphviz>=0.20.0",
     # New libraries for best-in-class scanner
     "pygit2>=1.15.0",
