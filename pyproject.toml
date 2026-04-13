@@ -88,7 +88,7 @@ api = [
     "pydantic>=2.5.0",
     "aiofiles>=23.2.1",
     "opentelemetry-distro>=0.45b0",
-    "opentelemetry-instrumentation-fastapi>=0.45b0",
+    "opentelemetry-instrumentation-fastapi>=0.62b0",
     "opentelemetry-exporter-jaeger>=1.21b0",
 ]
 ai = [
